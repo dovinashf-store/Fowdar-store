@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fowdar Store">
+<meta name="theme-color" content="#0d0f14">
+<title>Fowdar Store Tracker</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+/* ── Base app styles ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body,#root{height:100%;background:#0d0f14;color:#e8eaf0;}
+body{overscroll-behavior:none;}
+input,button{font-family:inherit;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:#0d0f14;}
+::-webkit-scrollbar-thumb{background:#2a2f3f;border-radius:2px;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* ── Order module design system ── */
+
+/* ===========================================================
+   Fowdar Store — Order module
+   Design tokens matched to the existing app shell
+   =========================================================== */
+
+:root {
+  /* Surfaces */
+  --bg:           #0a0a0a;
+  --bg-1:         #111111;
+  --panel:        #151515;
+  --panel-hover:  #1b1b1b;
+  --panel-2:      #1d1d1d;
+  --border:       #242424;
+  --border-soft:  #1e1e1e;
+  --border-strong:#2f2f2f;
+
+  /* Text */
+  --text:         #f5f5f5;
+  --text-dim:     #a3a3a3;
+  --text-muted:   #6e6e6e;
+  --text-faint:   #4a4a4a;
+
+  /* Accent — bright lime green from the existing app */
+  --accent:       #8aff7a;
+  --accent-soft:  #8aff7a26;
+  --accent-line:  #8aff7a3d;
+
+  /* Status */
+  --warn:         #f5c97a;
+  --warn-soft:    #f5c97a1f;
+  --danger:       #ff6f6f;
+  --danger-soft:  #ff6f6f1f;
+  --info:         #7ab7ff;
+  --info-soft:    #7ab7ff1f;
+
+  /* Type */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* Radii / shadows */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --shadow-1: 0 1px 0 rgba(255,255,255,.03) inset, 0 1px 2px rgba(0,0,0,.4);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button { font-family: inherit; }
+input, textarea, select { font-family: inherit; color: inherit; }
+
+/* ============== App shell ============== */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.appbar-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 28px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: start;
+}
+
+.brand-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.brand-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  background: none;
+  border: none;
+  padding: 0 0 6px 0;
+  cursor: pointer;
+  transition: color .15s ease;
+  width: max-content;
+}
+.brand-back:hover { color: var(--text-dim); }
+.brand-back svg { width: 12px; height: 12px; }
+
+.brand-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  margin: 0;
+  line-height: 1.1;
+}
+.brand-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+}
+
+.appbar-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.refresh-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.refresh-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.refresh-btn svg { width: 14px; height: 14px; }
+
+.totals {
+  text-align: right;
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+.totals .label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.totals .value {
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+/* ============== Tabs ============== */
+.tabs {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg);
+}
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  padding: 14px 14px;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color .15s ease;
+}
+.tab:hover { color: var(--text-dim); }
+.tab.active { color: var(--text); }
+.tab.active::after {
+  content: "";
+  position: absolute;
+  left: 12px; right: 12px; bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+.tab .count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--panel);
+  color: var(--text-dim);
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.tab.active .count {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
+/* ============== Page layout ============== */
+.page {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 26px 28px 80px;
+  flex: 1;
+}
+
+.section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 14px 0;
+  font-weight: 500;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0 22px;
+  flex-wrap: wrap;
+}
+.page-head h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.page-head .sub {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============== Inputs ============== */
+.field {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0 12px 0 38px;
+  height: 38px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s ease, background .15s ease;
+}
+.field:focus { border-color: var(--accent-line); background: var(--panel-hover); }
+.field::placeholder { color: var(--text-muted); }
+
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+.search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.controls-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12.5px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.chip:hover { color: var(--text); border-color: var(--border-strong); }
+.chip.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+/* ============== Buttons ============== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--r-md);
+  padding: 9px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--panel-hover); border-color: var(--border-strong); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn svg { width: 14px; height: 14px; }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0a1a06;
+  font-weight: 600;
+}
+.btn-primary:hover { background: #9bff8d; border-color: #9bff8d; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-dim);
+}
+.btn-ghost:hover { background: var(--panel); color: var(--text); }
+
+.btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* ============== Cards ============== */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.card.hoverable { cursor: pointer; }
+.card.hoverable:hover {
+  border-color: var(--border-strong);
+  background: var(--panel-hover);
+}
+
+/* ============== Supplier list ============== */
+.supplier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+.supplier-card {
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.supplier-emoji {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+}
+.supplier-info .name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+}
+.supplier-info .meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.supplier-info .meta .dot { margin: 0 6px; color: var(--text-faint); }
+.supplier-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.supplier-status .item-count {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* ============== Catalogue ============== */
+.catalogue-head {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 18px 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.catalogue-head .supplier-emoji {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  font-size: 28px;
+}
+.catalogue-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.catalogue-head .meta-line {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.catalogue-head .meta-line .dot { margin: 0 6px; color: var(--text-faint); }
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.product-row {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr 130px 130px 150px;
+  gap: 16px;
+  align-items: center;
+  transition: border-color .15s ease, background .15s ease;
+}
+.product-row:hover { border-color: var(--border-strong); }
+.product-row.in-cart {
+  background: linear-gradient(90deg, #0c1a09 0%, var(--panel) 100%);
+  border-color: var(--accent-line);
+}
+
+.product-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+.product-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.product-meta .last-ordered {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.product-meta .last-ordered::before {
+  content: "·";
+  color: var(--text-faint);
+}
+
+.product-pack, .product-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: right;
+}
+.product-pack .label, .product-price .label {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 2px;
+  font-family: var(--font-sans);
+}
+.product-price .value { color: var(--text); font-weight: 600; }
+
+/* Quantity stepper */
+.qty {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 130px;
+  margin-left: auto;
+}
+.qty button {
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background .15s ease, color .15s ease;
+}
+.qty button:hover:not(:disabled) { background: var(--panel-hover); color: var(--text); }
+.qty button:disabled { opacity: .35; cursor: not-allowed; }
+.qty .value {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+  min-width: 30px;
+}
+.qty.empty .value { color: var(--text-muted); }
+.qty.in-cart {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+.qty.in-cart .value { color: var(--accent); font-weight: 600; }
+
+/* ============== Cart sidebar ============== */
+.catalogue-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.cart-summary {
+  position: sticky;
+  top: 130px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cart-summary h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cart-summary h3 .count {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+.cart-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-soft);
+}
+.cart-item:last-child { border-bottom: none; }
+.cart-item .name { font-size: 13px; font-weight: 500; }
+.cart-item .meta { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+.cart-item .line-total {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+}
+.cart-item .remove {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 11px;
+  margin-top: 2px;
+  cursor: pointer;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+.cart-item .remove:hover { color: var(--danger); }
+
+.cart-empty {
+  padding: 24px 6px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.cart-empty .hint {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.cart-totals {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cart-totals .line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.cart-totals .line.grand {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 600;
+}
+.cart-totals .line.grand .amount { color: var(--accent); }
+
+/* ============== Order history ============== */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.order-card {
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+}
+.order-card .order-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.order-card .supplier-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 0;
+}
+.order-card .order-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 3px;
+}
+.order-card .order-meta .dot { margin: 0 6px; color: var(--text-faint); }
+.order-card .order-total {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.status .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status.draft     { color: var(--text-muted); border-color: var(--border-strong); background: var(--panel-2); }
+.status.pending   { color: var(--warn);       border-color: #f5c97a4d; background: var(--warn-soft); }
+.status.confirmed { color: var(--info);       border-color: #7ab7ff4d; background: var(--info-soft); }
+.status.delivered { color: var(--accent);     border-color: var(--accent-line); background: var(--accent-soft); }
+.status.cancelled { color: var(--danger);     border-color: #ff6f6f4d; background: var(--danger-soft); }
+
+/* ============== Order detail drawer ============== */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  animation: fade .2s ease;
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.drawer {
+  width: min(560px, 100%);
+  height: 100%;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  animation: slidein .25s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes slidein { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.drawer-head {
+  padding: 22px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.drawer-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.drawer-head .sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+.drawer-close {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.drawer-close:hover { color: var(--text); }
+
+.drawer-body {
+  padding: 18px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 22px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px; top: 8px; bottom: 8px;
+  width: 1px;
+  background: var(--border);
+}
+.tl-step {
+  position: relative;
+  padding: 6px 0;
+}
+.tl-step::before {
+  content: "";
+  position: absolute;
+  left: -22px; top: 12px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border-strong);
+}
+.tl-step.done::before { border-color: var(--accent); background: var(--accent); }
+.tl-step.current::before { border-color: var(--accent); background: var(--bg); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tl-step .label { font-size: 13.5px; font-weight: 500; }
+.tl-step.pending .label { color: var(--text-muted); }
+.tl-step .time { font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+
+.drawer-table {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.drawer-table .row {
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 60px 90px;
+  gap: 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.drawer-table .row:last-child { border-bottom: none; }
+.drawer-table .row.header {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-1);
+}
+.drawer-table .row .qty-cell, .drawer-table .row .total-cell {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+.drawer-table .totals-row {
+  background: var(--bg-1);
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.drawer-table .totals-row.grand {
+  font-weight: 600;
+  font-size: 15px;
+}
+.drawer-table .totals-row.grand .amount { color: var(--accent); }
+
+/* ============== Empty state ============== */
+.empty-state {
+  padding: 56px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+}
+.empty-state .glyph {
+  font-size: 32px;
+  margin-bottom: 10px;
+  opacity: .6;
+}
+.empty-state h3 {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin: 0 0 6px 0;
+  font-weight: 500;
+}
+.empty-state p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ============== Floating cart (mobile) ============== */
+.fab-cart {
+  position: fixed;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  background: var(--accent);
+  color: #0a1a06;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.2);
+}
+.fab-cart .count {
+  background: rgba(0,0,0,.18);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+}
+
+/* ============== Responsive ============== */
+@media (max-width: 920px) {
+  .catalogue-layout {
+    grid-template-columns: 1fr;
+  }
+  .cart-summary { display: none; }
+  .product-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+  .product-row .product-pack { display: none; }
+  .product-row .product-price {
+    grid-column: 1 / 2;
+    grid-row: 2;
+    text-align: left;
+  }
+  .product-row .product-price .label { display: inline; margin-right: 6px; }
+  .product-row .qty {
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .fab-cart.show { display: flex; }
+  .order-card {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 8px 14px;
+  }
+  .order-card .order-id { grid-column: 1; grid-row: 1; justify-self: start; }
+  .order-card .status { grid-column: 2; grid-row: 1; justify-self: end; }
+  .order-card .supplier-info-block { grid-column: 1 / 3; grid-row: 2; }
+  .order-card .order-total { grid-column: 1 / 3; grid-row: 3; text-align: left; }
+}
+
+@media (max-width: 640px) {
+  .appbar-inner { padding: 14px 16px 10px; }
+  .tabs { padding: 0 16px; overflow-x: auto; }
+  .page { padding: 20px 16px 100px; }
+  .brand-title { font-size: 22px; }
+  .supplier-grid { grid-template-columns: 1fr; }
+}
+
+/* ============== Toast ============== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #0a1a06;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 60;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  animation: toast-in .25s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes toast-in {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  
+
+/* ── Order module ── */
+.fowdar-order-module { font-family: var(--font-sans); }
+
+/* supplier grid responsive */
+.supplier-grid { grid-template-columns: 1fr; }
+@media(min-width:480px){ .supplier-grid { grid-template-columns: repeat(2,1fr); } }
+@media(min-width:768px){ .supplier-grid { grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); } }
+
+/* catalogue layout responsive */
+@media(max-width:767px){
+  .catalogue-layout { grid-template-columns: 1fr !important; }
+  .cart-summary { display: none; }
+  .product-row { grid-template-columns: 1fr 140px !important; grid-template-rows: auto auto; }
+  .product-row .product-price { grid-column: 1/2; grid-row: 2; text-align: left; }
+  .product-row .product-price .label { display: inline; margin-right: 6px; }
+  .product-row .qty { grid-column: 2/3; grid-row: 1/3; align-self: center; }
+  .fab-cart.show { display: flex !important; }
+  .order-card { grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; gap: 8px 14px; }
+  .order-card .order-id { grid-column:1; grid-row:1; justify-self:start; }
+  .order-card .status { grid-column:2; grid-row:1; justify-self:end; }
+  .order-card .supplier-info-block { grid-column:1/3; grid-row:2; }
+  .order-card .order-total { grid-column:1/3; grid-row:3; text-align:left; }
+}
+
+/* page-head inside order module */
+.fowdar-order-module .page-head h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+.fowdar-order-module .sub { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script type="text/babel">
+const SUPABASE_URL = "https://daijpydvfndihttpawum.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhaWpweWR2Zm5kaWh0dHBhd3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NTgzMzcsImV4cCI6MjA5NDQzNDMzN30.nyaybR2b3CoXvWBMSB-CKq8GAVmy08SQ-qoO6XKmE0U";
+const LS_KEY = "fowdar_v4";
+const DESC_KEYS = ["description","item description","product description","article description","product","products","desc","item","product name","article","brands","brand"];
+
+const C = {
+  bg:"#0d0f14", surf:"#161920", surf2:"#1e2230", bdr:"#2a2f3f",
+  accent:"#00e5a0", blue:"#0077ff", warn:"#ff9f43", text:"#e8eaf0",
+  muted:"#6b7280", danger:"#ff5e5e", rec:"#ffa500", purple:"#a855f7"
+};
+
+function fmt(n){
+  if(n===null||n===undefined||isNaN(n))return "0.00";
+  return Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function loadLS(){
+  try{const r=localStorage.getItem(LS_KEY);if(r)return JSON.parse(r);}catch(e){}
+  return{cellEdits:{},removedRows:{},payments:{},inventory:{},orders:[],custOrders:[]};
+}
+function saveLS(ce,rr,pay,inv,ord,cord){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({cellEdits:ce,removedRows:rr,payments:pay,inventory:inv,orders:ord||[],custOrders:cord||[]}));}catch(e){}
+}
+async function fetchSupabase(){
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/fowdar_invoices?select=*",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
+    if(!r.ok)return null;return await r.json();
+  }catch(e){return null;}
+}
+async function fetchStore(){
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/fowdar_store?key=eq.fowdar_v4&select=value",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
+    if(!r.ok)return null;
+    const d=await r.json();
+    if(d&&d[0]&&d[0].value)return JSON.parse(d[0].value);
+    return null;
+  }catch(e){return null;}
+}
+async function pushStore(ce,rr,pay,inv,ord,cord){
+  try{
+    await fetch(SUPABASE_URL+"/rest/v1/fowdar_store",{
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates"},
+      body:JSON.stringify({key:"fowdar_v4",value:JSON.stringify({cellEdits:ce,removedRows:rr,payments:pay,inventory:inv,orders:ord||[],custOrders:cord||[]}),updated_at:new Date().toISOString()})
+    });
+  }catch(e){}
+}
+function buildSuppliers(rows){
+  const out={};
+  if(!rows)return out;
+  rows.forEach(function(row){
+    const name=row.supplier_name||row.id;
+    const invoices=(row.invoices||[]).slice().sort(function(a,b){return(b.date||"").localeCompare(a.date||"");});
+    out[name]={meta:row.meta||{},invoices:invoices};
+  });
+  return out;
+}
+function calcRec(inv,ri,row,supMeta){
+  // Returns BUYING PRICE + VAT (cost per unit inclusive of VAT, no margin)
+  const cols=inv.cols||[];
+  const vat=inv.vatRate||1.0;
+  const qty=(inv.qtyCol!==null&&inv.qtyCol!==undefined)?(parseFloat(row[inv.qtyCol])||1):1;
+  const pack=(inv.packCol!==null&&inv.packCol!==undefined)?(parseFloat(row[inv.packCol])||1):1;
+  const supName=(supMeta&&supMeta.supplier)||"";
+
+  // 1. SHEET_REC overrides - handwritten prices, pre-filled rec prices
+  const sr=inv.SHEET_REC;
+  if(sr){
+    const code=String(row[0]);
+    if(sr[code]!==undefined)return Number(sr[code]);
+    if(sr[ri]!==undefined)return Number(sr[ri]);
+    // Tea Blenders: keyed by product name (col 1)
+    const nm=String(row[1]||"").trim();
+    if(nm&&sr[nm]!==undefined)return Number(sr[nm]);
+  }
+
+  // 2. RR Rapid Service: items by dozen, 25% margin baked into Buy+VAT display
+  if(supMeta&&supMeta.recPriceRule==="per_unit_dozen"){
+    const dozSize=supMeta.dozSize||12;
+    const amt=parseFloat(row[inv.amountCol]);
+    if(!isNaN(amt)&&qty>0)return(amt/qty/dozSize)*vat;
+    return null;
+  }
+
+  // 3. BrandActiv: use "Unit prc excl Vat" column (not Rec.Cons which is selling price)
+  if(supName.indexOf("BrandActiv")>=0||supName.indexOf("IBL")>=0){
+    const unitExclIdx=cols.findIndex(function(c){return c.toLowerCase()==="unit prc excl vat";});
+    if(unitExclIdx>=0){
+      // Find VAT% column
+      const vatPctIdx=cols.findIndex(function(c){const cl=c.toLowerCase();return cl==="vat %"||cl==="vat%";});
+      const rowVat=vatPctIdx>=0?(parseFloat(row[vatPctIdx])||0):0;
+      const vatMult=rowVat>0?(1+rowVat/100):1.0;
+      // Find discount col to get unit disc prc
+      const unitDiscIdx=cols.findIndex(function(c){return c.toLowerCase()==="unit disc prc excl vat";});
+      let buyPrice;
+      if(unitDiscIdx>=0){
+        const v=parseFloat(row[unitDiscIdx]);
+        if(!isNaN(v))buyPrice=v*vatMult;
+      }
+      if(!buyPrice){
+        const v=parseFloat(row[unitExclIdx]);
+        if(!isNaN(v))buyPrice=v*vatMult;
+      }
+      if(buyPrice)return buyPrice;
+    }
+  }
+
+  // 4. Lim How Brothers: use Price(Ex) column (excl VAT buying price)
+  if(supName.indexOf("Lim How")>=0){
+    const priceExIdx=cols.findIndex(function(c){return c.toLowerCase()==="price (ex)";});
+    if(priceExIdx>=0){
+      const v=parseFloat(row[priceExIdx]);
+      if(!isNaN(v))return v*vat;
+    }
+  }
+
+  // 5. Cadi Fortune: prices already VAT-inclusive, return amount/qty directly
+  if(supName.indexOf("Cadi Fortune")>=0){
+    const amt=parseFloat(row[inv.amountCol]);
+    if(!isNaN(amt)&&qty>0)return amt/qty;
+    return null;
+  }
+
+  // 6. Innodis: carton (CT) quantities - extract pack size from product name
+  if(supName.indexOf("Innodis")>=0){
+    const qtyStr=String(row[inv.qtyCol]||"");
+    const isCT=qtyStr.toUpperCase().indexOf("CT")>=0;
+    if(isCT){
+      // Extract number from qty string e.g. "2CT" -> 2
+      const ctQty=parseFloat(qtyStr)||1;
+      // Extract units per carton from product name e.g. "x36" -> 36
+      const prodName=String(row[1]||"");
+      const match=prodName.match(/[xX]([0-9]+)/);
+      const unitsPerCtn=match?parseInt(match[1]):1;
+      const totalUnits=ctQty*unitsPerCtn;
+      const amt=parseFloat(row[inv.amountCol]);
+      if(!isNaN(amt)&&totalUnits>0)return(amt/totalUnits)*vat;
+      return null;
+    }
+  }
+
+  // 7. Standard column detection
+  const ucpIdx=cols.findIndex(function(c){const cl=c.toLowerCase();return cl==="unit price"||cl==="ucp";});
+  const puIdx=cols.findIndex(function(c){return c.toLowerCase()==="price/unit";});
+  // Price (Ex) generic
+  const priceExIdx=cols.findIndex(function(c){return c.toLowerCase()==="price (ex)";});
+  // Unit prc excl vat generic
+  const unitExclIdx=cols.findIndex(function(c){return c.toLowerCase()==="unit prc excl vat";});
+
+  if(ucpIdx>=0){const v=parseFloat(row[ucpIdx]);if(!isNaN(v))return v*vat;}
+  if(puIdx>=0){const v=parseFloat(row[puIdx]);if(!isNaN(v))return v*vat;}
+  if(priceExIdx>=0){const v=parseFloat(row[priceExIdx]);if(!isNaN(v))return v*vat;}
+  if(unitExclIdx>=0){const v=parseFloat(row[unitExclIdx]);if(!isNaN(v))return v*vat;}
+
+  // 8. Fallback: amount / qty / pack * vat
+  const amt=parseFloat(row[inv.amountCol]);
+  if(!isNaN(amt)&&qty>0&&pack>0)return(amt/qty/pack)*vat;
+  return null;
+}
+function buildPriceHistory(SUPPLIERS){
+  const hist={};
+  Object.keys(SUPPLIERS).forEach(function(sn){
+    const sup=SUPPLIERS[sn];hist[sn]={};
+    sup.invoices.forEach(function(inv){
+      const cols=inv.cols||[];
+      const di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+      if(di<0)return;
+      inv.rows.forEach(function(row){
+        const name=String(row[di]||"").trim();if(!name)return;
+        const price=parseFloat(row[inv.amountCol]);
+        const qty=(inv.qtyCol!==null&&inv.qtyCol!==undefined)?(parseFloat(row[inv.qtyCol])||1):1;
+        const unitPrice=(!isNaN(price)&&qty>0)?price/qty:null;
+        if(unitPrice===null)return;
+        if(!hist[sn][name])hist[sn][name]=[];
+        hist[sn][name].push({date:inv.date||"",price:unitPrice,invoiceId:inv.id});
+      });
+    });
+    Object.keys(hist[sn]).forEach(function(pn){hist[sn][pn].sort(function(a,b){return a.date.localeCompare(b.date);});});
+  });
+  return hist;
+}
+function getWeekLabel(){
+  // Returns "Week X of MonthName YYYY" for the FOLLOWING week (used on Sundays)
+  const now=new Date();
+  const nextWeek=new Date(now.getTime()+7*24*60*60*1000);
+  const yr=nextWeek.getFullYear();
+  const mo=nextWeek.getMonth();
+  const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const firstDay=new Date(yr,mo,1);
+  const dayOfWeek=firstDay.getDay();
+  const offset=(dayOfWeek===0)?0:(7-dayOfWeek);
+  const firstMonday=new Date(yr,mo,1+offset);
+  const weekNum=Math.ceil((nextWeek.getDate()-offset)/7);
+  return "Week "+weekNum+" of "+months[mo]+" "+yr;
+}
+function getLatestUnitPrice(SUPPLIERS,supName,prodName){
+  const sup=SUPPLIERS[supName];
+  if(!sup)return null;
+  // find the most recent invoice row matching this product
+  const di_cache={};
+  let latest=null;
+  sup.invoices.forEach(function(inv){
+    const cols=inv.cols||[];
+    const di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+    if(di<0)return;
+    inv.rows.forEach(function(row){
+      const nm=String(row[di]||"").trim();
+      if(nm!==prodName)return;
+      const amt=parseFloat(row[inv.amountCol]);
+      const qty=(inv.qtyCol!==null&&inv.qtyCol!==undefined)?(parseFloat(row[inv.qtyCol])||1):1;
+      const pack=(inv.packCol!==null&&inv.packCol!==undefined)?(parseFloat(row[inv.packCol])||1):1;
+      const unitPrice=(!isNaN(amt)&&qty>0&&pack>0)?(amt/qty/pack):null;
+      if(unitPrice!==null){
+        if(!latest||inv.date>latest.date){
+          latest={price:unitPrice,date:inv.date,total:amt,qty:qty};
+        }
+      }
+    });
+  });
+  return latest;
+}
+function getSupProducts(sup){
+  const prods=[];
+  sup.invoices.forEach(function(inv){
+    const di=(inv.cols||[]).findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+    if(di<0)return;
+    inv.rows.forEach(function(row){
+      const nm=String(row[di]||"").trim();
+      if(nm&&prods.indexOf(nm)<0)prods.push(nm);
+    });
+  });
+  return prods;
+}
+
+function App(){
+  const [SUPPLIERS,   setSuppliers]   = React.useState({});
+  const [screen,      setScreen]      = React.useState("menu");
+  const [subScreen,   setSubScreen]   = React.useState(null); // for drill-downs: catalogue-supplier, inventory-supplier
+  const [tab,         setTab]         = React.useState(null);
+  const [search,      setSearch]      = React.useState("");
+  const [editMode,    setEditMode]    = React.useState(false);
+  const [cellEdits,   setCellEdits]   = React.useState({});
+  const [removedRows, setRemovedRows] = React.useState({});
+  const [payments,    setPayments]    = React.useState({});
+  const [inventory,   setInventory]   = React.useState({});
+  const [loading,     setLoading]     = React.useState(true);
+  const [refreshing,  setRefreshing]  = React.useState(false);
+  const [pullY,       setPullY]       = React.useState(0);
+  const [pulling,     setPulling]     = React.useState(false);
+  const [touchStartY, setTouchStartY] = React.useState(0);
+  const [dayFilter,   setDayFilter]   = React.useState(null);
+  const [sortMode,    setSortMode]    = React.useState("received");
+  const [catSort,     setCatSort]     = React.useState("az");
+  const [priceFilter, setPriceFilter] = React.useState("changed");
+  const [invFilter,   setInvFilter]   = React.useState("all"); // all | low | ok
+  const [toast,       setToast]       = React.useState(null);
+  const [orderItems,  setOrderItems]  = React.useState({});
+  const [orderSort,   setOrderSort]   = React.useState("az");
+  const [orders,      setOrders]      = React.useState([]);
+  const [orderSubScreen,setOrderSubScreen]=React.useState(null);
+  const [orderTab,    setOrderTab]    = React.useState(null);
+  const [orderMainTab,setOrderMainTab]= React.useState("taken"); // taken | create
+  const [custOrders,  setCustOrders]  = React.useState([]); // customer orders taken
+  const [custOrderSort,setCustOrderSort]=React.useState("newest");
+  const [custOrderFilter,setCustOrderFilter]=React.useState("all"); // all | pending | done
+  const [newCustOrder,setNewCustOrder]=React.useState({customer:"",product:"",qty:"",note:""});
+  // ── Order module state (must be top-level, not inside if blocks) ──
+  const [orderView,    setOrderView]    = React.useState("suppliers");
+  const [activeSupId,  setActiveSupId]  = React.useState(null);
+  const [activeOrderId,setActiveOrderId]= React.useState(null);
+  const [orderCarts,   setOrderCarts]   = React.useState({});
+  const [orderToast,   setOrderToast]   = React.useState(null);
+  const [ordQ,         setOrdQ]         = React.useState("");
+  const [ordFilter,    setOrdFilter]    = React.useState("all");
+  const [histQ,        setHistQ]        = React.useState("");
+  const [histStatus,   setHistStatus]   = React.useState("all");
+  const [catQ,         setCatQ]         = React.useState("");
+  const [catFilter,    setCatFilter]    = React.useState("all");
+
+  React.useEffect(function(){if(!orderToast)return;const t=setTimeout(function(){setOrderToast(null);},2400);return function(){clearTimeout(t);};},[orderToast]);
+  const totalCartLines=React.useMemo(function(){var n=0;Object.values(orderCarts).forEach(function(c){n+=Object.keys(c).length;});return n;},[orderCarts]);
+  const totalCartValue=React.useMemo(function(){
+    var v=0;
+    Object.entries(orderCarts).forEach(function(entry){
+      var sid=entry[0];var c=entry[1];var sup=SUPPLIERS[sid];if(!sup)return;
+      var prods=getSupProducts(sup);
+      Object.entries(c).forEach(function(e2){
+        var pi=parseInt((e2[0].split("_prod_")[1]||"NaN"));
+        if(!isNaN(pi)&&pi<prods.length){var latest=getLatestUnitPrice(SUPPLIERS,sid,prods[pi]);if(latest)v+=latest.price*e2[1];}
+      });
+    });
+    return v*1.15;
+  },[orderCarts,SUPPLIERS]);
+  const pendingOrderCount=React.useMemo(function(){return(orders||[]).filter(function(o){return o.status==="pending";}).length;},[orders]);
+
+  React.useEffect(function(){
+    const ls=loadLS();
+    setCellEdits(ls.cellEdits||{});setRemovedRows(ls.removedRows||{});
+    setPayments(ls.payments||{});setInventory(ls.inventory||{});
+    fetchSupabase().then(function(rows){
+      if(rows)setSuppliers(buildSuppliers(rows));
+      fetchStore().then(function(stored){
+        if(stored){
+          const ce=stored.cellEdits||ls.cellEdits||{};
+          const rr=stored.removedRows||ls.removedRows||{};
+          const pay=stored.payments||ls.payments||{};
+          const inv=stored.inventory||ls.inventory||{};
+          const ord=stored.orders||ls.orders||[];
+          const cord=stored.custOrders||ls.custOrders||[];
+          setCellEdits(ce);setRemovedRows(rr);setPayments(pay);setInventory(inv);
+          setOrders(ord);setCustOrders(cord);
+          saveLS(ce,rr,pay,inv,ord,cord);
+        }
+        setLoading(false);
+      });
+    });
+  },[]);
+
+  function showToast(msg){setToast(msg);setTimeout(function(){setToast(null);},2000);}
+
+  function refreshData(){
+    setRefreshing(true);
+    fetchSupabase().then(function(rows){
+      if(rows)setSuppliers(buildSuppliers(rows));
+      fetchStore().then(function(stored){
+        if(stored){
+          const ls=loadLS();
+          const ce=stored.cellEdits||ls.cellEdits||{};
+          const rr=stored.removedRows||ls.removedRows||{};
+          const pay=stored.payments||ls.payments||{};
+          const inv=stored.inventory||ls.inventory||{};
+          setCellEdits(ce);setRemovedRows(rr);setPayments(pay);setInventory(inv);
+          saveLS(ce,rr,pay,inv);
+        }
+        setRefreshing(false);showToast("Refreshed");
+      });
+    });
+  }
+
+  function onTouchStart(e){if(window.scrollY===0)setTouchStartY(e.touches[0].clientY);}
+  function onTouchMove(e){
+    if(touchStartY===0)return;
+    const dy=e.touches[0].clientY-touchStartY;
+    if(dy>0&&window.scrollY===0){setPulling(true);setPullY(Math.min(dy*0.4,70));}
+  }
+  function onTouchEnd(){if(pullY>50)refreshData();setPulling(false);setPullY(0);setTouchStartY(0);}
+
+  function persist(ce,rr,pay,inv,ord,cord){saveLS(ce,rr,pay,inv,ord,cord);pushStore(ce,rr,pay,inv,ord,cord);}
+  function setCE(key,val){const nce=Object.assign({},cellEdits);nce[key]=val;setCellEdits(nce);persist(nce,removedRows,payments,inventory,orders,custOrders);}
+  function doRemoveRow(invKey,ri){const nrr=Object.assign({},removedRows);if(!nrr[invKey])nrr[invKey]={};nrr[invKey][ri]=true;setRemovedRows(nrr);persist(cellEdits,nrr,payments,inventory,orders,custOrders);}
+  function setPayVal(key,val){const np=Object.assign({},payments);np[key]=val;setPayments(np);persist(cellEdits,removedRows,np,inventory,orders,custOrders);}
+  function setInvVal(key,val){const ni=Object.assign({},inventory);ni[key]=val;setInventory(ni);persist(cellEdits,removedRows,payments,ni,orders,custOrders);}
+
+  function goMenu(){setScreen("menu");setSubScreen(null);setTab(null);setSearch("");setEditMode(false);}
+
+  const supNames=Object.keys(SUPPLIERS);
+
+  const allDays=React.useMemo(function(){
+    const ds={};
+    supNames.forEach(function(sn){
+      (SUPPLIERS[sn].invoices||[]).forEach(function(inv){
+        const d=inv.receivedAt?inv.receivedAt.split("T")[0]:null;
+        if(d)ds[d]=true;
+      });
+    });
+    return Object.keys(ds).sort(function(a,b){return b.localeCompare(a);});
+  },[SUPPLIERS]);
+
+  React.useEffect(function(){if(allDays.length>0&&!dayFilter)setDayFilter(allDays[0]);},[allDays]);
+
+  function getDayLabel(d){
+    const p=d.split("-");
+    const m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return p[2]+" "+m[parseInt(p[1],10)-1];
+  }
+  function getSupsForDay(day){
+    const result=[];
+    supNames.forEach(function(sn){
+      const matched=(SUPPLIERS[sn].invoices||[]).filter(function(inv){return(inv.receivedAt?inv.receivedAt.split("T")[0]:null)===day;});
+      if(matched.length>0)result.push({name:sn,total:matched.reduce(function(a,i){return a+i.total;},0),latest:matched[0].receivedAt||""});
+    });
+    result.sort(function(a,b){
+      if(sortMode==="az")return a.name.localeCompare(b.name);
+      if(sortMode==="za")return b.name.localeCompare(a.name);
+      if(sortMode==="high")return b.total-a.total;
+      if(sortMode==="low")return a.total-b.total;
+      return b.latest.localeCompare(a.latest);
+    });
+    return result;
+  }
+
+  const priceHistory=React.useMemo(function(){return buildPriceHistory(SUPPLIERS);},[SUPPLIERS]);
+
+  const ISt={background:C.surf,border:"1px solid "+C.bdr,borderRadius:8,padding:"9px 12px",color:C.text,fontSize:13,width:"100%",outline:"none",boxSizing:"border-box",marginBottom:12};
+  const SC={background:C.surf2,borderRadius:10,padding:"10px 12px",flex:1,border:"1px solid "+C.bdr,minWidth:0};
+  const CISt={background:C.surf2,border:"1px solid "+C.bdr,borderRadius:4,padding:"4px 6px",color:C.text,fontSize:11,width:"100%",minWidth:50,outline:"none",boxSizing:"border-box"};
+
+  // BACK BAR component
+  function BackBar(props){
+    return(
+      <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,paddingTop:"max(10px,env(safe-area-inset-top))",paddingBottom:"10px",paddingLeft:"12px",paddingRight:"12px",position:"sticky",top:0,zIndex:200}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={props.onBack}
+            style={{background:props.accent?C.accent:C.surf2,border:props.accent?"none":"1px solid "+C.bdr,borderRadius:10,padding:"10px 16px",color:props.accent?"#000":C.accent,fontWeight:800,fontSize:14,cursor:"pointer",flexShrink:0}}>
+            {"< "+(props.backLabel||"Back")}
+          </button>
+          {props.title&&<div style={{fontWeight:800,fontSize:15,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:C.text}}>{props.title}</div>}
+          {props.right&&props.right}
+        </div>
+      </div>
+    );
+  }
+
+  // SORT PILLS component
+  function SortPills(props){
+    return(
+      <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:12,paddingBottom:2}}>
+        {props.options.map(function(o){
+          const active=props.value===o[0];
+          return(
+            <button key={o[0]} onClick={function(){props.onChange(o[0]);}}
+              style={{padding:"5px 12px",borderRadius:20,fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0,
+                background:active?props.color||C.blue:C.surf2,color:active?"#000":C.muted,
+                border:"1px solid "+(active?props.color||C.blue:C.bdr)}}>
+              {o[1]}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ── SUPPLIER INVOICE DETAIL ──────────────────────────────────────
+  if(screen==="supplier"&&tab){
+    const sup=SUPPLIERS[tab];
+    if(!sup)return <div style={{background:C.bg,padding:20,color:C.text,fontFamily:"-apple-system,sans-serif"}}><BackBar onBack={goMenu} title="Not found" accent/></div>;
+    const spend=sup.invoices.reduce(function(a,i){return a+i.total;},0);
+    const items=sup.invoices.reduce(function(a,i){return a+i.rows.length;},0);
+    const lq=search.toLowerCase();
+    const groups={};
+    sup.invoices.forEach(function(inv){
+      if(search&&!inv.rows.some(function(r){return r.some(function(c){return String(c).toLowerCase().includes(lq);});}))return;
+      const d=inv.date?inv.date.split(" ")[0]:"Unknown";
+      if(!groups[d])groups[d]=[];groups[d].push(inv);
+    });
+    const groupDates=Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
+    const fromScreen=subScreen||"invoices";
+    return(
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:40}}>
+        <BackBar accent onBack={function(){setScreen(fromScreen);setSubScreen(null);setTab(null);setSearch("");setEditMode(false);}} backLabel={fromScreen==="catalogue"?"Catalogue":fromScreen==="inventory"?"Inventory":"Invoices"} title={tab}/>
+        <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,padding:"8px 12px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{fontSize:11,color:C.muted}}>{sup.meta.supplier}</div>
+          <div style={{fontSize:12,color:C.accent,fontFamily:"monospace",fontWeight:800}}>MUR {fmt(spend)}</div>
+        </div>
+        <div style={{padding:"12px 10px"}}>
+          <div style={{display:"flex",gap:8,marginBottom:12}}>
+            {[["Invoices",sup.invoices.length],["Items",items],["Total","MUR "+fmt(spend)]].map(function(p){
+              return(<div key={p[0]} style={SC}><div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>{p[0]}</div><div style={{fontSize:12,fontWeight:800,color:C.accent,fontFamily:"monospace",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p[1]}</div></div>);
+            })}
+          </div>
+          <div style={{display:"flex",gap:8,marginBottom:14,alignItems:"center"}}>
+            <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products..." style={Object.assign({},ISt,{marginBottom:0,flex:1})}/>
+            <button onClick={function(){setEditMode(function(v){return !v;});}}
+              style={{padding:"9px 14px",borderRadius:8,fontWeight:700,fontSize:12,cursor:"pointer",flexShrink:0,background:editMode?C.accent:C.surf2,color:editMode?"#000":C.muted,border:"1px solid "+(editMode?C.accent:C.bdr)}}>
+              {editMode?"Done":"Edit"}
+            </button>
+          </div>
+          {groupDates.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No results</div>):groupDates.map(function(dateKey){
+            return(<div key={dateKey}>
+              <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:6,marginTop:10,paddingLeft:2}}>{dateKey}</div>
+              {groups[dateKey].map(function(inv){
+                const invKey=tab+"||"+inv.id;const removed=removedRows[invKey]||{};
+                return(
+                  <div key={inv.id} style={{background:C.surf,borderRadius:12,marginBottom:14,border:"1px solid "+C.bdr,overflow:"hidden"}}>
+                    <div style={{background:C.surf2,padding:"8px 12px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                      <div style={{fontSize:11,color:C.accent,fontWeight:700}}>{inv.id}</div>
+                      <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>MUR {fmt(inv.total)}</div>
+                    </div>
+                    <div style={{overflowX:"auto"}}>
+                      <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+                        <thead><tr style={{background:C.surf2}}>
+                          {(inv.cols||[]).map(function(col,ci){return <th key={ci} style={{padding:"6px 8px",textAlign:"left",color:C.muted,fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid "+C.bdr}}>{col}</th>;})}
+                          <th style={{padding:"6px 8px",textAlign:"right",color:C.rec,fontWeight:700,whiteSpace:"nowrap",borderBottom:"1px solid "+C.bdr}}>Buy+VAT</th>
+                          <th style={{padding:"6px 8px",textAlign:"right",color:C.warn,fontWeight:700,whiteSpace:"nowrap",borderBottom:"1px solid "+C.bdr}}>Rec Price</th>
+                          <th style={{padding:"6px 8px",textAlign:"right",color:C.accent,fontWeight:700,whiteSpace:"nowrap",borderBottom:"1px solid "+C.bdr}}>Selling</th>
+                          <th style={{padding:"6px 8px",textAlign:"left",color:C.muted,fontWeight:600,whiteSpace:"nowrap",borderBottom:"1px solid "+C.bdr}}>Notes</th>
+                          {editMode&&<th style={{padding:"6px 8px",borderBottom:"1px solid "+C.bdr}}></th>}
+                        </tr></thead>
+                        <tbody>
+                          {inv.rows.map(function(row,ri){
+                            if(removed[ri])return null;
+                            const rec=calcRec(inv,ri,row,sup.meta);const rec20=rec!==null?rec*1.2:null;
+                            const spKey=invKey+"||"+ri+"||sp";const ntKey=invKey+"||"+ri+"||nt";
+                            const spVal=cellEdits[spKey]!==undefined?cellEdits[spKey]:(rec20!==null?fmt(rec20):"");
+                            const ntVal=cellEdits[ntKey]!==undefined?cellEdits[ntKey]:"";
+                            return(
+                              <tr key={ri} style={{borderBottom:"1px solid "+C.bdr,background:ri%2===0?"transparent":"rgba(255,255,255,0.02)"}}>
+                                {row.map(function(cell,ci){
+                                  const ck=invKey+"||"+ri+"||"+ci;
+                                  const val=cellEdits[ck]!==undefined?cellEdits[ck]:String(cell);
+                                  return(<td key={ci} style={{padding:"6px 8px",color:C.text,whiteSpace:ci===0?"nowrap":"normal"}}>{editMode?(<input value={val} onChange={function(e){setCE(ck,e.target.value);}} style={CISt}/>):(<span>{val}</span>)}</td>);
+                                })}
+                                <td style={{padding:"6px 8px",textAlign:"right",color:C.rec,fontWeight:700,whiteSpace:"nowrap"}}>{rec!==null?fmt(rec):"-"}</td>
+                                <td style={{padding:"6px 8px",textAlign:"right",color:C.warn,whiteSpace:"nowrap"}}>{rec20!==null?fmt(rec20):"-"}</td>
+                                <td style={{padding:"6px 8px",whiteSpace:"nowrap"}}><input value={spVal} onChange={function(e){setCE(spKey,e.target.value);}} style={Object.assign({},CISt,{color:C.accent,width:72,textAlign:"right"})}/></td>
+                                <td style={{padding:"6px 8px"}}><input value={ntVal} onChange={function(e){setCE(ntKey,e.target.value);}} style={Object.assign({},CISt,{color:C.muted,width:90})}/></td>
+                                {editMode&&(<td style={{padding:"6px 8px"}}><button onClick={function(){doRemoveRow(invKey,ri);}} style={{background:C.danger,border:"none",borderRadius:4,padding:"3px 8px",color:"#fff",fontSize:10,cursor:"pointer"}}>Del</button></td>)}
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                        {(inv.totals||[]).length>0&&(<tfoot>{inv.totals.map(function(t,ti){return(<tr key={ti} style={{background:C.surf2}}><td colSpan={(inv.cols||[]).length+3} style={{padding:"5px 8px",textAlign:"right",color:C.muted,fontSize:11}}>{t[0]}</td><td style={{padding:"5px 8px",textAlign:"right",color:C.accent,fontWeight:800,fontSize:12,fontFamily:"monospace",whiteSpace:"nowrap"}}>MUR {fmt(t[1])}</td>{editMode&&<td></td>}</tr>);})}</tfoot>)}
+                      </table>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>);
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── CATALOGUE: SUPPLIER PRODUCTS DRILL-DOWN ──────────────────────
+  if(screen==="catalogue"&&subScreen==="cat-supplier"&&tab){
+    const sup=SUPPLIERS[tab];
+    if(!sup)return null;
+    const lq=search.toLowerCase();
+    let prods=getSupProducts(sup);
+    if(lq)prods=prods.filter(function(p){return p.toLowerCase().includes(lq);});
+    if(catSort==="az")prods=prods.slice().sort(function(a,b){return a.localeCompare(b);});
+    else if(catSort==="za")prods=prods.slice().sort(function(a,b){return b.localeCompare(a);});
+    return(
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:40}}>
+        <BackBar accent onBack={function(){setSubScreen(null);setTab(null);setSearch("");}} backLabel="Catalogue" title={tab}/>
+        <div style={{padding:"12px 10px"}}>
+          <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
+            <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products..." style={Object.assign({},ISt,{marginBottom:0,flex:1})}/>
+            <div style={{fontSize:11,color:C.muted,flexShrink:0,fontWeight:700}}>{prods.length} items</div>
+          </div>
+          <SortPills value={catSort} onChange={setCatSort} color={C.warn} options={[["az","A-Z"],["za","Z-A"],["default","Invoice Order"]]}/>
+          <div style={{background:C.surf,borderRadius:12,border:"1px solid "+C.bdr,overflow:"hidden"}}>
+            {prods.length===0?(<div style={{padding:30,textAlign:"center",color:C.muted}}>No products found</div>):
+            prods.map(function(p,pi){
+              return(<div key={pi} style={{padding:"12px 14px",borderBottom:pi<prods.length-1?"1px solid "+C.bdr:"none",display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:28,height:28,borderRadius:8,background:C.surf2,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:11,color:C.muted,fontWeight:700}}>{pi+1}</div>
+                <div style={{fontSize:13,color:C.text,flex:1}}>{p}</div>
+              </div>);
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── INVENTORY: SUPPLIER PRODUCTS DRILL-DOWN ──────────────────────
+  if(screen==="inventory"&&subScreen==="inv-supplier"&&tab){
+    const sup=SUPPLIERS[tab];
+    if(!sup)return null;
+    const lq=search.toLowerCase();
+    const prods=getSupProducts(sup);
+    const filtered=lq?prods.filter(function(p){return p.toLowerCase().includes(lq);}):prods;
+
+    return(
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:80}}>
+        <BackBar accent onBack={function(){setSubScreen(null);setTab(null);setSearch("");}} backLabel="Inventory" title={tab}/>
+        <div style={{padding:"12px 10px"}}>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products..." style={ISt}/>
+          {filtered.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No products found</div>):
+          filtered.map(function(p,pi){
+            const stockKey=tab+"||"+p+"||stock";
+            const reorderKey=tab+"||"+p+"||reorder";
+            const stockVal=inventory[stockKey]!==undefined?inventory[stockKey]:"";
+            const reorderVal=inventory[reorderKey]!==undefined?inventory[reorderKey]:"";
+            const stock=parseFloat(stockVal);
+            const reorder=parseFloat(reorderVal);
+            const hasStock=!isNaN(stock);
+            const hasReorder=!isNaN(reorder);
+            const isLow=hasStock&&hasReorder&&stock<=reorder;
+            const isOut=hasStock&&stock===0;
+            const statusColor=isOut?C.danger:(isLow?C.warn:C.accent);
+            const statusLabel=isOut?"OUT":(isLow?"LOW":"OK");
+            return(
+              <div key={pi} style={{background:C.surf,borderRadius:12,marginBottom:10,border:"1px solid "+(isLow||isOut?statusColor:C.bdr),overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.bdr}}>
+                  <div style={{flex:1,minWidth:0,marginRight:8}}>
+                    <div style={{fontSize:13,fontWeight:700,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p}</div>
+                    <div style={{fontSize:10,color:C.muted,marginTop:2}}>{tab}</div>
+                  </div>
+                  {hasStock&&(
+                    <div style={{background:statusColor,borderRadius:8,padding:"3px 10px",fontSize:11,fontWeight:800,color:"#000",flexShrink:0}}>
+                      {statusLabel}
+                    </div>
+                  )}
+                </div>
+                <div style={{padding:"10px 14px",display:"flex",gap:10}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:10,color:C.muted,marginBottom:4,fontWeight:600,textTransform:"uppercase"}}>Current Stock</div>
+                    <input value={stockVal} onChange={function(e){setInvVal(stockKey,e.target.value);}}
+                      placeholder="0"
+                      style={{background:C.surf2,border:"1px solid "+(isOut?C.danger:isLow?C.warn:C.bdr),borderRadius:8,padding:"8px 12px",color:isOut?C.danger:isLow?C.warn:C.text,fontSize:16,fontWeight:800,width:"100%",outline:"none",textAlign:"center",boxSizing:"border-box"}}/>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:10,color:C.muted,marginBottom:4,fontWeight:600,textTransform:"uppercase"}}>Reorder At</div>
+                    <input value={reorderVal} onChange={function(e){setInvVal(reorderKey,e.target.value);}}
+                      placeholder="Min"
+                      style={{background:C.surf2,border:"1px solid "+C.bdr,borderRadius:8,padding:"8px 12px",color:C.muted,fontSize:16,fontWeight:800,width:"100%",outline:"none",textAlign:"center",boxSizing:"border-box"}}/>
+                  </div>
+                </div>
+                {isLow&&!isOut&&(
+                  <div style={{padding:"6px 14px 10px",display:"flex",alignItems:"center",gap:6}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:C.warn,flexShrink:0}}></div>
+                    <div style={{fontSize:11,color:C.warn,fontWeight:600}}>Reorder needed — only {stockVal} units remaining</div>
+                  </div>
+                )}
+                {isOut&&(
+                  <div style={{padding:"6px 14px 10px",display:"flex",alignItems:"center",gap:6}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:C.danger,flexShrink:0}}></div>
+                    <div style={{fontSize:11,color:C.danger,fontWeight:600}}>Out of stock — add to reorder list</div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── PRICE TRACKER ────────────────────────────────────────────────
+  if(screen==="prices"){
+    const lq=search.toLowerCase();
+    const flagged=[];
+    Object.keys(priceHistory).forEach(function(sn){
+      Object.keys(priceHistory[sn]).forEach(function(pn){
+        const hist=priceHistory[sn][pn];
+        if(hist.length<2)return;
+        const first=hist[0];const last=hist[hist.length-1];
+        const changed=Math.abs(last.price-first.price)>0.001;
+        if(priceFilter==="changed"&&!changed)return;
+        if(lq&&!pn.toLowerCase().includes(lq)&&!sn.toLowerCase().includes(lq))return;
+        const pct=((last.price-first.price)/first.price)*100;
+        flagged.push({sn:sn,pn:pn,hist:hist,first:first,last:last,pct:pct,changed:changed});
+      });
+    });
+    flagged.sort(function(a,b){if(a.changed&&!b.changed)return -1;if(!a.changed&&b.changed)return 1;return Math.abs(b.pct)-Math.abs(a.pct);});
+    const changedCount=flagged.filter(function(f){return f.changed;}).length;
+    return(
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:40}}>
+        <BackBar onBack={goMenu} backLabel="Menu" title="Price Tracker"/>
+        <div style={{padding:"12px 10px"}}>
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            <div style={Object.assign({},SC,{borderColor:changedCount>0?C.warn:C.bdr})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Changes</div>
+              <div style={{fontSize:18,fontWeight:800,color:changedCount>0?C.warn:C.muted}}>{changedCount}</div>
+            </div>
+            <div style={SC}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Tracked</div>
+              <div style={{fontSize:18,fontWeight:800,color:C.text}}>{Object.keys(priceHistory).reduce(function(a,sn){return a+Object.keys(priceHistory[sn]).length;},0)}</div>
+            </div>
+          </div>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products or suppliers..." style={ISt}/>
+          <SortPills value={priceFilter} onChange={setPriceFilter} color={C.warn} options={[["changed","Changes Only"],["all","All Products"]]}/>
+          {flagged.length===0?(<div style={{color:C.muted,textAlign:"center",padding:40}}>{priceFilter==="changed"?"No price changes detected yet":"No products found"}</div>):
+          flagged.map(function(f,fi){
+            const up=f.pct>0;const flagColor=f.changed?(up?C.danger:C.accent):C.muted;
+            return(
+              <div key={fi} style={{background:C.surf,borderRadius:12,marginBottom:10,border:"1px solid "+(f.changed?(up?C.danger:C.accent):C.bdr),overflow:"hidden"}}>
+                <div style={{padding:"10px 12px"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                    <div style={{flex:1,minWidth:0,marginRight:8}}>
+                      <div style={{fontWeight:700,fontSize:13,marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{f.pn}</div>
+                      <div style={{fontSize:11,color:C.muted}}>{f.sn}</div>
+                    </div>
+                    {f.changed&&(<div style={{textAlign:"right",flexShrink:0}}>
+                      <div style={{fontSize:16,fontWeight:800,color:flagColor}}>{up?"▲":"▼"} {Math.abs(f.pct).toFixed(1)}%</div>
+                      <div style={{fontSize:10,color:flagColor}}>{up?"Price Up":"Price Down"}</div>
+                    </div>)}
+                  </div>
+                  <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4}}>
+                    {f.hist.map(function(h,hi){
+                      const isLast=hi===f.hist.length-1;
+                      const prev=hi>0?f.hist[hi-1].price:null;
+                      const wentUp=prev!==null&&h.price>prev+0.001;
+                      const wentDown=prev!==null&&h.price<prev-0.001;
+                      const dotColor=hi===0?C.muted:(wentUp?C.danger:(wentDown?C.accent:C.muted));
+                      return(<div key={hi} style={{flexShrink:0,textAlign:"center",minWidth:60}}>
+                        <div style={{fontSize:9,color:C.muted,marginBottom:2}}>{h.date.split(" ")[0]}</div>
+                        <div style={{fontSize:12,fontWeight:isLast?800:400,color:isLast?C.text:C.muted,fontFamily:"monospace"}}>{fmt(h.price)}</div>
+                        <div style={{width:8,height:8,borderRadius:"50%",background:dotColor,margin:"4px auto 0"}}></div>
+                      </div>);
+                    })}
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:8,paddingTop:8,borderTop:"1px solid "+C.bdr}}>
+                    <div style={{fontSize:11,color:C.muted}}>First: <span style={{color:C.text,fontFamily:"monospace"}}>{fmt(f.first.price)}</span><span style={{color:C.muted}}> {f.first.date.split(" ")[0]}</span></div>
+                    <div style={{fontSize:11,color:C.muted}}>Latest: <span style={{color:flagColor,fontFamily:"monospace",fontWeight:700}}>{fmt(f.last.price)}</span><span style={{color:C.muted}}> {f.last.date.split(" ")[0]}</span></div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── SHARED VARS FOR SECTION SCREENS ─────────────────────────────
+  const totalAll=supNames.reduce(function(a,sn){return a+SUPPLIERS[sn].invoices.reduce(function(b,i){return b+i.total;},0);},0);
+  const lq=search.toLowerCase();
+  const daySuppliers=dayFilter?getSupsForDay(dayFilter):[];
+  const dayTotal=daySuppliers.reduce(function(a,s){return a+s.total;},0);
+  const filteredDaySups=daySuppliers.filter(function(s){
+    if(!search)return true;
+    if(s.name.toLowerCase().includes(lq))return true;
+    const sup=SUPPLIERS[s.name];
+    if(sup&&sup.meta&&sup.meta.supplier&&sup.meta.supplier.toLowerCase().includes(lq))return true;
+    return sup&&sup.invoices&&sup.invoices.some(function(inv){return inv.rows&&inv.rows.some(function(r){return r.some(function(c){return String(c).toLowerCase().includes(lq);});});});
+  });
+
+  // ── INVENTORY MAIN LIST ──────────────────────────────────────────
+  if(screen==="inventory"){
+    // count low/out per supplier
+    const supStats=supNames.map(function(sn){
+      const prods=getSupProducts(SUPPLIERS[sn]);
+      let low=0,out=0,tracked=0;
+      prods.forEach(function(p){
+        const stockKey=sn+"||"+p+"||stock";
+        const reorderKey=sn+"||"+p+"||reorder";
+        const stock=parseFloat(inventory[stockKey]);
+        const reorder=parseFloat(inventory[reorderKey]);
+        if(!isNaN(stock)){tracked++;if(stock===0)out++;else if(!isNaN(reorder)&&stock<=reorder)low++;}
+      });
+      return{name:sn,prods:prods.length,tracked:tracked,low:low,out:out};
+    });
+    // overall counts
+    const totalLow=supStats.reduce(function(a,s){return a+s.low;},0);
+    const totalOut=supStats.reduce(function(a,s){return a+s.out;},0);
+    const filteredStats=supStats.filter(function(s){
+      if(invFilter==="low")return s.low>0||s.out>0;
+      if(search)return s.name.toLowerCase().includes(lq);
+      return true;
+    });
+    return(
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:40}}>
+        <BackBar onBack={goMenu} backLabel="Menu" title="Inventory"/>
+        <div style={{padding:"12px 10px"}}>
+          {/* SUMMARY ROW */}
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            <div style={Object.assign({},SC,{borderColor:totalOut>0?C.danger:C.bdr})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Out of Stock</div>
+              <div style={{fontSize:20,fontWeight:800,color:totalOut>0?C.danger:C.muted}}>{totalOut}</div>
+            </div>
+            <div style={Object.assign({},SC,{borderColor:totalLow>0?C.warn:C.bdr})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Low Stock</div>
+              <div style={{fontSize:20,fontWeight:800,color:totalLow>0?C.warn:C.muted}}>{totalLow}</div>
+            </div>
+            <div style={SC}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Suppliers</div>
+              <div style={{fontSize:20,fontWeight:800,color:C.text}}>{supNames.length}</div>
+            </div>
+          </div>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers..." style={ISt}/>
+          <SortPills value={invFilter} onChange={setInvFilter} color={C.warn} options={[["all","All Suppliers"],["low","Needs Reorder"]]}/>
+          {filteredStats.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No suppliers found</div>):
+          filteredStats.map(function(s){
+            const hasAlert=s.low>0||s.out>0;
+            const sup=SUPPLIERS[s.name];
+            return(
+              <div key={s.name} onClick={function(){setTab(s.name);setSubScreen("inv-supplier");setSearch("");}}
+                style={{background:C.surf,borderRadius:12,marginBottom:10,border:"1px solid "+(s.out>0?C.danger:s.low>0?C.warn:C.bdr),cursor:"pointer",overflow:"hidden"}}>
+                <div style={{padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</div>
+                    <div style={{fontSize:11,color:C.muted,marginTop:2}}>{sup.meta.supplier}</div>
+                    <div style={{display:"flex",gap:8,marginTop:6}}>
+                      <span style={{fontSize:10,color:C.muted}}>{s.prods} products</span>
+                      {s.tracked>0&&<span style={{fontSize:10,color:C.muted}}>{s.tracked} tracked</span>}
+                    </div>
+                  </div>
+                  <div style={{flexShrink:0,marginLeft:10,textAlign:"right"}}>
+                    {s.out>0&&(<div style={{background:C.danger,borderRadius:8,padding:"3px 10px",fontSize:11,fontWeight:800,color:"#fff",marginBottom:4}}>{s.out} OUT</div>)}
+                    {s.low>0&&(<div style={{background:C.warn,borderRadius:8,padding:"3px 10px",fontSize:11,fontWeight:800,color:"#000"}}>{s.low} LOW</div>)}
+                    {!hasAlert&&s.tracked>0&&(<div style={{background:"rgba(0,229,160,0.15)",borderRadius:8,padding:"3px 10px",fontSize:11,fontWeight:800,color:C.accent}}>OK</div>)}
+                    {s.tracked===0&&(<div style={{fontSize:11,color:C.muted}}>Not set</div>)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── ORDER MODULE ─────────────────────────────────────────────────
+  if(screen==="order"){
+    const weekLabel=getWeekLabel();
+
+    // ── Helpers ───────────────────────────────────────────────────
+    function daysSince(isoDate){
+      if(!isoDate)return null;
+      return Math.floor((new Date()-new Date(isoDate))/(1000*60*60*24));
+    }
+    function relDay(isoDate){
+      var n=daysSince(isoDate);
+      if(n===null)return"—";
+      if(n===0)return"today";
+      if(n===1)return"yesterday";
+      if(n<7)return n+"d ago";
+      if(n<30)return Math.floor(n/7)+"w ago";
+      return Math.floor(n/30)+"mo ago";
+    }
+
+    // ── UI primitives ─────────────────────────────────────────────
+    function StatusChip({status}){
+      var labels={draft:"Draft",pending:"Sent",confirmed:"Confirmed",delivered:"Delivered",cancelled:"Cancelled"};
+      return <span className={"status "+status}><span className="dot"></span>{labels[status]||status}</span>;
+    }
+    function QtyStepper({value,onChange}){
+      var inCart=value>0;
+      return(
+        <div className={"qty"+(inCart?" in-cart":" empty")}>
+          <button onClick={function(){onChange(Math.max(0,value-1));}} disabled={value<=0}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M3 8h10"/></svg>
+          </button>
+          <div className="value">{value||0}</div>
+          <button onClick={function(){onChange(Math.min(99,value+1));}}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+          </button>
+        </div>
+      );
+    }
+
+    // ── Data builders ─────────────────────────────────────────────
+    function buildOrderSuppliers(){
+      const glyphMap={"Phoenix":"🍺","Beverages":"🧃","Food":"🥫","Kool":"❄️","Innodis":"🥩","Panagora":"🥫","VKS":"🐟","Quality":"🧃","Grays":"🥃","New Goodwill":"🥃","Lim How":"🍬","BrandActiv":"🛒","Tea Blenders":"🍰","Cernol":"🧴","Eagle":"🌶️","Ashfaaq":"🌾","Agiliss":"🐟","Inicia":"🥚","Edendale":"🧊","Tash":"🍝","LCF":"🏪","FSS":"📦","Dywada":"🍱","Scott":"🧴","Megatrixe":"🛁","Li Wan Po":"🍭","Cheekips":"🍿","RR Rapid":"🕯️","Afara":"🥩","VL Marketing":"📦","RPM":"📦","Eau-Val":"💧","Faucon":"🐓","Ashok":"📱","Mayil":"🌶️","Bedford":"🍺","Madhvi":"🍿","Cadi Fortune":"🍬","Gujadhur":"🧈","Pillay":"❄️","MOROIL":"🫙","IFS":"🥫","Flemingo":"📦","LVM":"🍟"};
+      return supNames.map(function(sn){
+        const sup=SUPPLIERS[sn];
+        const prods=getSupProducts(sup);
+        const lastInv=sup.invoices&&sup.invoices.length>0?sup.invoices[0]:null;
+        var glyph="🏪";
+        Object.keys(glyphMap).forEach(function(k){if(sn.indexOf(k)>=0)glyph=glyphMap[k];});
+        return{id:sn,name:sn,fullName:sup.meta.supplier||sn,glyph:glyph,items:prods.length,last_order:lastInv?lastInv.date:"",category:sup.meta.payment||"General Supplier",lead_time:"Next-day"};
+      });
+    }
+    function buildOrderProducts(sn){
+      const sup=SUPPLIERS[sn];if(!sup)return[];
+      return getSupProducts(sup).map(function(pname,pi){
+        const latest=getLatestUnitPrice(SUPPLIERS,sn,pname);
+        return{id:sn+"_prod_"+pi,name:pname,price:latest?latest.price:0,unit:"unit",last_ordered:latest?latest.date:"",popular:false};
+      });
+    }
+
+    const orderSuppliers=buildOrderSuppliers();
+
+    // ── Actions ───────────────────────────────────────────────────
+    function openSupplier(id){setActiveSupId(id);setOrderView("catalogue");setCatQ("");setCatFilter("all");window.scrollTo({top:0,behavior:"smooth"});}
+    function backToSuppliers(){setActiveSupId(null);setOrderView("suppliers");window.scrollTo({top:0,behavior:"smooth"});}
+    function setQtyInCart(sid,pid,qty){setOrderCarts(function(prev){var next=Object.assign({},prev);var c=Object.assign({},next[sid]||{});if(qty<=0)delete c[pid];else c[pid]=qty;if(Object.keys(c).length===0)delete next[sid];else next[sid]=c;return next;});}
+    function clearCart(sid){setOrderCarts(function(prev){var next=Object.assign({},prev);delete next[sid];return next;});setOrderToast("Order cleared");}
+    function updateOrderStatus(oid,status){var no=(orders||[]).map(function(o){return o.id===oid?Object.assign({},o,{status:status}):o;});setOrders(no);persist(cellEdits,removedRows,payments,inventory,no,custOrders);}
+    function submitOrder(sid){
+      var cart=orderCarts[sid];if(!cart||Object.keys(cart).length===0)return;
+      var ps=buildOrderProducts(sid);
+      var now=new Date();var timeStr=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+      var items=Object.entries(cart).map(function(e){var p=ps.find(function(x){return x.id===e[0];});return{name:p?p.name:e[0],qty:e[1],unit_price:p?p.price:0,pack:"1 unit"};});
+      var newOrder={
+        id:"PO-"+now.getFullYear()+"-"+String(Date.now()).slice(-5),
+        supplier_id:sid,status:"pending",
+        created:now.toISOString().slice(0,10),week:weekLabel,items:items,
+        timeline:[
+          {label:"Draft created",time:"Today, "+timeStr,state:"done"},
+          {label:"Sent to supplier",time:"Today, "+timeStr,state:"current"},
+          {label:"Confirmed by supplier",time:"—",state:"pending"},
+          {label:"Out for delivery",time:"—",state:"pending"},
+          {label:"Delivered",time:"—",state:"pending"},
+        ]
+      };
+      var newOrders=[newOrder].concat(orders||[]);
+      setOrders(newOrders);persist(cellEdits,removedRows,payments,inventory,newOrders,custOrders);
+      setOrderCarts(function(prev){var next=Object.assign({},prev);delete next[sid];return next;});
+      var si=orderSuppliers.find(function(s){return s.id===sid;});
+      setOrderToast("Order sent to "+(si?si.name:sid)+"!");
+      setOrderView("history");window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    // ── Derived for current view ──────────────────────────────────
+    const activeSupplier=orderSuppliers.find(function(s){return s.id===activeSupId;})||null;
+    const activeOrderObj=(orders||[]).find(function(o){return o.id===activeOrderId;})||null;
+    const activeOrderSup=activeOrderObj?orderSuppliers.find(function(s){return s.id===activeOrderObj.supplier_id;}):null;
+
+    // ── Shared appbar ─────────────────────────────────────────────
+    const OrderAppBar=(
+      <div className="appbar">
+        <div className="appbar-inner">
+          <div className="brand-row">
+            <button className="brand-back" onClick={orderView==="catalogue"?backToSuppliers:goMenu}>
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7.5 2.5L3 6l4.5 3.5"/><path d="M3 6h7"/></svg>
+              {orderView==="catalogue"?"All suppliers":"Fowdar Store"}
+            </button>
+            <h1 className="brand-title">{orderView==="catalogue"&&activeSupplier?activeSupplier.name:"Order"}</h1>
+            <p className="brand-sub">
+              {orderView==="catalogue"&&activeSupplier?activeSupplier.fullName:"Customer orders & weekly purchasing · "+weekLabel}
+            </p>
+          </div>
+          <div className="appbar-meta">
+            <button className="refresh-btn" onClick={refreshData} title="Refresh">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M14 8a6 6 0 1 1-1.76-4.24"/><path d="M14 2v3.5h-3.5"/></svg>
+            </button>
+            <div className="totals">
+              <div className="label">{orderView==="catalogue"?"Order total":"Open order value"}</div>
+              <div className="value">{"MUR "+fmt(totalCartValue)}</div>
+            </div>
+          </div>
+        </div>
+        {orderView!=="catalogue"&&(
+          <nav className="tabs" style={{maxWidth:"100%",padding:"0 16px"}}>
+            {[["suppliers","Suppliers"],["history","Orders",pendingOrderCount>0?pendingOrderCount:null]].map(function(t){
+              return(
+                <button key={t[0]} className={"tab"+(orderView===t[0]?" active":"")} onClick={function(){if(t[0]==="suppliers")backToSuppliers();else setOrderView(t[0]);}}>
+                  {t[1]}{t[2]!=null&&<span className="count">{t[2]}</span>}
+                </button>
+              );
+            })}
+            {totalCartLines>0&&(
+              <div style={{marginLeft:"auto",display:"flex",alignItems:"center",padding:"6px 0"}}>
+                <button className="chip active" style={{gap:6}} onClick={function(){var sid=Object.keys(orderCarts)[0];if(sid)openSupplier(sid);}}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{width:13,height:13}}><path d="M2 3h2l1.5 8h7l1.5-6H4.5"/><circle cx="6.5" cy="13.5" r="1"/><circle cx="11.5" cy="13.5" r="1"/></svg>
+                  {totalCartLines} line{totalCartLines!==1?"s":""} drafting
+                </button>
+              </div>
+            )}
+          </nav>
+        )}
+      </div>
+    );
+
+    // ── ORDER DRAWER ──────────────────────────────────────────────
+    function OrderDrawer({order,supplier,onClose}){
+      React.useEffect(function(){
+        function onEsc(e){if(e.key==="Escape")onClose();}
+        window.addEventListener("keydown",onEsc);
+        return function(){window.removeEventListener("keydown",onEsc);};
+      },[]);
+      if(!order)return null;
+      var sub=(order.items||[]).reduce(function(s,it){return s+it.qty*it.unit_price;},0);
+      var vat=sub*0.15;var tot=sub+vat;
+      return(
+        <div className="drawer-backdrop" onClick={onClose}>
+          <div className="drawer" onClick={function(e){e.stopPropagation();}}>
+            <div className="drawer-head">
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+                  <h2>{order.id}</h2>
+                  <StatusChip status={order.status}/>
+                </div>
+                <div className="sub">{supplier?supplier.name:"—"} · created {relDay(order.created)}</div>
+              </div>
+              <button className="drawer-close" onClick={onClose}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              {order.timeline&&(
+                <div>
+                  <div className="section-label">Status</div>
+                  <div className="timeline">
+                    {order.timeline.map(function(step,i){
+                      return <div key={i} className={"tl-step "+step.state}><div className="label">{step.label}</div><div className="time">{step.time}</div></div>;
+                    })}
+                  </div>
+                </div>
+              )}
+              <div>
+                <div className="section-label">Items</div>
+                <div className="drawer-table">
+                  <div className="row header"><span>Product</span><span className="qty-cell">Qty</span><span className="total-cell">Line total</span></div>
+                  {(order.items||[]).map(function(it,i){
+                    return(
+                      <div key={i} className="row">
+                        <div>
+                          <div style={{fontWeight:500}}>{it.name}</div>
+                          <div style={{fontSize:11,color:"var(--text-muted)",fontFamily:"var(--font-mono)",marginTop:2}}>{it.pack} · MUR {fmt(it.unit_price)}</div>
+                        </div>
+                        <div className="qty-cell">{it.qty}</div>
+                        <div className="total-cell">MUR {fmt(it.qty*it.unit_price)}</div>
+                      </div>
+                    );
+                  })}
+                  <div className="totals-row"><span>Subtotal</span><span>MUR {fmt(sub)}</span></div>
+                  <div className="totals-row"><span>VAT (15%)</span><span>MUR {fmt(vat)}</span></div>
+                  <div className="totals-row grand"><span>Total</span><span className="amount">MUR {fmt(tot)}</span></div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                {order.status==="pending"&&(
+                  <button className="btn btn-primary" onClick={function(){updateOrderStatus(order.id,"confirmed");onClose();}}>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{width:14,height:14}}><path d="M3 8.5L6.5 12 13 4.5"/></svg>
+                    Confirm receipt
+                  </button>
+                )}
+                {order.status==="confirmed"&&(
+                  <button className="btn btn-primary" style={{background:"var(--info)",borderColor:"var(--info)",color:"#000"}} onClick={function(){updateOrderStatus(order.id,"delivered");onClose();}}>Mark Delivered</button>
+                )}
+                <button className="btn btn-ghost" onClick={onClose} style={{marginLeft:"auto"}}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── SUPPLIERS VIEW ────────────────────────────────────────────
+    if(orderView==="suppliers"){
+      var filteredSups=orderSuppliers.filter(function(s){
+        var term=ordQ.trim().toLowerCase();
+        if(term&&!s.name.toLowerCase().includes(term)&&!s.category.toLowerCase().includes(term))return false;
+        if(ordFilter==="recent")return daysSince(s.last_order)!==null&&daysSince(s.last_order)<=7;
+        if(ordFilter==="overdue")return daysSince(s.last_order)!==null&&daysSince(s.last_order)>10;
+        return true;
+      });
+      return(
+        <div className="fowdar-order-module" style={{minHeight:"100%",paddingBottom:40}}>
+          {OrderAppBar}
+          <div style={{maxWidth:1240,margin:"0 auto",padding:"20px 16px"}}>
+            <div className="section-label">Suppliers</div>
+            <div className="page-head">
+              <div><h1 style={{marginBottom:0}}>Browse suppliers</h1><div className="sub">Pick a supplier to start a new order.</div></div>
+            </div>
+            <div className="controls-row">
+              <div className="search">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" strokeLinecap="round"/></svg>
+                <input className="field" placeholder="Search suppliers, categories…" value={ordQ} onChange={function(e){setOrdQ(e.target.value);}}/>
+              </div>
+              <button className={"chip"+(ordFilter==="all"?" active":"")} onClick={function(){setOrdFilter("all");}}>All <span style={{color:"var(--text-faint)"}}>·</span> {orderSuppliers.length}</button>
+              <button className={"chip"+(ordFilter==="recent"?" active":"")} onClick={function(){setOrdFilter("recent");}}>Ordered this week</button>
+              <button className={"chip"+(ordFilter==="overdue"?" active":"")} onClick={function(){setOrdFilter("overdue");}}>Overdue (10d+)</button>
+            </div>
+            {filteredSups.length===0?(
+              <div className="empty-state"><div className="glyph">🔎</div><h3>No suppliers match</h3><p>Try a different search or filter.</p></div>
+            ):(
+              <div className="supplier-grid">
+                {filteredSups.map(function(s){
+                  var cartCount=Object.keys(orderCarts[s.id]||{}).length;
+                  return(
+                    <div key={s.id} className="card hoverable supplier-card" onClick={function(){openSupplier(s.id);}}>
+                      <div className="supplier-emoji">{s.glyph}</div>
+                      <div className="supplier-info">
+                        <h3 className="name">{s.name}</h3>
+                        <div className="meta">
+                          {s.category}<span className="dot">·</span>{s.lead_time}
+                        </div>
+                      </div>
+                      <div className="supplier-status">
+                        <div className="item-count">{s.items} items</div>
+                        {s.last_order&&<div>last {relDay(s.last_order)}</div>}
+                        {cartCount>0&&<div style={{color:"var(--accent)",fontWeight:600}}>{cartCount} in cart</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          {orderToast&&<div className="toast">{orderToast}</div>}
+        </div>
+      );
+    }
+
+    // ── CATALOGUE VIEW ────────────────────────────────────────────
+    if(orderView==="catalogue"&&activeSupId){
+      var supInfo=activeSupplier||{glyph:"🏪",name:activeSupId,fullName:"",items:0,category:"",lead_time:"Next-day"};
+      var ps=buildOrderProducts(activeSupId);
+      var cart=orderCarts[activeSupId]||{};
+      var filteredProds=ps.filter(function(p){
+        var term=catQ.trim().toLowerCase();
+        if(term&&!p.name.toLowerCase().includes(term))return false;
+        if(catFilter==="reorder")return daysSince(p.last_ordered)!==null&&daysSince(p.last_ordered)>=7;
+        return true;
+      });
+      var supplierCartItems=Object.entries(cart).map(function(e){var p=ps.find(function(x){return x.id===e[0];});return p?Object.assign({},p,{qty:e[1]}):null;}).filter(Boolean);
+      var subtotal=supplierCartItems.reduce(function(s,it){return s+it.qty*it.price;},0);
+      var vat=subtotal*0.15;var total=subtotal+vat;
+      var itemCount=supplierCartItems.reduce(function(s,it){return s+it.qty;},0);
+      return(
+        <div className="fowdar-order-module" style={{minHeight:"100%",paddingBottom:120}}>
+          {OrderAppBar}
+          <div style={{maxWidth:1240,margin:"0 auto",padding:"20px 16px"}}>
+            <div className="catalogue-head">
+              <div className="supplier-emoji">{supInfo.glyph}</div>
+              <div>
+                <h2>{supInfo.name}</h2>
+                <div className="meta-line">
+                  {supInfo.fullName}
+                  {supInfo.category&&supInfo.category!==supInfo.fullName&&<><span className="dot">·</span>{supInfo.category}</>}
+                </div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div className="section-label" style={{margin:0}}>Items</div>
+                <div style={{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:600}}>{ps.length}</div>
+              </div>
+            </div>
+            <div className="catalogue-layout">
+              <div>
+                <div className="controls-row">
+                  <div className="search">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" strokeLinecap="round"/></svg>
+                    <input className="field" placeholder={"Search "+supInfo.name.split(" ")[0]+" catalogue…"} value={catQ} onChange={function(e){setCatQ(e.target.value);}}/>
+                  </div>
+                  <button className={"chip"+(catFilter==="all"?" active":"")} onClick={function(){setCatFilter("all");}}>All items</button>
+                  <button className={"chip"+(catFilter==="reorder"?" active":"")} onClick={function(){setCatFilter("reorder");}}>Due to reorder</button>
+                </div>
+                {filteredProds.length===0?(
+                  <div className="empty-state"><div className="glyph">📦</div><h3>No matching items</h3><p>Try clearing the filter.</p></div>
+                ):(
+                  <div className="product-list">
+                    {filteredProds.map(function(p){
+                      var qty=cart[p.id]||0;
+                      return(
+                        <div key={p.id} className={"product-row"+(qty>0?" in-cart":"")} style={{gridTemplateColumns:"1fr 160px 140px"}}>
+                          <div>
+                            <h4 className="product-name">{p.name}</h4>
+                            {p.last_ordered&&<div className="product-meta"><span className="last-ordered">last {relDay(p.last_ordered)}</span></div>}
+                          </div>
+                          <div className="product-price">
+                            <span className="label">Buy+VAT / unit</span>
+                            <span className="value">{p.price>0?("MUR "+fmt(p.price)):"—"}</span>
+                          </div>
+                          <QtyStepper value={qty} onChange={function(v){setQtyInCart(activeSupId,p.id,v);}}/>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              {/* CART SIDEBAR */}
+              <aside className="cart-summary">
+                <h3>Current order <span className="count">{supplierCartItems.length} line{supplierCartItems.length!==1?"s":""}</span></h3>
+                {supplierCartItems.length===0?(
+                  <div className="cart-empty">
+                    <div>Nothing in the order yet.</div>
+                    <div className="hint">Tap + on a product to add it.</div>
+                  </div>
+                ):(
+                  <div className="cart-list">
+                    {supplierCartItems.map(function(it){
+                      return(
+                        <div key={it.id} className="cart-item">
+                          <div>
+                            <div className="name">{it.name}</div>
+                            <div className="meta">{it.qty} × MUR {fmt(it.price)}</div>
+                          </div>
+                          <div>
+                            <div className="line-total">MUR {fmt(it.qty*it.price)}</div>
+                            <button className="remove" onClick={function(){setQtyInCart(activeSupId,it.id,0);}}>remove</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="cart-totals">
+                  <div className="line"><span>Subtotal</span><span>MUR {fmt(subtotal)}</span></div>
+                  <div className="line"><span>VAT (15%)</span><span>MUR {fmt(vat)}</span></div>
+                  <div className="line grand"><span>Total</span><span className="amount">MUR {fmt(total)}</span></div>
+                </div>
+                {supplierCartItems.length>0&&(
+                  <div style={{display:"flex",gap:8,marginTop:4}}>
+                    <button className="btn btn-ghost" onClick={function(){clearCart(activeSupId);}}>Clear</button>
+                    <button className="btn btn-primary" onClick={function(){submitOrder(activeSupId);}} style={{flex:1,justifyContent:"center"}}>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{width:14,height:14}}><path d="M14 2L2 7l5 2 2 5z"/><path d="M7 9l4-4"/></svg>
+                      Send to {supInfo.name.split(" ")[0]}
+                    </button>
+                  </div>
+                )}
+              </aside>
+            </div>
+          </div>
+          {/* FAB for mobile */}
+          {itemCount>0&&(
+            <button className="fab-cart show" style={{bottom:"max(18px,env(safe-area-inset-bottom))"}} onClick={function(){submitOrder(activeSupId);}}>
+              <span style={{display:"flex",alignItems:"center",gap:10}}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{width:16,height:16}}><path d="M2 3h2l1.5 8h7l1.5-6H4.5"/><circle cx="6.5" cy="13.5" r="1"/><circle cx="11.5" cy="13.5" r="1"/></svg>
+                Review order
+                <span className="count">{itemCount}</span>
+              </span>
+              <span style={{fontFamily:"var(--font-mono)"}}>MUR {fmt(total)}</span>
+            </button>
+          )}
+          {orderToast&&<div className="toast">{orderToast}</div>}
+        </div>
+      );
+    }
+
+    // ── HISTORY VIEW ──────────────────────────────────────────────
+    if(orderView==="history"){
+      var allHistOrders=orders||[];
+      var histCounts={all:allHistOrders.length,pending:0,confirmed:0,delivered:0,cancelled:0};
+      allHistOrders.forEach(function(o){histCounts[o.status]=(histCounts[o.status]||0)+1;});
+      var filteredHist=allHistOrders.filter(function(o){
+        if(histStatus!=="all"&&o.status!==histStatus)return false;
+        var term=histQ.trim().toLowerCase();
+        if(term&&!o.id.toLowerCase().includes(term)&&!((o.supplier_id||"").toLowerCase().includes(term)))return false;
+        return true;
+      });
+      return(
+        <div className="fowdar-order-module" style={{minHeight:"100%",paddingBottom:40}}>
+          {OrderAppBar}
+          <div style={{maxWidth:1240,margin:"0 auto",padding:"20px 16px"}}>
+            <div className="section-label">Order History</div>
+            <div className="page-head">
+              <div><h1 style={{marginBottom:0}}>Recent orders</h1><div className="sub">Track every purchase order. Tap any row to see status &amp; details.</div></div>
+            </div>
+            <div className="controls-row">
+              <div className="search">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" strokeLinecap="round"/></svg>
+                <input className="field" placeholder="Search by order ID or supplier…" value={histQ} onChange={function(e){setHistQ(e.target.value);}}/>
+              </div>
+              {[["all","All",histCounts.all],["pending","Sent",histCounts.pending],["confirmed","Confirmed",histCounts.confirmed],["delivered","Delivered",histCounts.delivered],["cancelled","Cancelled",histCounts.cancelled]].map(function(f){
+                return(
+                  <button key={f[0]} className={"chip"+(histStatus===f[0]?" active":"")} onClick={function(){setHistStatus(f[0]);}}>
+                    {f[1]} <span style={{color:"var(--text-faint)",marginLeft:4}}>{f[2]}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {filteredHist.length===0?(
+              <div className="empty-state"><div className="glyph">📋</div><h3>No orders yet</h3><p>Submit an order from the Suppliers tab.</p></div>
+            ):(
+              <div className="order-list">
+                {filteredHist.map(function(o){
+                  var si=orderSuppliers.find(function(s){return s.id===o.supplier_id;});
+                  var sub=(o.items||[]).reduce(function(s,it){return s+it.qty*it.unit_price;},0);
+                  var tot=sub*1.15;
+                  var units=(o.items||[]).reduce(function(s,it){return s+it.qty;},0);
+                  return(
+                    <div key={o.id} className="card hoverable order-card" onClick={function(){setActiveOrderId(o.id);}}>
+                      <span className="order-id">{o.id}</span>
+                      <div className="supplier-info-block">
+                        <h4 className="supplier-name">{si?si.name:(o.supplier_id||"—")}</h4>
+                        <div className="order-meta">
+                          {(o.items||[]).length} line{(o.items||[]).length!==1?"s":""}
+                          <span className="dot">·</span>{units} unit{units!==1?"s":""}
+                          <span className="dot">·</span>{relDay(o.created)}
+                        </div>
+                      </div>
+                      <StatusChip status={o.status}/>
+                      <div className="order-total">MUR {fmt(tot)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {/* Customer Orders */}
+            {custOrders.length>0&&(
+              <div style={{marginTop:28}}>
+                <div className="section-label" style={{marginBottom:12}}>Customer Orders Taken</div>
+                <div className="order-list">
+                  {custOrders.map(function(o){
+                    return(
+                      <div key={o.id} className="card order-card" style={{borderColor:o.ordered?"var(--accent-line)":"#f5c97a4d"}}>
+                        <span className="order-id" style={{color:"var(--warn)"}}>CUST</span>
+                        <div className="supplier-info-block">
+                          <h4 className="supplier-name">{o.customer||"Customer"}</h4>
+                          <div className="order-meta">{o.product}{o.qty?" · qty "+o.qty:""}{o.note?" · "+o.note:""}</div>
+                        </div>
+                        <StatusChip status={o.ordered?"delivered":"pending"}/>
+                        <div style={{display:"flex",gap:6}}>
+                          <button className="btn btn-ghost" style={{padding:"5px 10px",fontSize:12}} onClick={function(e){e.stopPropagation();var nc=custOrders.map(function(x){return x.id===o.id?Object.assign({},x,{ordered:!x.ordered}):x;});setCustOrders(nc);persist(cellEdits,removedRows,payments,inventory,orders,nc);}}>{o.ordered?"Unmark":"Mark Ordered"}</button>
+                          <button className="btn btn-ghost" style={{padding:"5px 10px",fontSize:12,color:"var(--danger)"}} onClick={function(e){e.stopPropagation();var nc=custOrders.filter(function(x){return x.id!==o.id;});setCustOrders(nc);persist(cellEdits,removedRows,payments,inventory,orders,nc);}}>Del</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          {activeOrderObj&&<OrderDrawer order={activeOrderObj} supplier={activeOrderSup} onClose={function(){setActiveOrderId(null);}}/>}
+          {orderToast&&<div className="toast">{orderToast}</div>}
+        </div>
+      );
+    }
+
+    return null;
+  }
+
+  if(screen==="menu"){
+    const changedCount=Object.keys(priceHistory).reduce(function(a,sn){
+      return a+Object.keys(priceHistory[sn]).filter(function(pn){const h=priceHistory[sn][pn];return h.length>=2&&Math.abs(h[h.length-1].price-h[0].price)>0.001;}).length;
+    },0);
+    const totalOut=supNames.reduce(function(a,sn){
+      const prods=getSupProducts(SUPPLIERS[sn]);
+      return a+prods.filter(function(p){const s=parseFloat(inventory[sn+"||"+p+"||stock"]);return!isNaN(s)&&s===0;}).length;
+    },0);
+    const totalLow=supNames.reduce(function(a,sn){
+      const prods=getSupProducts(SUPPLIERS[sn]);
+      return a+prods.filter(function(p){
+        const s=parseFloat(inventory[sn+"||"+p+"||stock"]);
+        const r=parseFloat(inventory[sn+"||"+p+"||reorder"]);
+        return!isNaN(s)&&!isNaN(r)&&s>0&&s<=r;
+      }).length;
+    },0);
+
+    const menuItems=[
+      {key:"invoices",  icon:"🧾", label:"Invoices",     sub:"Browse supplier invoices",                         color:C.blue,   badge:null},
+      {key:"payments",  icon:"💳", label:"Payments",     sub:"Payment methods & status",                         color:C.accent, badge:null},
+      {key:"catalogue", icon:"📦", label:"Catalogue",    sub:"Full product list by supplier",                    color:C.warn,   badge:null},
+      {key:"prices",    icon:"📊", label:"Price Tracker",sub:changedCount>0?changedCount+" change"+(changedCount!==1?"s":"")+" detected":"Monitor buying price changes", color:changedCount>0?C.warn:C.rec, badge:changedCount>0?changedCount:null, badgeColor:C.warn},
+      {key:"inventory", icon:"📋", label:"Inventory",    sub:totalOut>0?totalOut+" out of stock"+(totalLow>0?", "+totalLow+" low":""):totalLow>0?totalLow+" low stock items":"Track stock & reorder levels", color:totalOut>0?C.danger:totalLow>0?C.warn:C.purple, badge:totalOut>0?totalOut:totalLow>0?totalLow:null, badgeColor:totalOut>0?C.danger:C.warn},
+      {key:"order",     icon:"🛒", label:"Order",         sub:(function(){const p=custOrders.filter(function(o){return !o.ordered;}).length;return p>0?p+" order"+(p!==1?"s":"")+" pending":"Customer orders & weekly purchasing";}()), color:C.blue, badge:(function(){const p=custOrders.filter(function(o){return !o.ordered;}).length;return p>0?p:null;}()), badgeColor:C.warn},
+    ];
+    return(
+      <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
+        style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:"max(40px,calc(40px + env(safe-area-inset-bottom)))"}}>
+        <div style={{height:"env(safe-area-inset-top)",background:C.surf}}></div>
+        {(pulling||refreshing)&&(
+          <div style={{height:refreshing?50:pullY,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",transition:pulling?"none":"height 0.3s ease",background:C.bg}}>
+            <div style={{width:28,height:28,borderRadius:"50%",border:"3px solid "+C.bdr,borderTop:"3px solid "+C.accent,animation:refreshing?"spin 0.7s linear infinite":"none",transform:!refreshing?("rotate("+Math.min(pullY*3,270)+"deg)"):"none"}}></div>
+          </div>
+        )}
+        <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div>
+            <div style={{fontWeight:800,fontSize:18}}>Fowdar Store</div>
+            <div style={{fontSize:11,color:C.muted}}>Veer Bisham Fowdar Trading Co. Ltd.</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <button onClick={refreshData} disabled={refreshing}
+              style={{background:"none",border:"1px solid "+C.bdr,borderRadius:8,padding:"6px 12px",color:refreshing?C.muted:C.accent,fontSize:20,cursor:"pointer",lineHeight:1}}>
+              {refreshing?"...":"\u21BB"}
+            </button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:10,color:C.muted}}>Total Spend</div>
+              <div style={{fontSize:15,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(totalAll)}</div>
+            </div>
+          </div>
+        </div>
+        {loading?(<div style={{textAlign:"center",padding:60,color:C.muted}}>Loading...</div>):(
+          <div style={{padding:"20px 14px"}}>
+            <div style={{fontSize:11,color:C.muted,marginBottom:16,fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Select a section</div>
+            {menuItems.map(function(item){
+              return(
+                <div key={item.key} onClick={function(){setScreen(item.key);setSearch("");setSubScreen(null);}}
+                  style={{background:C.surf,borderRadius:16,marginBottom:12,padding:"16px 16px",border:"1px solid "+(item.badge?item.badgeColor:C.bdr),cursor:"pointer",display:"flex",alignItems:"center",gap:14,position:"relative"}}>
+                  <div style={{fontSize:30,flexShrink:0,width:44,height:44,borderRadius:12,background:C.surf2,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.icon}</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:800,fontSize:15,marginBottom:3,color:C.text}}>{item.label}</div>
+                    <div style={{fontSize:12,color:item.badge?item.badgeColor:C.muted,fontWeight:item.badge?700:400}}>{item.sub}</div>
+                  </div>
+                  {item.badge&&(<div style={{background:item.badgeColor,borderRadius:20,padding:"3px 10px",fontSize:12,fontWeight:800,color:item.badgeColor===C.warn?"#000":"#fff",flexShrink:0}}>{item.badge}</div>)}
+                  {!item.badge&&(<div style={{fontSize:18,color:C.muted,flexShrink:0}}>{">"}</div>)}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {toast&&(<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:C.accent,color:"#000",padding:"10px 20px",borderRadius:20,fontWeight:700,fontSize:13,zIndex:999,boxShadow:"0 4px 20px rgba(0,229,160,0.4)"}}>{toast}</div>)}
+      </div>
+    );
+  }
+
+  // ── SECTION SCREENS (invoices / payments / catalogue) ────────────
+  return(
+    <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:"max(60px,calc(60px + env(safe-area-inset-bottom)))"}}>
+      <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,paddingTop:"max(10px,env(safe-area-inset-top))",paddingBottom:"10px",paddingLeft:"12px",paddingRight:"12px",position:"sticky",top:0,zIndex:200}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={goMenu}
+            style={{background:C.surf2,border:"1px solid "+C.bdr,borderRadius:10,padding:"10px 16px",color:C.accent,fontWeight:800,fontSize:14,cursor:"pointer",flexShrink:0}}>
+            {"< Menu"}
+          </button>
+          <div style={{fontWeight:800,fontSize:16,color:C.text}}>
+            {screen==="invoices"?"Invoices":screen==="payments"?"Payments":"Catalogue"}
+          </div>
+        </div>
+      </div>
+
+      {/* ── INVOICES ── */}
+      {screen==="invoices"&&(
+        <div style={{padding:"12px 10px"}}>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers or products..." style={ISt}/>
+          <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:12,paddingBottom:4}}>
+            {allDays.map(function(d){
+              const active=dayFilter===d;
+              return(<button key={d} onClick={function(){setDayFilter(d);setSortMode("received");}}
+                style={{padding:"6px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",background:active?C.accent:C.surf2,color:active?"#000":C.muted,border:"1px solid "+(active?C.accent:C.bdr),flexShrink:0}}>
+                {getDayLabel(d)}
+              </button>);
+            })}
+          </div>
+          {dayFilter&&(
+            <div style={{background:C.surf,borderRadius:10,padding:"10px 14px",marginBottom:12,border:"1px solid "+C.bdr,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div><div style={{fontSize:10,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Day Total</div><div style={{fontSize:15,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(dayTotal)}</div></div>
+              <div style={{textAlign:"right"}}><div style={{fontSize:10,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Suppliers</div><div style={{fontSize:15,fontWeight:800,color:C.text}}>{daySuppliers.length}</div></div>
+            </div>
+          )}
+          <SortPills value={sortMode} onChange={setSortMode} color={C.blue} options={[["received","Received"],["az","A-Z"],["za","Z-A"],["high","$ High"],["low","$ Low"]]}/>
+          {filteredDaySups.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No suppliers for this day</div>):
+          filteredDaySups.map(function(s){
+            const sup=SUPPLIERS[s.name];
+            const invCount=(sup.invoices||[]).filter(function(inv){return(inv.receivedAt?inv.receivedAt.split("T")[0]:null)===dayFilter;}).length;
+            return(
+              <div key={s.name} onClick={function(){setTab(s.name);setScreen("supplier");setSubScreen("invoices");setSearch("");setEditMode(false);}}
+                style={{background:C.surf,borderRadius:12,marginBottom:10,padding:"12px 14px",border:"1px solid "+C.bdr,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{minWidth:0,flex:1}}>
+                  <div style={{fontWeight:700,fontSize:14,marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</div>
+                  <div style={{fontSize:11,color:C.muted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sup.meta.supplier}</div>
+                  <div style={{fontSize:10,color:C.muted,marginTop:2}}>{invCount} invoice{invCount!==1?"s":""}</div>
+                </div>
+                <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
+                  <div style={{fontSize:13,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(s.total)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── PAYMENTS — Redesigned ── */}
+      {screen==="payments"&&(
+        <div style={{padding:"12px 10px"}}>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers..." style={ISt}/>
+          {/* SUMMARY STATS */}
+          {(function(){
+            const methods={};
+            supNames.forEach(function(sn){
+              const pk=sn+"||pay";
+              const pv=payments[pk]!==undefined?payments[pk]:(SUPPLIERS[sn].meta.payment||"");
+              const key=pv.trim()||"Unset";
+              methods[key]=(methods[key]||0)+1;
+            });
+            return(
+              <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
+                {Object.keys(methods).map(function(m){
+                  return(<div key={m} style={{flexShrink:0,background:C.surf2,borderRadius:10,padding:"8px 14px",border:"1px solid "+C.bdr,textAlign:"center"}}>
+                    <div style={{fontSize:16,fontWeight:800,color:m==="Unset"?C.muted:C.accent}}>{methods[m]}</div>
+                    <div style={{fontSize:10,color:C.muted,marginTop:2,maxWidth:80,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m}</div>
+                  </div>);
+                })}
+              </div>
+            );
+          })()}
+          {supNames.filter(function(sn){
+            if(!search)return true;
+            return sn.toLowerCase().includes(lq)||(SUPPLIERS[sn].meta.supplier||"").toLowerCase().includes(lq);
+          }).map(function(sn){
+            const sup=SUPPLIERS[sn];
+            const total=sup.invoices.reduce(function(a,i){return a+i.total;},0);
+            const pk=sn+"||pay";
+            const pv=payments[pk]!==undefined?payments[pk]:(sup.meta.payment||"");
+            const hasMethod=pv.trim().length>0;
+            const METHODS=["Cash","Credit","Cheque","Bank Transfer","Other"];
+            return(
+              <div key={sn} style={{background:C.surf,borderRadius:14,marginBottom:10,border:"1px solid "+(hasMethod?C.bdr:C.warn),overflow:"hidden"}}>
+                {/* HEADER ROW */}
+                <div style={{padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.bdr}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sn}</div>
+                    <div style={{fontSize:11,color:C.muted,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sup.meta.supplier}</div>
+                  </div>
+                  <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
+                    <div style={{fontSize:12,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(total)}</div>
+                    {!hasMethod&&<div style={{fontSize:10,color:C.warn,marginTop:2}}>⚠ Not set</div>}
+                  </div>
+                </div>
+                {/* QUICK SELECT BUTTONS */}
+                <div style={{padding:"10px 14px",display:"flex",gap:6,flexWrap:"wrap"}}>
+                  {METHODS.map(function(m){
+                    const active=pv.trim()===m;
+                    return(<button key={m} onClick={function(){setPayVal(pk,active?"":m);}}
+                      style={{padding:"6px 12px",borderRadius:20,fontSize:11,fontWeight:700,cursor:"pointer",
+                        background:active?C.accent:C.surf2,color:active?"#000":C.muted,
+                        border:"1px solid "+(active?C.accent:C.bdr)}}>
+                      {m}
+                    </button>);
+                  })}
+                </div>
+                {/* CUSTOM NOTES */}
+                <div style={{padding:"0 14px 12px"}}>
+                  <input value={pv} onChange={function(e){setPayVal(pk,e.target.value);}}
+                    placeholder="Custom notes (e.g. Net 30 days, reference #)..."
+                    style={Object.assign({},ISt,{marginBottom:0,fontSize:12,background:C.surf2})}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── CATALOGUE — Supplier list only ── */}
+      {screen==="catalogue"&&(
+        <div style={{padding:"12px 10px"}}>
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers..." style={ISt}/>
+          <SortPills value={catSort} onChange={setCatSort} color={C.warn} options={[["az","A-Z"],["za","Z-A"],["count","Most Products"],["default","Default"]]}/>
+          {(function(){
+            let list=supNames.map(function(sn){
+              const sup=SUPPLIERS[sn];
+              const prods=getSupProducts(sup);
+              return{name:sn,sup:sup,count:prods.length};
+            }).filter(function(s){
+              if(!search)return s.count>0;
+              return s.name.toLowerCase().includes(lq)||s.sup.meta.supplier.toLowerCase().includes(lq);
+            });
+            if(catSort==="az")list=list.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+            else if(catSort==="za")list=list.slice().sort(function(a,b){return b.name.localeCompare(a.name);});
+            else if(catSort==="count")list=list.slice().sort(function(a,b){return b.count-a.count;});
+            return list.map(function(s){
+              return(
+                <div key={s.name} onClick={function(){setTab(s.name);setSubScreen("cat-supplier");setSearch("");}}
+                  style={{background:C.surf,borderRadius:12,marginBottom:10,padding:"14px 16px",border:"1px solid "+C.bdr,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</div>
+                    <div style={{fontSize:11,color:C.muted,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.sup.meta.supplier}</div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0,marginLeft:10}}>
+                    <div style={{background:C.surf2,borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:700,color:C.warn}}>{s.count}</div>
+                    <div style={{color:C.muted,fontSize:16}}>{">"}</div>
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      )}
+
+      {toast&&(<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:C.accent,color:"#000",padding:"10px 20px",borderRadius:20,fontWeight:700,fontSize:13,zIndex:999,boxShadow:"0 4px 20px rgba(0,229,160,0.4)"}}>{toast}</div>)}
+    </div>
+  );
+}
+ReactDOM.render(React.createElement(App),document.getElementById("root"));
+</script>
+</body>
+</html>
