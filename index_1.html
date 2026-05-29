@@ -1288,6 +1288,21 @@ input, textarea, select { font-family: inherit; color: inherit; }
 .credit-sum-lbl { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; }
 .credit-sum-val { font-size:20px; font-weight:700; font-family:var(--font-mono); letter-spacing:-0.02em; }
 .credit-sum-sub { font-size:11.5px; color:var(--text-muted); margin-top:3px; font-family:var(--font-mono); }
+/* Group by controls */
+.credit-group-row { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.credit-group-lbl { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; white-space:nowrap; }
+.credit-group-pills { display:inline-flex; background:var(--bg-1); border:1px solid var(--border); border-radius:12px; padding:3px; gap:2px; flex-wrap:wrap; }
+.cgpill { background:transparent; border:none; color:var(--text-muted); font-size:12px; font-weight:600; padding:6px 12px; border-radius:9px; cursor:pointer; transition:all .15s; white-space:nowrap; font-family:inherit; }
+.cgpill:hover { color:var(--text); }
+.cgpill.cga { background:var(--panel); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.22); }
+/* Group headers */
+.credit-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 4px 8px; margin-top:8px; border-bottom:1px solid var(--border); gap:8px; }
+.credit-group-hdr:first-child { margin-top:0; }
+.cgh-label { font-size:13px; font-weight:700; color:var(--text); letter-spacing:-0.01em; }
+.cgh-meta  { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.cgh-count { font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono); }
+.cgh-total { font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--accent); }
+.cgh-unpaid{ font-size:11px; color:var(--warn); font-family:var(--font-mono); background:rgba(245,201,122,0.12); border-radius:6px; padding:2px 7px; }
 
 /* ============================================================
    CATALOGUE SCREEN — supplier grid
@@ -2005,19 +2020,20 @@ function normalizeTotals(t){
     totalBeforeVat:"Excl. VAT",totalExclVat:"Excl. VAT",
     subtotalExVat:"Subtotal Excl. VAT",subTotal:"Sub Total",
     subTotalInclLineDisc:"Subtotal (after disc.)",
-    // Discounts
-    discount:"Discount",discountTotal:"Discount",
+    // Discounts (including Innodis line-level discount)
+    discount:"Discount",discountTotal:"Discount",totalLineDiscount:"Line Discount",
     // VAT
     vat:"VAT",vatTotal:"VAT",vatAmt:"VAT",vatAmount:"VAT",
     vat15:"VAT 15%",totalVatAmt:"VAT",totalVatAmount:"VAT",
     // Other taxes
     petTax:"PET Tax",
     // Net / after-discount amounts
-    net:"Net Total",netTotal:"Net Total",totalNet:"Net Total",
+    net:"Net Total",netTotal:"Net Total",totalNet:"Net Total",netAmt:"Net Amount",
     // Incl-VAT / grand totals
     inclVat:"Total Incl. VAT",totalIncl:"Total Incl. VAT",totalInclVat:"Total Incl. VAT",totalIncVat:"Total Incl. VAT",
     totalPayable:"Total Payable",invoiceTotal:"Total Payable",
     gross:"Gross Total",grossTotal:"Gross Total",grandTotal:"Grand Total",
+    grossAmount:"Gross Amount",grossAmt:"Gross Amount",
     total:"Total",
   };
 
@@ -2026,11 +2042,11 @@ function normalizeTotals(t){
     "totalExempted","totalTaxable","exempted","taxable","zeroRated",
     "exclVat","exclAmt","totalExcl","totalBeforeVat","totalExclVat",
     "subtotalExVat","subTotal","subTotalInclLineDisc",
-    "discount","discountTotal",
+    "discount","discountTotal","totalLineDiscount",
     "vat","vatTotal","vatAmt","vatAmount","vat15","totalVatAmt","totalVatAmount","petTax",
-    "net","netTotal","totalNet",
+    "net","netTotal","totalNet","netAmt",
     "inclVat","totalIncl","totalInclVat","totalIncVat","totalPayable","invoiceTotal",
-    "gross","grossTotal","grandTotal","total"
+    "gross","grossTotal","grossAmount","grossAmt","grandTotal","total"
   ];
 
   var used={};
@@ -2076,6 +2092,41 @@ function getInvGrandTotal(inv){
     return inv.rows.reduce(function(a,r){return a+(parseFloat(r[inv.amountCol])||0);},0);
   }
   return 0;
+}
+
+// Finds which row in a [[label, value], ...] totals array is the "grand total"
+// to highlight in the invoice footer. Scans labels by priority rather than
+// always using the last row — prevents auxiliary rows (e.g. "Line Discount" MUR 0.04)
+// from being highlighted instead of the real total.
+//
+// Priority order:
+//  1. Label contains "grand"  → Grand Total, Grand Amount
+//  2. Label contains "gross"  → Gross Total, Gross Amount
+//  3. Label contains "payable"→ Total Payable
+//  4. Label contains "incl"   → Total Incl. VAT
+//  5. Label is exactly "Net Total"
+//  6. Label is exactly "Total"
+//  7. Fallback: row with the maximum absolute value
+function findGrandTotalIdx(totRows){
+  if(!totRows||!totRows.length)return 0;
+  var patterns=[
+    function(l){return /grand/i.test(l);},
+    function(l){return /gross/i.test(l);},
+    function(l){return /payable/i.test(l);},
+    function(l){return /incl/i.test(l);},
+    function(l){return l==="Net Total";},
+    function(l){return l==="Total";}
+  ];
+  for(var pi=0;pi<patterns.length;pi++){
+    // Search from the END so if there are multiple matches we get the last one
+    for(var i=totRows.length-1;i>=0;i--){
+      if(patterns[pi](totRows[i][0]))return i;
+    }
+  }
+  // Fallback: row with maximum value
+  var maxIdx=totRows.length-1;
+  totRows.forEach(function(r,i){if(Math.abs(r[1])>Math.abs(totRows[maxIdx][1]))maxIdx=i;});
+  return maxIdx;
 }
 
 function buildPriceHistory(SUPPLIERS){
@@ -2271,6 +2322,7 @@ function App(){
   const [payTab,       setPayTab]       = React.useState("methods"); // "methods" | "credit"
   const [creditStatus, setCreditStatus] = React.useState(function(){try{return JSON.parse(localStorage.getItem("fw_creditStatus")||"{}");}catch(e){return{};}});
   const [creditDue,    setCreditDue]    = React.useState(function(){try{return JSON.parse(localStorage.getItem("fw_creditDue")||"{}");}catch(e){return{};}});
+  const [creditGroupBy,setCreditGroupBy]= React.useState("supplier"); // "supplier"|"month"|"amount"|"status"|"none"
 
   React.useEffect(function(){try{localStorage.setItem("fw_creditStatus",JSON.stringify(creditStatus));}catch(e){};},[creditStatus]);
   React.useEffect(function(){try{localStorage.setItem("fw_creditDue",JSON.stringify(creditDue));}catch(e){};},[creditDue]);
@@ -2586,14 +2638,16 @@ function App(){
                           // Fallback: if the AI invoice has no totals but carries a total value, synthesise a row
                           if(totRows.length===0&&inv.total>0)totRows=[["Grand Total",inv.total]];
                           if(totRows.length===0)return null;
-                          var lastTi=totRows.length-1;
+                          // Smart highlight: find the row that IS the grand total by label,
+                          // not just whichever happens to be last (avoids highlighting "Line Discount" etc.)
+                          var highlightTi=findGrandTotalIdx(totRows);
                           return(
                             <tfoot>{totRows.map(function(t,ti){
-                              var isLast=ti===lastTi;
+                              var isHL=ti===highlightTi;
                               return(
-                                <tr key={ti} style={{background:isLast?"rgba(138,255,122,0.08)":C.surf2,borderTop:isLast?"2px solid rgba(138,255,122,0.32)":"none"}}>
-                                  <td colSpan={(inv.cols||[]).length+3} style={{padding:isLast?"9px 10px":"5px 8px",textAlign:"right",color:isLast?C.text:C.muted,fontSize:isLast?12:11,fontWeight:isLast?700:400,letterSpacing:isLast?0.02:0}}>{t[0]}</td>
-                                  <td style={{padding:isLast?"9px 10px":"5px 8px",textAlign:"right",color:C.accent,fontWeight:800,fontSize:isLast?14:12,fontFamily:"monospace",whiteSpace:"nowrap"}}>MUR {fmt(t[1])}</td>
+                                <tr key={ti} style={{background:isHL?"rgba(138,255,122,0.08)":C.surf2,borderTop:isHL?"2px solid rgba(138,255,122,0.32)":"none"}}>
+                                  <td colSpan={(inv.cols||[]).length+3} style={{padding:isHL?"9px 10px":"5px 8px",textAlign:"right",color:isHL?C.text:C.muted,fontSize:isHL?12:11,fontWeight:isHL?700:400,letterSpacing:isHL?0.02:0}}>{t[0]}</td>
+                                  <td style={{padding:isHL?"9px 10px":"5px 8px",textAlign:"right",color:C.accent,fontWeight:800,fontSize:isHL?14:12,fontFamily:"monospace",whiteSpace:"nowrap"}}>MUR {fmt(t[1])}</td>
                                   {editMode&&<td></td>}
                                 </tr>
                               );
@@ -3847,14 +3901,64 @@ function App(){
         rows.push({sn:sn, inv:inv, amount:amount, key:key});
       });
     });
+    // Base sort: unpaid first, then newest invoice first
     rows.sort(function(a,b){
-      var as = creditStatus[a.key]||"unpaid", bs = creditStatus[b.key]||"unpaid";
+      var as=creditStatus[a.key]||"unpaid", bs=creditStatus[b.key]||"unpaid";
       if(as!==bs) return as==="unpaid"?-1:1;
       return toISODate(b.inv.date).localeCompare(toISODate(a.inv.date));
     });
     return rows;
   })();
   const creditUnpaidCount = creditRows.filter(function(r){return (creditStatus[r.key]||"unpaid")==="unpaid";}).length;
+
+  // Build grouped structure for Credit Invoices tab
+  const creditGroups = (function(){
+    if(creditGroupBy==="none") return [{label:null, rows:creditRows}];
+
+    var groupMap = {};
+    var groupOrder = [];
+
+    creditRows.forEach(function(r){
+      var key;
+      if(creditGroupBy==="supplier"){
+        key = r.sn;
+      } else if(creditGroupBy==="month"){
+        var iso = toISODate(r.inv.date)||"";
+        key = iso.length>=7 ? iso.substring(0,7) : "Unknown"; // "YYYY-MM"
+      } else if(creditGroupBy==="amount"){
+        var a = r.amount;
+        key = a < 5000 ? "A_under5k" : a <= 20000 ? "B_5k_20k" : "C_over20k";
+      } else if(creditGroupBy==="status"){
+        key = (creditStatus[r.key]||"unpaid")==="paid" ? "B_paid" : "A_unpaid";
+      }
+      if(!groupMap[key]){ groupMap[key]=[]; groupOrder.push(key); }
+      groupMap[key].push(r);
+    });
+
+    // For month: sort keys newest-first
+    if(creditGroupBy==="month") groupOrder.sort(function(a,b){return b.localeCompare(a);});
+
+    return groupOrder.map(function(k){
+      var rows = groupMap[k];
+      var unpaid = rows.filter(function(r){return (creditStatus[r.key]||"unpaid")==="unpaid";});
+      var total = rows.reduce(function(a,r){return a+r.amount;},0);
+      var unpaidTotal = unpaid.reduce(function(a,r){return a+r.amount;},0);
+
+      // Build human label
+      var label = k;
+      if(creditGroupBy==="month"){
+        var parts=k.split("-");
+        var months=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        label = (months[parseInt(parts[1])]||parts[1]) + " " + parts[0];
+      } else if(creditGroupBy==="amount"){
+        label = k==="A_under5k"?"Under MUR 5,000":k==="B_5k_20k"?"MUR 5,000 – 20,000":"Over MUR 20,000";
+      } else if(creditGroupBy==="status"){
+        label = k==="A_unpaid"?"Unpaid":"Paid";
+      }
+
+      return {label:label, rows:rows, total:total, unpaidCount:unpaid.length, unpaidTotal:unpaidTotal, groupKey:k};
+    });
+  })();
 
   return(
     <div style={{background:"var(--bg)",minHeight:"100%",paddingBottom:"max(60px,calc(60px + env(safe-area-inset-bottom)))"}}>
@@ -4152,39 +4256,83 @@ function App(){
                     </div>
                   </div>
 
-                  {/* Invoice cards */}
+                  {/* Group by controls */}
+                  <div className="credit-group-row">
+                    <span className="credit-group-lbl">Group by</span>
+                    <div className="credit-group-pills">
+                      {[["supplier","Supplier"],["month","Month"],["amount","Amount"],["status","Status"],["none","None"]].map(function(opt){
+                        return(
+                          <button key={opt[0]} className={"cgpill"+(creditGroupBy===opt[0]?" cga":"")}
+                            onClick={function(){setCreditGroupBy(opt[0]);}}>
+                            {opt[1]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Grouped invoice list */}
                   <div className="credit-list">
-                    {creditRows.map(function(r){
-                      var isPaid = (creditStatus[r.key]||"unpaid")==="paid";
-                      var due = creditDue[r.key]||"";
+                    {creditGroups.map(function(grp){
                       return(
-                        <div key={r.key} className={"credit-card"+(isPaid?" cc-paid":"")}>
-                          <div className="credit-top">
-                            <div className="credit-av">{r.sn.substring(0,2).toUpperCase()}</div>
-                            <div className="credit-info">
-                              <div className="credit-sup">{r.sn}</div>
-                              <div className="credit-date">
-                                Inv {r.inv.id||"—"} · {fmtDD(r.inv.date)}
+                        <div key={grp.groupKey||"all"}>
+                          {/* Group header — only shown when grouping is active */}
+                          {creditGroupBy!=="none"&&grp.label!==null&&(
+                            <div className="credit-group-hdr">
+                              <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
+                                <span className="cgh-label">{grp.label}</span>
+                                <span className="cgh-count">{grp.rows.length} invoice{grp.rows.length!==1?"s":""}</span>
+                              </div>
+                              <div className="cgh-meta">
+                                {grp.unpaidCount>0&&(
+                                  <span className="cgh-unpaid">MUR {fmt(grp.unpaidTotal)} unpaid</span>
+                                )}
+                                <span className="cgh-total">MUR {fmt(grp.total)}</span>
                               </div>
                             </div>
-                            <div style={{textAlign:"right",flexShrink:0}}>
-                              <div className="credit-amtlbl">Amount</div>
-                              <div className="credit-amt">MUR {fmt(r.amount)}</div>
-                            </div>
-                          </div>
-                          <div className="credit-foot">
-                            <div className="credit-due">
-                              <span className="credit-due-lbl">Due:</span>
-                              <input type="date" className="credit-due-in" value={due}
-                                onChange={function(e){var v=e.target.value;setCreditDue(function(p){var n=Object.assign({},p);n[r.key]=v;return n;});}}
-                              />
-                              {due&&<span style={{fontSize:11.5,color:"var(--text-muted)",fontFamily:"var(--font-mono)"}}>{fmtDD(due)}</span>}
-                            </div>
-                            <button className={"credit-status-btn "+(isPaid?"csb-paid":"csb-unpaid")}
-                              onClick={function(){var k=r.key;setCreditStatus(function(p){var n=Object.assign({},p);n[k]=isPaid?"unpaid":"paid";return n;});}}>
-                              {isPaid?"✓ Paid":"Mark Paid"}
-                            </button>
-                          </div>
+                          )}
+
+                          {/* Invoice cards within group */}
+                          {grp.rows.map(function(r){
+                            var isPaid = (creditStatus[r.key]||"unpaid")==="paid";
+                            var due = creditDue[r.key]||"";
+                            return(
+                              <div key={r.key} className={"credit-card"+(isPaid?" cc-paid":"")}>
+                                <div className="credit-top">
+                                  <div className="credit-av">{r.sn.substring(0,2).toUpperCase()}</div>
+                                  <div className="credit-info">
+                                    {/* Only show supplier name when not grouped by supplier */}
+                                    {creditGroupBy!=="supplier"&&(
+                                      <div className="credit-sup">{r.sn}</div>
+                                    )}
+                                    <div className="credit-date" style={{color:creditGroupBy==="supplier"?"var(--text)":"var(--text-muted)",fontWeight:creditGroupBy==="supplier"?600:400}}>
+                                      Inv {r.inv.id||"—"} · {fmtDD(r.inv.date)}
+                                    </div>
+                                    {creditGroupBy==="supplier"&&(
+                                      <div style={{fontSize:11.5,color:"var(--text-muted)",marginTop:1,fontFamily:"var(--font-mono)"}}>{r.sn}</div>
+                                    )}
+                                  </div>
+                                  <div style={{textAlign:"right",flexShrink:0}}>
+                                    <div className="credit-amtlbl">Amount</div>
+                                    <div className="credit-amt">MUR {fmt(r.amount)}</div>
+                                  </div>
+                                </div>
+                                <div className="credit-foot">
+                                  <div className="credit-due">
+                                    <span className="credit-due-lbl">Due:</span>
+                                    <input type="date" className="credit-due-in" value={due}
+                                      onChange={function(e){var v=e.target.value;setCreditDue(function(p){var n=Object.assign({},p);n[r.key]=v;return n;});}}
+                                    />
+                                    {due&&<span style={{fontSize:11.5,color:"var(--text-muted)",fontFamily:"var(--font-mono)"}}>{fmtDD(due)}</span>}
+                                  </div>
+                                  <button className={"credit-status-btn "+(isPaid?"csb-paid":"csb-unpaid")}
+                                    onClick={function(){var k=r.key;setCreditStatus(function(p){var n=Object.assign({},p);n[k]=isPaid?"unpaid":"paid";return n;});}}>
+                                    {isPaid?"✓ Paid":"Mark Paid"}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       );
                     })}
