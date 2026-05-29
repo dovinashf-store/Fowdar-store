@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fowdar Store — Payments</title>
+  <style>
+:root {
+  --bg:           #0a0a0a;
+  --bg-1:         #111111;
+  --panel:        #151515;
+  --panel-hover:  #1b1b1b;
+  --panel-2:      #1d1d1d;
+  --border:       #242424;
+  --border-soft:  #1e1e1e;
+  --border-strong:#2f2f2f;
+
+  --text:         #f5f5f5;
+  --text-dim:     #a3a3a3;
+  --text-muted:   #6e6e6e;
+  --text-faint:   #4a4a4a;
+
+  --accent:       #8aff7a;
+  --accent-soft:  #8aff7a26;
+  --accent-line:  #8aff7a3d;
+  --accent-bg:    #0d1a09;
+
+  --warn:         #f5b34a;
+  --warn-soft:    #f5b34a1f;
+  --warn-line:    #f5b34a3d;
+  --danger:       #ff6f6f;
+  --info:         #7ab7ff;
+  --info-soft:    #7ab7ff1f;
+  --info-line:    #7ab7ff3d;
+
+  /* Payment-method accents */
+  --m-cash:       #8aff7a;   /* lime */
+  --m-cheque:     #c9a8ff;   /* lavender */
+  --m-juice:      #ff9b6a;   /* orange (Juice brand-ish) */
+  --m-credit:     #7ab7ff;   /* blue */
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font-family: inherit; color: inherit; }
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ============== Appbar ============== */
+.appbar {
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.appbar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 18px 32px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+.brand-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.brand-back:hover { background: #8aff7a30; }
+.brand-back svg { width: 12px; height: 12px; }
+.brand-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.appbar-meta { display: flex; align-items: center; gap: 12px; }
+.totals { text-align: right; font-family: var(--font-mono); line-height: 1.15; }
+.totals .label {
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted);
+}
+.totals .value {
+  margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--accent);
+}
+
+/* ============== Page ============== */
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 22px 32px 80px;
+  flex: 1;
+}
+
+.section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label .rule { flex: 1; height: 1px; background: var(--border-soft); }
+
+/* ============== Payment-method summary cards ============== */
+.method-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.method-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+  position: relative;
+  overflow: hidden;
+}
+.method-card:hover { border-color: var(--border-strong); background: var(--panel-hover); }
+.method-card.active {
+  border-color: var(--mc);
+  background: linear-gradient(140deg, color-mix(in srgb, var(--mc) 12%, var(--panel)) 0%, var(--panel) 60%);
+}
+.method-card .head {
+  display: flex; align-items: center; gap: 10px;
+}
+.method-card .glyph {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--mc) 14%, transparent);
+  color: var(--mc);
+  display: grid; place-items: center;
+  border: 1px solid color-mix(in srgb, var(--mc) 28%, transparent);
+}
+.method-card .glyph svg { width: 16px; height: 16px; }
+.method-card .name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.method-card .count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+.method-card .amount {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.method-card .amount .unit {
+  font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: 4px;
+}
+.method-card .bar {
+  height: 4px;
+  background: var(--bg-1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.method-card .bar .fill {
+  height: 100%;
+  background: var(--mc);
+  border-radius: 999px;
+}
+
+/* ============== Controls row ============== */
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.search svg {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;
+}
+.field {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0 12px 0 38px;
+  height: 40px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s ease, background .15s ease;
+}
+.field:focus { border-color: var(--accent-line); background: var(--panel-hover); }
+.field::placeholder { color: var(--text-muted); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12.5px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.chip:hover { color: var(--text); border-color: var(--border-strong); }
+.chip.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+.chip .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.chip.active .num { color: var(--accent); }
+
+/* ============== Supplier list ============== */
+.supplier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.supplier-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px 24px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.supplier-card:hover { border-color: var(--border-strong); }
+
+.supplier-head {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.supplier-avatar {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.supplier-info { min-width: 0; }
+.supplier-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+.supplier-sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+.supplier-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.supplier-meta .dot { color: var(--text-faint); }
+
+.supplier-amount {
+  text-align: right;
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.supplier-amount .amount {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+.supplier-amount .unit {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Method selector row */
+.method-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.method-pills {
+  display: inline-flex;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+}
+.method-pill {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.method-pill:hover:not(.active) { color: var(--text-dim); }
+.method-pill svg { width: 14px; height: 14px; opacity: 0.7; }
+.method-pill.active {
+  background: color-mix(in srgb, var(--mc) 18%, transparent);
+  color: var(--mc);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mc) 35%, transparent);
+}
+.method-pill.active svg { opacity: 1; }
+
+/* Inline reference field */
+.ref-field {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  font-family: var(--font-mono);
+  height: 36px;
+}
+.ref-field:focus { border-color: var(--accent-line); }
+.ref-field::placeholder { color: var(--text-faint); font-family: var(--font-sans); font-style: italic; font-size: 12.5px; }
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status-pill.paid    { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.status-pill.pending { color: var(--warn);   border-color: var(--warn-line);   background: var(--warn-soft); }
+
+.action-btn {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #0a1a06;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s ease;
+}
+.action-btn:hover { background: #9bff8d; }
+.action-btn.ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border-color: var(--border);
+  font-weight: 500;
+}
+.action-btn.ghost:hover { background: var(--panel-hover); color: var(--text); }
+
+/* Footer */
+.foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #0a1a06;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 60;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .25s cubic-bezier(.2,.7,.2,1);
+}
+.toast.show { opacity: 1; transform: translate(-50%, -8px); }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .method-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .appbar-inner { padding: 14px 16px; }
+  .page { padding: 18px 16px 80px; }
+  .supplier-card { padding: 14px 16px; grid-template-columns: 1fr; }
+  .supplier-amount { flex-direction: row; gap: 8px; align-items: baseline; }
+  .method-row { flex-direction: column; align-items: stretch; }
+  .method-pills { overflow-x: auto; }
+  .brand-title { font-size: 18px; }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ============== Appbar ============== -->
+    <header class="appbar">
+      <div class="appbar-inner">
+        <a class="brand-back" href="Fowdar Store Home.html">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 2.5L3 6l4.5 3.5"/><path d="M3 6h7"/>
+          </svg>
+          Menu
+        </a>
+        <h1 class="brand-title">Payments</h1>
+        <div class="appbar-meta">
+          <div class="totals">
+            <div class="label">Total Outstanding</div>
+            <div class="value" id="grand-total">MUR 0.00</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- ============== Method summary cards ============== -->
+      <div class="section-label">
+        <span>By Method</span>
+        <span class="rule"></span>
+        <span style="font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: none;">tap to filter</span>
+      </div>
+      <div class="method-cards" id="method-cards">
+        <!-- populated by JS -->
+      </div>
+
+      <!-- ============== Controls ============== -->
+      <div class="controls">
+        <div class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/>
+          </svg>
+          <input class="field" id="search" placeholder="Search suppliers, references, or amounts…" />
+        </div>
+        <button class="chip active" data-status="all">All <span class="num" id="count-all"></span></button>
+        <button class="chip" data-status="pending">Pending <span class="num" id="count-pending"></span></button>
+        <button class="chip" data-status="paid">Paid <span class="num" id="count-paid"></span></button>
+      </div>
+
+      <!-- ============== Supplier list ============== -->
+      <div class="section-label">
+        <span>Suppliers</span>
+        <span class="rule"></span>
+        <span id="visible-count" style="font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: none;"></span>
+      </div>
+      <div class="supplier-list" id="supplier-list"></div>
+
+      <div class="foot">
+        <span>Fowdar Store Tracker · Payments</span>
+        <span id="totals-foot"></span>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  // ===========================================================
+  // Data & helpers
+  // ===========================================================
+  const METHODS = [
+    {
+      key: "cash",
+      name: "Cash",
+      colorVar: "--m-cash",
+      icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="8" rx="1.5"/><circle cx="8" cy="8" r="1.6"/><path d="M4.5 6.5h.01M11.5 9.5h.01"/></svg>',
+      placeholder: "Cash receipt # (optional)",
+    },
+    {
+      key: "cheque",
+      name: "Cheque",
+      colorVar: "--m-cheque",
+      icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M4 6.5h4M4 9h6"/><path d="M11 10.5l1.5-1.5"/></svg>',
+      placeholder: "Cheque number — e.g. 587012",
+    },
+    {
+      key: "juice",
+      name: "Juice",
+      colorVar: "--m-juice",
+      icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="1.5" width="8" height="13" rx="1.5"/><path d="M7 12.5h2"/><path d="M6 4h4M6 6h4M6 8h3"/></svg>',
+      placeholder: "Juice transaction ID — e.g. JC2026-…",
+    },
+    {
+      key: "credit",
+      name: "Credit",
+      colorVar: "--m-credit",
+      icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M1.5 6.5h13"/><path d="M4 10h2M8 10h1.5"/></svg>',
+      placeholder: "Credit terms — e.g. Net 30",
+    },
+  ];
+
+  const METHOD_BY_KEY = Object.fromEntries(METHODS.map(m => [m.key, m]));
+
+  // Each supplier has: id, name, sub, amount (outstanding), method, status, ref, last_paid
+  let SUPPLIERS = [
+    { id: "lcf",    name: "LCF Distribution",   sub: "LCF Distribution Ltd",            amount: 4494.00,   method: "cheque", status: "pending", ref: "587012",        last_paid: "12 May" },
+    { id: "vaul",   name: "Vaulbert",           sub: "HVC Ltd via Vaulbert",            amount: 12010.60,  method: "cheque", status: "pending", ref: "587013",        last_paid: "10 May" },
+    { id: "rpm",    name: "RPM Enterprise",     sub: "RPM Enterprise Ltd",              amount: 5815.00,   method: "credit", status: "pending", ref: "Net 30",        last_paid: "—" },
+    { id: "fss",    name: "FSS Distributors",   sub: "FSS Distributors Ltd",            amount: 14782.83,  method: "cash",   status: "paid",    ref: "CASH-2418",     last_paid: "Today" },
+    { id: "qbl",    name: "Quality Beverages",  sub: "Quality Beverages Limited",       amount: 87045.16,  method: "cheque", status: "pending", ref: "587014",        last_paid: "08 May" },
+    { id: "ibl",    name: "IBL Foods",          sub: "Ireland Blyth Limited · Foods",   amount: 22480.00,  method: "juice",  status: "paid",    ref: "JC2026-09142",  last_paid: "Yesterday" },
+    { id: "inn",    name: "Innodis Ltd",        sub: "Innodis Group · Meat & Dairy",    amount: 38920.00,  method: "cash",   status: "pending", ref: "",              last_paid: "05 May" },
+    { id: "pan",    name: "Panagora Marketing", sub: "Panagora Marketing Co. Ltd.",     amount: 18620.00,  method: "juice",  status: "pending", ref: "",              last_paid: "20 Apr" },
+    { id: "phx",    name: "Phoenix Beverages",  sub: "Phoenix Beverages Limited",       amount: 9460.00,   method: "cheque", status: "paid",    ref: "586998",        last_paid: "Yesterday" },
+    { id: "dvt",    name: "Dairy Vita",         sub: "Dairy Vita Co. Ltd.",             amount: 3120.50,   method: "cash",   status: "paid",    ref: "CASH-2412",     last_paid: "Today" },
+    { id: "lot",    name: "Lottotech",          sub: "Lottotech Distribution",          amount: 6240.00,   method: "credit", status: "pending", ref: "Net 60",        last_paid: "—" },
+    { id: "hap",    name: "Hapag Distribution", sub: "Hapag Distribution Ltd",          amount: 7180.00,   method: "juice",  status: "pending", ref: "",              last_paid: "02 May" },
+  ];
+
+  const fmtMUR = (n) => "MUR " + n.toLocaleString("en-MU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const initials = (name) => name.split(/\s+/).slice(0,2).map(s => s[0]).join("").toUpperCase();
+
+  // ===========================================================
+  // State
+  // ===========================================================
+  let state = {
+    methodFilter: null,   // null | "cash" | "cheque" | "juice" | "credit"
+    statusFilter: "all",  // "all" | "pending" | "paid"
+    search: "",
+  };
+
+  // ===========================================================
+  // Render
+  // ===========================================================
+  function renderMethodCards() {
+    const totals = METHODS.map(m => {
+      const list = SUPPLIERS.filter(s => s.method === m.key);
+      const total = list.reduce((s, x) => s + x.amount, 0);
+      const pending = list.filter(s => s.status === "pending").reduce((s,x) => s + x.amount, 0);
+      return { ...m, count: list.length, total, pending };
+    });
+
+    const grand = totals.reduce((s,m) => s + m.total, 0);
+    const grandPending = SUPPLIERS.filter(s => s.status === "pending").reduce((s,x) => s + x.amount, 0);
+
+    const container = document.getElementById("method-cards");
+    container.innerHTML = totals.map(m => {
+      const isActive = state.methodFilter === m.key;
+      const pct = grand ? (m.total / grand) * 100 : 0;
+      return `
+        <div class="method-card ${isActive ? "active" : ""}" data-method="${m.key}" style="--mc: var(${m.colorVar});">
+          <div class="head">
+            <div class="glyph">${m.icon}</div>
+            <div class="name">${m.name}</div>
+            <div class="count">${m.count} supplier${m.count !== 1 ? "s" : ""}</div>
+          </div>
+          <div class="amount">${fmtMUR(m.total)}</div>
+          <div class="bar"><div class="fill" style="width:${pct.toFixed(1)}%"></div></div>
+          <div style="font-size:11.5px;color:var(--text-muted);font-family:var(--font-mono);">
+            ${m.pending > 0 ? fmtMUR(m.pending) + " pending" : "all settled"}
+          </div>
+        </div>`;
+    }).join("");
+
+    document.getElementById("grand-total").textContent = fmtMUR(grandPending);
+    document.getElementById("totals-foot").textContent =
+      `${SUPPLIERS.length} suppliers · ${fmtMUR(grand)} total · ${fmtMUR(grandPending)} pending`;
+  }
+
+  function renderCounts() {
+    document.getElementById("count-all").textContent     = SUPPLIERS.length;
+    document.getElementById("count-pending").textContent = SUPPLIERS.filter(s => s.status === "pending").length;
+    document.getElementById("count-paid").textContent    = SUPPLIERS.filter(s => s.status === "paid").length;
+  }
+
+  function renderList() {
+    const term = state.search.trim().toLowerCase();
+    const list = SUPPLIERS.filter(s => {
+      if (state.methodFilter && s.method !== state.methodFilter) return false;
+      if (state.statusFilter !== "all" && s.status !== state.statusFilter) return false;
+      if (term) {
+        const hay = `${s.name} ${s.sub} ${s.ref || ""} ${s.amount}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+
+    const container = document.getElementById("supplier-list");
+    document.getElementById("visible-count").textContent =
+      list.length === SUPPLIERS.length ? `${list.length} shown` : `${list.length} of ${SUPPLIERS.length} shown`;
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="padding:48px 24px;text-align:center;border:1px dashed var(--border-strong);border-radius:var(--r-lg);color:var(--text-muted);">
+          <div style="font-size:24px;margin-bottom:8px;opacity:0.5;">🔎</div>
+          <div>No suppliers match</div>
+          <div style="font-size:12px;color:var(--text-faint);margin-top:4px;">Try clearing the filters above.</div>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(s => {
+      const method = METHOD_BY_KEY[s.method];
+      const pills = METHODS.map(m => `
+        <button class="method-pill ${m.key === s.method ? "active" : ""}"
+                data-id="${s.id}" data-method="${m.key}"
+                style="--mc: var(${m.colorVar});">
+          ${m.icon}
+          ${m.name}
+        </button>
+      `).join("");
+
+      return `
+        <div class="supplier-card">
+          <div class="supplier-head">
+            <div class="supplier-avatar">${initials(s.name)}</div>
+            <div class="supplier-info">
+              <h3 class="supplier-name">${s.name}</h3>
+              <div class="supplier-sub">${s.sub}</div>
+              <div class="supplier-meta">
+                <span>last payment ${s.last_paid}</span>
+                <span class="dot">·</span>
+                <span>via ${method.name.toLowerCase()}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="supplier-amount">
+            <span class="unit">${s.status === "paid" ? "Paid" : "Outstanding"}</span>
+            <span class="amount">${fmtMUR(s.amount)}</span>
+          </div>
+
+          <div class="method-row">
+            <div class="method-pills">${pills}</div>
+            <input class="ref-field" data-id="${s.id}" type="text"
+              placeholder="${method.placeholder}"
+              value="${(s.ref || "").replace(/"/g, "&quot;")}" />
+            <span class="status-pill ${s.status}"><span class="dot"></span>${s.status === "paid" ? "Paid" : "Pending"}</span>
+            ${s.status === "pending"
+              ? `<button class="action-btn" data-mark-paid="${s.id}">Mark paid</button>`
+              : `<button class="action-btn ghost" data-mark-pending="${s.id}">Undo</button>`}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderAll() {
+    renderMethodCards();
+    renderCounts();
+    renderList();
+  }
+
+  // ===========================================================
+  // Interactions
+  // ===========================================================
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  document.addEventListener("click", (e) => {
+    // Method summary card click → toggle filter
+    const card = e.target.closest(".method-card");
+    if (card) {
+      const m = card.dataset.method;
+      state.methodFilter = state.methodFilter === m ? null : m;
+      renderAll();
+      return;
+    }
+    // Status chip click
+    const chip = e.target.closest(".chip[data-status]");
+    if (chip) {
+      state.statusFilter = chip.dataset.status;
+      document.querySelectorAll(".chip[data-status]").forEach(c => c.classList.toggle("active", c.dataset.status === state.statusFilter));
+      renderList();
+      return;
+    }
+    // Method pill on supplier row
+    const pill = e.target.closest(".method-pill");
+    if (pill) {
+      const id = pill.dataset.id;
+      const m  = pill.dataset.method;
+      const sup = SUPPLIERS.find(s => s.id === id);
+      if (sup && sup.method !== m) {
+        sup.method = m;
+        sup.ref = "";
+        renderAll();
+        showToast(`${sup.name} set to ${METHOD_BY_KEY[m].name}`);
+      }
+      return;
+    }
+    // Mark paid
+    const mp = e.target.closest("[data-mark-paid]");
+    if (mp) {
+      const id = mp.dataset.markPaid;
+      const sup = SUPPLIERS.find(s => s.id === id);
+      sup.status = "paid";
+      sup.last_paid = "Today";
+      renderAll();
+      showToast(`${sup.name} marked paid`);
+      return;
+    }
+    const mu = e.target.closest("[data-mark-pending]");
+    if (mu) {
+      const id = mu.dataset.markPending;
+      const sup = SUPPLIERS.find(s => s.id === id);
+      sup.status = "pending";
+      renderAll();
+      return;
+    }
+  });
+
+  // Reference inputs (delegated)
+  document.addEventListener("input", (e) => {
+    if (e.target.matches(".ref-field")) {
+      const id = e.target.dataset.id;
+      const sup = SUPPLIERS.find(s => s.id === id);
+      sup.ref = e.target.value;
+    }
+    if (e.target.id === "search") {
+      state.search = e.target.value;
+      renderList();
+    }
+  });
+
+  renderAll();
+  </script>
+</body>
+</html>

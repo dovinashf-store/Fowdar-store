@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fowdar Store — Catalogue</title>
+  <style>
+:root {
+  --bg:           #0a0a0a;
+  --bg-1:         #111111;
+  --panel:        #151515;
+  --panel-hover:  #1b1b1b;
+  --panel-2:      #1d1d1d;
+  --border:       #242424;
+  --border-soft:  #1e1e1e;
+  --border-strong:#2f2f2f;
+
+  --text:         #f5f5f5;
+  --text-dim:     #a3a3a3;
+  --text-muted:   #6e6e6e;
+  --text-faint:   #4a4a4a;
+
+  --accent:       #8aff7a;
+  --accent-soft:  #8aff7a26;
+  --accent-line:  #8aff7a3d;
+  --accent-bg:    #0d1a09;
+
+  --warn:         #f5b34a;
+  --warn-soft:    #f5b34a1f;
+  --warn-line:    #f5b34a3d;
+  --danger:       #ff6f6f;
+  --danger-soft:  #ff6f6f1f;
+  --info:         #7ab7ff;
+  --info-soft:    #7ab7ff1f;
+  --info-line:    #7ab7ff3d;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font-family: inherit; color: inherit; }
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ============== Appbar ============== */
+.appbar {
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky; top: 0; z-index: 30;
+}
+.appbar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+.brand-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.brand-back:hover { background: #8aff7a30; }
+.brand-back svg { width: 12px; height: 12px; }
+.brand-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.appbar-meta .totals { text-align: right; font-family: var(--font-mono); line-height: 1.15; }
+.appbar-meta .label {
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted);
+}
+.appbar-meta .value { margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--accent); }
+
+/* ============== Page ============== */
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 22px 32px 80px;
+  flex: 1;
+}
+
+.section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label .rule { flex: 1; height: 1px; background: var(--border-soft); }
+.section-label .meta {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 11.5px;
+}
+
+/* ============== KPI strip ============== */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kpi .label {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.kpi .value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.kpi .value.accent { color: var(--accent); }
+.kpi .value.warn   { color: var(--warn); }
+.kpi .meta {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ============== Controls ============== */
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.search svg {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;
+}
+.field {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0 12px 0 38px;
+  height: 40px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s ease, background .15s ease;
+}
+.field:focus { border-color: var(--accent-line); background: var(--panel-hover); }
+.field::placeholder { color: var(--text-muted); }
+
+.sort-group {
+  display: inline-flex;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.sort-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: all .15s ease;
+}
+.sort-btn:hover:not(.active) { color: var(--text-dim); }
+.sort-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+}
+
+/* Category chips */
+.cat-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12.5px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s ease;
+}
+.chip:hover { color: var(--text); border-color: var(--border-strong); }
+.chip.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+.chip .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.chip.active .num { color: var(--accent); }
+
+/* ============== Supplier list ============== */
+.sup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sup-row {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  transition: border-color .15s ease, background .15s ease;
+  overflow: hidden;
+}
+.sup-row:hover { border-color: var(--border-strong); }
+.sup-row.open { border-color: var(--accent-line); }
+
+.sup-summary {
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 42px 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  cursor: pointer;
+}
+.sup-avatar {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.sup-info { min-width: 0; }
+.sup-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+.sup-sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+.sup-cats {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.cat-tag {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.cat-tag .count { color: var(--text-muted); }
+
+.sup-stats {
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+}
+.sup-stat {
+  text-align: right;
+  font-family: var(--font-mono);
+  line-height: 1.15;
+}
+.sup-stat .label {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+.sup-stat .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+}
+.sup-stat .value.accent { color: var(--accent); }
+.sup-stat .value.warn   { color: var(--warn); }
+.sup-stat .value.muted  { color: var(--text-muted); }
+
+.sup-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+.sup-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.sup-badge .pip { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.sup-badge.fresh { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.sup-badge.warn  { color: var(--warn);   border-color: var(--warn-line);   background: var(--warn-soft); }
+
+.sup-chevron {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  color: var(--text-muted);
+  transition: transform .2s ease;
+}
+.sup-row.open .sup-chevron {
+  transform: rotate(180deg);
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.sup-chevron svg { width: 12px; height: 12px; }
+
+/* Expanded products preview */
+.sup-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.sup-row.open .sup-details { max-height: 900px; }
+.sup-details-inner {
+  padding: 4px 18px 18px;
+}
+.product-table {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.product-table .row {
+  display: grid;
+  grid-template-columns: 1fr 110px 100px 90px;
+  gap: 14px;
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+}
+.product-table .row:last-child { border-bottom: none; }
+.product-table .row.header {
+  background: var(--panel-2);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.product-table .row .num,
+.product-table .row .price {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+.product-table .row .price { color: var(--text); font-weight: 600; }
+.product-table .row .pack {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.product-table .row .change {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-align: right;
+}
+.product-table .row .change.up   { color: var(--danger); }
+.product-table .row .change.down { color: var(--accent); }
+.product-table .row .change.flat { color: var(--text-faint); }
+.product-table .footer {
+  background: var(--panel-2);
+  padding: 10px 14px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+}
+.product-table .footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.product-table .footer a:hover { text-decoration: underline; }
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s ease;
+}
+.btn:hover { background: var(--panel-hover); border-color: var(--border-strong); }
+.btn svg { width: 13px; height: 13px; }
+.btn.primary {
+  background: var(--accent); color: #0a1a06; border-color: var(--accent); font-weight: 600;
+}
+.btn.primary:hover { background: #9bff8d; }
+
+/* Footer */
+.foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+.empty {
+  padding: 60px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+}
+.empty .glyph { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+.empty h3 { color: var(--text-dim); font-size: 15px; margin: 0 0 4px 0; }
+.empty p { margin: 0; font-size: 13px; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 820px) {
+  .sup-summary { grid-template-columns: 36px 1fr auto auto; }
+  .sup-stats { display: none; }
+  .sup-cats { display: none; }
+}
+@media (max-width: 720px) {
+  .appbar-inner { padding: 14px 16px; }
+  .page { padding: 18px 16px 80px; }
+  .brand-title { font-size: 18px; }
+  .product-table .row { grid-template-columns: 1fr 80px 80px; }
+  .product-table .row .change { display: none; }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="appbar">
+      <div class="appbar-inner">
+        <a class="brand-back" href="Fowdar Store Home.html">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 2.5L3 6l4.5 3.5"/><path d="M3 6h7"/>
+          </svg>
+          Menu
+        </a>
+        <h1 class="brand-title">Catalogue</h1>
+        <div class="appbar-meta">
+          <div class="totals">
+            <div class="label">Total SKUs</div>
+            <div class="value" id="grand-skus">0</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- ============== KPI strip ============== -->
+      <div class="section-label">
+        <span>Overview</span>
+        <span class="rule"></span>
+        <span class="meta">last sync 2 min ago</span>
+      </div>
+      <div class="kpis" id="kpis"></div>
+
+      <!-- ============== Controls ============== -->
+      <div class="controls">
+        <div class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+          <input class="field" id="search" placeholder="Search suppliers or products…" />
+        </div>
+        <div class="sort-group" id="sort-group">
+          <button class="sort-btn active" data-sort="az">A–Z</button>
+          <button class="sort-btn" data-sort="za">Z–A</button>
+          <button class="sort-btn" data-sort="most">Most products</button>
+          <button class="sort-btn" data-sort="recent">Recently updated</button>
+        </div>
+      </div>
+
+      <!-- ============== Category filters ============== -->
+      <div class="cat-chips" id="cat-chips"></div>
+
+      <!-- ============== Supplier list ============== -->
+      <div class="section-label">
+        <span>Suppliers</span>
+        <span class="rule"></span>
+        <span class="meta" id="visible-count"></span>
+      </div>
+      <div class="sup-list" id="sup-list"></div>
+
+      <div class="foot">
+        <span>Fowdar Store Tracker · Catalogue</span>
+        <span id="totals-foot"></span>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  // ===========================================================
+  // Helpers
+  // ===========================================================
+  const fmtMUR = (n) => "MUR " + n.toLocaleString("en-MU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtInt = (n) => n.toLocaleString("en-MU");
+  const initials = (name) => name.split(/\s+/).slice(0,2).map(s => s[0]).join("").toUpperCase();
+  const relativeDay = (n) => n === 0 ? "today" : n === 1 ? "yesterday" : n < 7 ? `${n}d ago` : n < 30 ? `${Math.floor(n/7)}w ago` : `${Math.floor(n/30)}mo ago`;
+
+  // ===========================================================
+  // Mock data — Mauritius grocery suppliers
+  // ===========================================================
+  const SUPPLIERS = [
+    {
+      id: "afara", name: "Afara Ltd", sub: "Afara Ltd",
+      categories: { "Snacks": 3, "Beverages": 2 }, updated: 8,
+      products: [
+        { name: "Salted Cashews 200g", pack: "20 × 200g", price: 1840, change: 0 },
+        { name: "Roasted Peanuts 150g", pack: "24 × 150g", price: 920, change: 0 },
+        { name: "Pistachios 100g",      pack: "24 × 100g", price: 1480, change: -2.4 },
+      ],
+    },
+    {
+      id: "agi", name: "Agiliss", sub: "Agiliss Ltd",
+      categories: { "Cleaning": 2 }, updated: 12,
+      products: [
+        { name: "Multi-Surface Cleaner 500ml", pack: "12 × 500ml", price: 540, change: 0 },
+        { name: "Glass Cleaner 750ml",         pack: "12 × 750ml", price: 720, change: 0 },
+      ],
+    },
+    {
+      id: "ash", name: "Ashfaaq & Co", sub: "Ashfaaq & Co Ltd",
+      categories: { "Pantry": 4, "Spices": 2 }, updated: 3,
+      products: [
+        { name: "Basmati Rice 5kg",     pack: "4 × 5kg",  price: 1680, change: 0,    popular: true },
+        { name: "Toor Dal 1kg",         pack: "20 × 1kg", price: 1240, change: 1.6 },
+        { name: "Coriander Powder 200g", pack: "24 × 200g", price: 920, change: 0 },
+      ],
+    },
+    {
+      id: "akg", name: "Ashok Kumar Gupta", sub: "Ashok Kumar Gupta",
+      categories: { "Grains": 3, "Pantry": 3, "Spices": 2 }, updated: 14,
+      products: [
+        { name: "Atta Flour 5kg",      pack: "4 × 5kg",  price: 1820, change: 0, popular: true },
+        { name: "Brown Sugar 1kg",     pack: "20 × 1kg", price: 820,  change: 0 },
+        { name: "Black Pepper 100g",   pack: "24 × 100g", price: 1480, change: 4.2 },
+      ],
+    },
+    {
+      id: "bed", name: "Bedford Impex", sub: "Bedford Impex Ltd",
+      categories: { "Oils": 2, "Pantry": 1 }, updated: 5,
+      products: [
+        { name: "Olive Oil 1L",     pack: "6 × 1L",  price: 1646, change: 0, popular: true },
+        { name: "Coconut Oil 500ml", pack: "12 × 500ml", price: 740, change: -3.1 },
+      ],
+    },
+    {
+      id: "bra", name: "BrandActiv", sub: "BrandActiv IBL Ltd",
+      categories: { "Dairy": 8, "Pantry": 12, "Snacks": 11, "Beverages": 6 }, updated: 1,
+      products: [
+        { name: "Nido Powder Milk 900g",    pack: "12 × 900g", price: 4680, change: 5.9, popular: true },
+        { name: "Maggi Cubes Chicken 4g",   pack: "60 × 24",   price: 1380, change: 0 },
+        { name: "Nescafé Classic 200g",     pack: "12 × 200g", price: 3240, change: 0,   popular: true },
+        { name: "KitKat 4-finger 41.5g",    pack: "36 × 41.5g", price: 1620, change: 0 },
+      ],
+    },
+    {
+      id: "cad", name: "Cadi Fortune", sub: "Cadi Fortune Ltd",
+      categories: { "Snacks": 5, "Confectionery": 3 }, updated: 11,
+      products: [
+        { name: "Tic Tac Mint 16g",        pack: "24 × 16g",  price: 480, change: 0 },
+        { name: "Mentos Original 38g",     pack: "40 × 38g",  price: 840, change: 2.4 },
+      ],
+    },
+    {
+      id: "cer", name: "Cernol", sub: "Cernol Ltd",
+      categories: { "Cleaning": 3 }, updated: 22,
+      products: [
+        { name: "Bleach 1L",            pack: "12 × 1L",   price: 380, change: 0 },
+        { name: "Laundry Powder 3kg",   pack: "4 × 3kg",   price: 1240, change: 0 },
+      ],
+    },
+    {
+      id: "che", name: "Cheekips", sub: "Cheekips Ltd",
+      categories: { "Snacks": 3 }, updated: 9,
+      products: [
+        { name: "Cheekips Cheese 50g",  pack: "30 × 50g",  price: 780, change: 0, popular: true },
+        { name: "Cheekips BBQ 50g",     pack: "30 × 50g",  price: 780, change: 0 },
+        { name: "Cheekips Salt 50g",    pack: "30 × 50g",  price: 720, change: -2.7 },
+      ],
+    },
+    {
+      id: "con", name: "Convenience Food", sub: "Convenience Food Ltd",
+      categories: { "Pantry": 2 }, updated: 30,
+      products: [
+        { name: "Canned Tuna 185g",  pack: "48 × 185g", price: 3720, change: 0 },
+        { name: "Sardines 125g",     pack: "50 × 125g", price: 2380, change: 0 },
+      ],
+    },
+    {
+      id: "dyw", name: "Dywada", sub: "Dywada Worldwide Co Ltd",
+      categories: { "Beverages": 8, "Confectionery": 7, "Snacks": 6 }, updated: 2,
+      products: [
+        { name: "Pringles Original 165g", pack: "12 × 165g", price: 1080, change: 0, popular: true },
+        { name: "Oreo Original 137g",     pack: "20 × 137g", price: 980,  change: 0 },
+        { name: "Cadbury Dairy Milk 90g", pack: "24 × 90g",  price: 1640, change: 0,   popular: true },
+      ],
+    },
+    {
+      id: "fca", name: "Food Canners", sub: "Food Canners Marketing Ltd",
+      categories: { "Pantry": 5 }, updated: 5,
+      products: [
+        { name: "Tomato Paste 70g",  pack: "100 × 70g",  price: 540,  change: 0 },
+        { name: "Baked Beans 410g",  pack: "24 × 410g",  price: 1180, change: 0 },
+        { name: "Sweetcorn 340g",    pack: "24 × 340g",  price: 1020, change: 0 },
+      ],
+    },
+    {
+      id: "ibl", name: "IBL Foods", sub: "Ireland Blyth Limited · Foods",
+      categories: { "Grains": 4, "Oils": 2, "Pantry": 3 }, updated: 6,
+      products: [
+        { name: "Sunflower Oil 5L",  pack: "4 × 5L",   price: 2240, change: 2.8, popular: true },
+        { name: "Basmati Rice 5kg",  pack: "4 × 5kg",  price: 1680, change: 0,   popular: true },
+        { name: "Red Lentils 1kg",   pack: "20 × 1kg", price: 1240, change: 0 },
+      ],
+    },
+    {
+      id: "inn", name: "Innodis Ltd", sub: "Innodis Group · Meat & Dairy",
+      categories: { "Meat": 9, "Dairy": 4, "Frozen": 5 }, updated: 3,
+      products: [
+        { name: "Chicken Fillets 1kg",       pack: "10 × 1kg", price: 1680, change: -4.5, popular: true },
+        { name: "Chicken Whole Frozen 1.2kg", pack: "12 × 1.2kg", price: 1820, change: 0, popular: true },
+        { name: "Beef Mince Premium 500g",   pack: "20 × 500g", price: 2640, change: 0 },
+      ],
+    },
+    {
+      id: "phx", name: "Phoenix Beverages", sub: "Phoenix Beverages Limited",
+      categories: { "Beverages": 12 }, updated: 6,
+      products: [
+        { name: "Phoenix Lager 33cl",    pack: "24 × 33cl", price: 980,  change: 0, popular: true },
+        { name: "Phoenix Special 65cl",  pack: "12 × 65cl", price: 1120, change: 0 },
+        { name: "Stella Artois 33cl",    pack: "24 × 33cl", price: 1480, change: 0 },
+      ],
+    },
+    {
+      id: "lot", name: "Lottotech", sub: "Lottotech Distribution",
+      categories: { "Cleaning": 6, "Household": 4 }, updated: 14,
+      products: [
+        { name: "Toilet Paper 12-roll",  pack: "8 × 12-pack",  price: 1480, change: 4.2 },
+        { name: "Dish Soap 500ml",       pack: "12 × 500ml",   price: 540,  change: 0 },
+      ],
+    },
+  ];
+
+  // Compute total SKUs per supplier from categories
+  SUPPLIERS.forEach(s => {
+    s.skus = Object.values(s.categories).reduce((a,b) => a+b, 0);
+    s.priceChanges = s.products.filter(p => p.change !== 0).length;
+  });
+
+  // ===========================================================
+  // State
+  // ===========================================================
+  let state = {
+    search: "",
+    sort: "az",
+    category: "all",
+    openId: null,
+  };
+
+  // ===========================================================
+  // Render
+  // ===========================================================
+  function renderKpis() {
+    const totalSkus = SUPPLIERS.reduce((s,x) => s + x.skus, 0);
+    const recentlyUpdated = SUPPLIERS.filter(s => s.updated <= 7).length;
+    const priceChangeCount = SUPPLIERS.reduce((s,x) => s + x.priceChanges, 0);
+    const categories = new Set();
+    SUPPLIERS.forEach(s => Object.keys(s.categories).forEach(c => categories.add(c)));
+
+    document.getElementById("grand-skus").textContent = fmtInt(totalSkus);
+
+    document.getElementById("kpis").innerHTML = `
+      <div class="kpi">
+        <div class="label">Suppliers</div>
+        <div class="value">${SUPPLIERS.length}</div>
+        <div class="meta">across ${categories.size} categories</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Total SKUs</div>
+        <div class="value accent">${fmtInt(totalSkus)}</div>
+        <div class="meta">tracked across all suppliers</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Updated this week</div>
+        <div class="value">${recentlyUpdated}</div>
+        <div class="meta">${recentlyUpdated} of ${SUPPLIERS.length} suppliers</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Price changes</div>
+        <div class="value warn">${priceChangeCount}</div>
+        <div class="meta">items moved in last 7d</div>
+      </div>
+    `;
+  }
+
+  function renderCatChips() {
+    const counts = { all: SUPPLIERS.length };
+    SUPPLIERS.forEach(s => {
+      Object.keys(s.categories).forEach(c => {
+        counts[c] = (counts[c] || 0) + 1;
+      });
+    });
+    const cats = ["all", ...Object.keys(counts).filter(c => c !== "all").sort((a,b) => counts[b] - counts[a])];
+
+    document.getElementById("cat-chips").innerHTML = cats.map(c => `
+      <button class="chip ${state.category === c ? "active" : ""}" data-cat="${c}">
+        ${c === "all" ? "All categories" : c}
+        <span class="num">${counts[c]}</span>
+      </button>
+    `).join("");
+  }
+
+  function renderList() {
+    let list = SUPPLIERS.filter(s => {
+      if (state.category !== "all" && !s.categories[state.category]) return false;
+      if (state.search.trim()) {
+        const term = state.search.toLowerCase();
+        const hay = `${s.name} ${s.sub} ${s.products.map(p => p.name).join(" ")}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+
+    list.sort((a,b) => {
+      switch (state.sort) {
+        case "za":     return b.name.localeCompare(a.name);
+        case "most":   return b.skus - a.skus;
+        case "recent": return a.updated - b.updated;
+        default:       return a.name.localeCompare(b.name);
+      }
+    });
+
+    document.getElementById("visible-count").textContent =
+      list.length === SUPPLIERS.length
+        ? `${list.length} suppliers · ${fmtInt(list.reduce((s,x) => s + x.skus, 0))} SKUs`
+        : `${list.length} of ${SUPPLIERS.length} suppliers`;
+
+    document.getElementById("totals-foot").textContent =
+      `${list.length} suppliers · ${fmtInt(list.reduce((s,x) => s + x.skus, 0))} SKUs shown`;
+
+    if (list.length === 0) {
+      document.getElementById("sup-list").innerHTML = `
+        <div class="empty">
+          <div class="glyph">📦</div>
+          <h3>No suppliers match</h3>
+          <p>Try a different search or clear the category filter.</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById("sup-list").innerHTML = list.map(s => {
+      const open = state.openId === s.id;
+      const topCats = Object.entries(s.categories)
+        .sort(([,a],[,b]) => b-a)
+        .slice(0, 3)
+        .map(([cat, n]) => `<span class="cat-tag">${cat} <span class="count">${n}</span></span>`)
+        .join("");
+
+      const badges = [];
+      if (s.updated <= 3) badges.push(`<span class="sup-badge fresh"><span class="pip"></span>Updated ${relativeDay(s.updated)}</span>`);
+      else if (s.updated > 14) badges.push(`<span class="sup-badge warn"><span class="pip"></span>Last sync ${relativeDay(s.updated)}</span>`);
+      if (s.priceChanges > 0) badges.push(`<span class="sup-badge warn"><span class="pip"></span>${s.priceChanges} price change${s.priceChanges !== 1 ? "s" : ""}</span>`);
+
+      return `
+        <div class="sup-row ${open ? "open" : ""}" data-id="${s.id}">
+          <div class="sup-summary">
+            <div class="sup-avatar">${initials(s.name)}</div>
+            <div class="sup-info">
+              <h3 class="sup-name">${s.name}</h3>
+              <div class="sup-sub">${s.sub}</div>
+              <div class="sup-cats">${topCats}</div>
+            </div>
+            <div class="sup-stats">
+              <div class="sup-stat">
+                <div class="label">SKUs</div>
+                <div class="value accent">${s.skus}</div>
+              </div>
+              <div class="sup-stat">
+                <div class="label">Categories</div>
+                <div class="value">${Object.keys(s.categories).length}</div>
+              </div>
+            </div>
+            <div class="sup-badges">${badges.join("")}</div>
+            <div class="sup-chevron">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+            </div>
+          </div>
+          <div class="sup-details">
+            <div class="sup-details-inner">
+              <div class="product-table">
+                <div class="row header">
+                  <span>Product</span>
+                  <span class="num">Pack</span>
+                  <span class="price">Price</span>
+                  <span class="change">7d</span>
+                </div>
+                ${s.products.map(p => `
+                  <div class="row">
+                    <span>${p.name}${p.popular ? ' <span style="color:var(--accent);font-size:11px;font-family:var(--font-mono);">· popular</span>' : ""}</span>
+                    <span class="num pack">${p.pack}</span>
+                    <span class="price">${fmtMUR(p.price)}</span>
+                    <span class="change ${p.change > 0 ? "up" : p.change < 0 ? "down" : "flat"}">
+                      ${p.change === 0 ? "—" : (p.change > 0 ? "▲" : "▼") + " " + Math.abs(p.change).toFixed(1) + "%"}
+                    </span>
+                  </div>
+                `).join("")}
+                <div class="footer">
+                  <span>Showing ${s.products.length} of ${s.skus} SKUs</span>
+                  <a href="#">View full catalogue →</a>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 0 1 10 0"/><path d="M3 8v3.5h3.5"/><path d="M13 8v-3.5h-3.5"/></svg>
+                  Sync catalogue
+                </button>
+                <button class="btn">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="11" height="9" rx="1"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg>
+                  Export CSV
+                </button>
+                <button class="btn primary" style="margin-left:auto;">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+                  Start order
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderAll() {
+    renderKpis();
+    renderCatChips();
+    renderList();
+  }
+
+  // ===========================================================
+  // Interactions
+  // ===========================================================
+  document.addEventListener("click", (e) => {
+    const sortBtn = e.target.closest(".sort-btn");
+    if (sortBtn) {
+      state.sort = sortBtn.dataset.sort;
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.toggle("active", b.dataset.sort === state.sort));
+      renderList();
+      return;
+    }
+    const chip = e.target.closest(".chip[data-cat]");
+    if (chip) {
+      state.category = chip.dataset.cat;
+      renderCatChips();
+      renderList();
+      return;
+    }
+    const summary = e.target.closest(".sup-summary");
+    if (summary) {
+      const row = summary.parentElement;
+      const id = row.dataset.id;
+      state.openId = state.openId === id ? null : id;
+      document.querySelectorAll(".sup-row").forEach(r => {
+        r.classList.toggle("open", r.dataset.id === state.openId);
+      });
+      return;
+    }
+  });
+
+  document.getElementById("search").addEventListener("input", (e) => {
+    state.search = e.target.value;
+    renderList();
+  });
+
+  renderAll();
+  </script>
+</body>
+</html>

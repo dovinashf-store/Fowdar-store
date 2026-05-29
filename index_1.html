@@ -1004,6 +1004,416 @@ input, textarea, select { font-family: inherit; color: inherit; }
 
   
 
+/* ============================================================
+   HOME / MENU SCREEN
+   ============================================================ */
+.home-wrap { background: var(--bg); min-height: 100%; }
+.home-appbar {
+  background: rgba(10,10,10,.88);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 22px 32px;
+}
+.home-appbar-inner {
+  max-width: 1320px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 24px; align-items: start;
+}
+.home-brand { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 0; line-height: 1.1; color: var(--text); }
+.home-sub   { font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0; }
+.home-meta  { display: flex; align-items: flex-start; gap: 14px; }
+.home-refresh {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--accent-line); background: var(--accent-soft);
+  color: var(--accent); display: grid; place-items: center;
+  cursor: pointer; transition: all .15s ease;
+}
+.home-refresh:hover { background: #8aff7a30; }
+.home-refresh svg { width: 16px; height: 16px; }
+.home-totals { text-align: right; font-family: var(--font-mono); line-height: 1.15; }
+.home-totals .ht-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+.home-totals .ht-value { margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--accent); }
+.home-totals .ht-sub   { margin-top: 3px; font-size: 11px; color: var(--text-muted); letter-spacing: 0.02em; }
+.home-page  { max-width: 1320px; margin: 0 auto; padding: 26px 32px 60px; }
+
+/* section label with rule */
+.slabel {
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-muted); margin: 0 0 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+}
+.slabel .rule { flex: 1; height: 1px; background: var(--border-soft); }
+.slabel .meta { font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: none; font-size: 11.5px; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 26px; }
+.kpi  {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+  position: relative; overflow: hidden;
+}
+.kpi .kl  { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+.kpi .kv  { font-family: var(--font-mono); font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 6px; }
+.kpi .kv .ku { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.kpi .kd  { font-family: var(--font-mono); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
+.kpi .kd.up   { color: var(--accent); }
+.kpi .kd.down { color: var(--danger); }
+.kpi .kd.flat { color: var(--text-muted); }
+.kpi .kspark {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 90px; height: 30px; opacity: .9; pointer-events: none;
+}
+
+/* Bento grid */
+.bento { display: grid; grid-template-columns: repeat(12,1fr); gap: 12px; }
+.tile  {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 20px 22px;
+  cursor: pointer; transition: border-color .15s, background .15s;
+  display: flex; flex-direction: column; gap: 14px;
+  color: inherit; position: relative; overflow: hidden;
+}
+.tile:hover { border-color: var(--border-strong); background: var(--panel-hover); }
+.tile:hover .t-arrow { color: var(--text-dim); transform: translateX(2px); }
+.t-head   { display: flex; align-items: center; gap: 12px; }
+.t-glyph  { width: 42px; height: 42px; border-radius: 11px; background: var(--panel-2); border: 1px solid var(--border); display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+.t-titles { flex: 1; min-width: 0; }
+.t-title  { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.005em; }
+.t-sub    { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.t-arrow  { color: var(--text-faint); transition: all .15s; }
+.t-arrow svg { width: 16px; height: 16px; }
+.t-body   { display: flex; flex-direction: column; gap: 12px; }
+.t-stat   { display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden; }
+.t-num    { font-family: var(--font-mono); font-size: 28px; font-weight: 600; letter-spacing: -0.01em; flex-shrink: 0; }
+.t-unit   { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-num.accent { color: var(--accent); }
+.t-num.warn   { color: var(--warn); }
+.t-meta   { font-size: 12.5px; color: var(--text-muted); font-family: var(--font-mono); display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; overflow: hidden; }
+.t-meta .dot { color: var(--text-faint); }
+.col6  { grid-column: span 6; }
+.col4  { grid-column: span 4; }
+
+/* tile variants */
+.tile-order { border-color: var(--accent-line); background: linear-gradient(140deg,#0d1a09 0%,var(--panel) 60%); }
+.tile-order:hover { border-color: var(--accent); }
+.tile-order .t-glyph { background: var(--accent-soft); border-color: var(--accent-line); }
+.tile-alert { border-color: var(--warn-line); background: linear-gradient(140deg,#1c1408 0%,var(--panel) 55%); }
+.tile-alert:hover { border-color: var(--warn); }
+.tile-alert .t-glyph { background: var(--warn-soft); border-color: var(--warn-line); }
+.tile-badge { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-line); padding: 3px 10px; border-radius: 999px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+.tile-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); animation: tpulse 2s infinite; }
+@keyframes tpulse { 0% { box-shadow:0 0 0 0 #f5b34a80; } 70% { box-shadow:0 0 0 8px #f5b34a00; } 100% { box-shadow:0 0 0 0 #f5b34a00; } }
+.t-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.tqa { background: var(--bg-1); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 12px; border-radius: 10px; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; font-family: inherit; }
+.tqa:hover { background: var(--panel-hover); color: var(--text); border-color: var(--border-strong); }
+.tqa.primary { background: var(--accent); color: #0a1a06; border-color: var(--accent); font-weight: 600; }
+.tqa.primary:hover { background: #9bff8d; }
+.tqa svg { width: 13px; height: 13px; }
+
+/* mini list inside tile */
+.ml { display: flex; flex-direction: column; margin-top: 4px; border-top: 1px solid var(--border-soft); }
+.ml-row { padding: 9px 0; display: grid; grid-template-columns: 1fr auto; gap: 12px; font-size: 13px; border-bottom: 1px solid var(--border-soft); align-items: center; }
+.ml-row:last-child { border-bottom: none; }
+.ml-name { color: var(--text); font-weight: 500; }
+.ml-info { font-size: 11.5px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+.ml-right { font-family: var(--font-mono); font-size: 13px; text-align: right; color: var(--text); }
+.mpill { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; border: 1px solid; margin-top: 4px; }
+.mpill.pending   { color: var(--warn);   border-color: var(--warn-line);   background: var(--warn-soft); }
+.mpill.confirmed { color: var(--info);   border-color: var(--info-line);   background: var(--info-soft); }
+.mpill.delivered { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+
+/* gauge */
+.gauge     { width:100%; height:6px; background:var(--bg-1); border-radius:999px; overflow:hidden; }
+.gauge-fill { height:100%; border-radius:999px; background:var(--accent); }
+.gauge-fill.warn { background:var(--warn); }
+
+.home-foot { margin-top:22px; padding-top:18px; border-top:1px solid var(--border-soft); font-size:11.5px; color:var(--text-faint); display:flex; justify-content:space-between; font-family:var(--font-mono); }
+
+/* ============================================================
+   SECTION SCREEN SHARED HEADER
+   ============================================================ */
+.sec-appbar {
+  background: rgba(10,10,10,.88);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky; top: 0; z-index: 30;
+}
+.sec-appbar-inner {
+  max-width: 1320px; margin: 0 auto;
+  padding: 18px 32px;
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 18px; align-items: center;
+}
+.sec-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent); font-size: 13px;
+  background: var(--accent-soft); border: 1px solid var(--accent-line);
+  padding: 6px 12px; border-radius: 999px;
+  cursor: pointer; text-decoration: none; transition: background .15s;
+  font-family: inherit;
+}
+.sec-back:hover { background: #8aff7a30; }
+.sec-back svg { width: 12px; height: 12px; }
+.sec-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin: 0; color: var(--text); }
+.sec-page  { max-width: 1320px; margin: 0 auto; padding: 22px 32px 80px; }
+.sec-totals { text-align: right; font-family: var(--font-mono); line-height: 1.15; }
+.sec-totals .stl { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+.sec-totals .stv { margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--accent); }
+
+/* ============================================================
+   INVOICES SCREEN
+   ============================================================ */
+.week-strip { display: grid; grid-template-columns: 36px 1fr 36px; gap: 10px; align-items: stretch; margin-bottom: 22px; }
+.week-nav   { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-md); cursor: pointer; color: var(--text-dim); display: grid; place-items: center; transition: all .15s; font-family: inherit; }
+.week-nav:hover { background: var(--panel-hover); color: var(--text); border-color: var(--border-strong); }
+.week-nav svg { width: 14px; height: 14px; }
+.day-cards-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 8px; }
+.day-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 10px 8px;
+  text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+  transition: all .15s; position: relative;
+}
+.day-card:hover { background: var(--panel-hover); border-color: var(--border-strong); }
+.day-card.dc-active { background: linear-gradient(180deg,#0d1a09 0%,var(--panel) 100%); border-color: var(--accent-line); }
+.day-card.dc-active .dcn { color: var(--accent); }
+.day-card.dc-active .dct { color: var(--accent); }
+.day-card.dc-today::after { content:""; position:absolute; top:6px; right:6px; width:6px; height:6px; background:var(--accent); border-radius:50%; }
+.dcn  { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); font-weight:500; }
+.dcnum { font-family:var(--font-mono); font-size:22px; font-weight:600; letter-spacing:-0.01em; color:var(--text); }
+.dct  { font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-top:2px; }
+.dcc  { font-size:10px; color:var(--text-faint); font-family:var(--font-mono); }
+.day-card.dc-empty .dct,.day-card.dc-empty .dcc { color:var(--text-faint); }
+
+.day-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+.dstat { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); padding:14px 16px; display:flex; flex-direction:column; gap:4px; }
+.dstat .dsl { font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-muted); font-weight:500; }
+.dstat .dsv { font-family:var(--font-mono); font-size:22px; font-weight:600; letter-spacing:-0.01em; color:var(--text); }
+.dstat .dsv.accent { color:var(--accent); }
+.dstat .dsm { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+.sort-grp { display:inline-flex; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:3px; gap:2px; }
+.sort-btn { background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:500; padding:7px 12px; border-radius:7px; cursor:pointer; white-space:nowrap; transition:all .15s; font-family:inherit; }
+.sort-btn:hover { color:var(--text-dim); }
+.sort-btn.sba { background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent-line); }
+
+.inv-list  { display:flex; flex-direction:column; gap:8px; }
+.inv-row   { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; cursor:pointer; transition:border-color .15s; }
+.inv-row:hover { border-color:var(--border-strong); }
+.inv-summ  { padding:14px 18px; display:grid; grid-template-columns:40px 1fr auto auto; gap:16px; align-items:center; }
+.inv-av    { width:40px; height:40px; border-radius:11px; background:var(--panel-2); border:1px solid var(--border); display:grid; place-items:center; font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--text-dim); }
+.inv-info  { min-width:0; }
+.inv-sup   { font-size:15px; font-weight:600; margin:0; letter-spacing:-0.005em; }
+.inv-meta  { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; font-size:12px; font-family:var(--font-mono); color:var(--text-muted); align-items:center; }
+.inv-meta .dot { color:var(--text-faint); }
+.inv-cnt   { background:var(--bg-1); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim); }
+.inv-amt   { font-family:var(--font-mono); font-size:16px; font-weight:600; color:var(--accent); letter-spacing:-0.01em; text-align:right; min-width:120px; }
+.inv-amt .iau { display:block; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); font-weight:500; margin-bottom:2px; }
+
+/* ============================================================
+   PAYMENTS SCREEN
+   ============================================================ */
+.method-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.method-card  {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:16px 18px;
+  display:flex; flex-direction:column; gap:8px;
+  cursor:pointer; transition:border-color .15s, background .15s;
+  position:relative; overflow:hidden;
+}
+.method-card:hover { border-color:var(--border-strong); background:var(--panel-hover); }
+.method-card.mc-active { border-color:var(--mc,var(--accent)); }
+.mc-head { display:flex; align-items:center; gap:10px; }
+.mc-icon { width:32px; height:32px; border-radius:9px; display:grid; place-items:center; }
+.mc-icon svg { width:16px; height:16px; }
+.mc-name { font-size:13px; font-weight:600; color:var(--text); }
+.mc-count { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-left:auto; }
+.mc-amount { font-family:var(--font-mono); font-size:22px; font-weight:600; color:var(--text); letter-spacing:-0.01em; }
+.mc-amount .mcu { font-size:11px; color:var(--text-muted); font-weight:500; margin-left:4px; }
+.mc-bar  { height:4px; background:var(--bg-1); border-radius:999px; overflow:hidden; }
+.mc-fill { height:100%; border-radius:999px; }
+.mc-foot { font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono); }
+
+.pay-list  { display:flex; flex-direction:column; gap:10px; }
+.pay-card  { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 20px; display:flex; flex-direction:column; gap:12px; transition:border-color .15s; }
+.pay-card:hover { border-color:var(--border-strong); }
+.pay-row   { display:flex; align-items:flex-start; gap:14px; }
+.pay-av    { width:40px; height:40px; border-radius:11px; background:var(--panel-2); border:1px solid var(--border); display:grid; place-items:center; font-family:var(--font-mono); font-size:14px; font-weight:600; color:var(--text-dim); flex-shrink:0; }
+.pay-info  { min-width:0; flex:1; }
+.pay-name  { font-size:15.5px; font-weight:600; margin:0; letter-spacing:-0.005em; }
+.pay-sub   { font-size:12.5px; color:var(--text-muted); margin-top:2px; font-family:var(--font-mono); }
+.pay-right { text-align:right; flex-shrink:0; }
+.pay-total { font-family:var(--font-mono); font-size:18px; font-weight:600; color:var(--accent); letter-spacing:-0.01em; }
+.pay-tlbl  { font-size:10.5px; color:var(--text-muted); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:2px; }
+
+.pay-method-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.pay-pills { display:inline-flex; background:var(--bg-1); border:1px solid var(--border); border-radius:12px; padding:3px; gap:2px; }
+.ppill { background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:500; padding:7px 13px; border-radius:9px; cursor:pointer; transition:all .15s; white-space:nowrap; font-family:inherit; }
+.ppill:hover { color:var(--text-dim); }
+.ppill.ppa { background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent-line); }
+.pay-ref   { flex:1; min-width:180px; background:var(--bg-1); border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:13px; color:var(--text); outline:none; font-family:var(--font-mono); height:36px; transition:border-color .15s; }
+.pay-ref:focus { border-color:var(--accent-line); }
+.pay-ref::placeholder { color:var(--text-faint); font-family:var(--font-sans); font-style:italic; font-size:12.5px; }
+
+/* ── Credit Invoices Tab ── */
+.pay-tab-row { display:flex; background:var(--bg-1); border:1px solid var(--border); border-radius:14px; padding:4px; gap:4px; margin-bottom:18px; }
+.pay-tab-pill { flex:1; background:transparent; border:none; color:var(--text-muted); font-size:13.5px; font-weight:600; padding:10px 14px; border-radius:11px; cursor:pointer; transition:all .18s; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:7px; }
+.pay-tab-pill:hover { color:var(--text); }
+.pay-tab-pill.pta { background:var(--panel); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.22); }
+.pay-tab-badge { background:var(--warn); color:#000; font-size:10.5px; font-weight:800; border-radius:99px; padding:1px 7px; min-width:18px; text-align:center; }
+.credit-list  { display:flex; flex-direction:column; gap:10px; }
+.credit-card  { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+.credit-card.cc-paid { opacity:0.62; }
+.credit-top   { display:flex; align-items:flex-start; gap:12px; }
+.credit-av    { width:36px; height:36px; border-radius:10px; background:var(--panel-2); border:1px solid var(--border); display:grid; place-items:center; font-size:12px; font-weight:700; font-family:var(--font-mono); color:var(--text-dim); flex-shrink:0; }
+.credit-info  { flex:1; min-width:0; }
+.credit-sup   { font-size:14.5px; font-weight:700; letter-spacing:-0.01em; }
+.credit-date  { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); margin-top:2px; }
+.credit-amt   { text-align:right; flex-shrink:0; font-family:var(--font-mono); font-size:17px; font-weight:700; color:var(--accent); letter-spacing:-0.01em; }
+.credit-amtlbl{ font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1px; }
+.credit-foot  { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.credit-due   { display:flex; align-items:center; gap:7px; flex:1; min-width:170px; }
+.credit-due-lbl{ font-size:12px; color:var(--text-muted); white-space:nowrap; }
+.credit-due-in { background:var(--bg-1); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:12.5px; color:var(--text); outline:none; font-family:var(--font-mono); width:130px; transition:border-color .15s; }
+.credit-due-in:focus { border-color:var(--accent-line); }
+.credit-status-btn { border:none; border-radius:20px; padding:6px 16px; font-size:12.5px; font-weight:700; cursor:pointer; transition:all .18s; font-family:inherit; flex-shrink:0; }
+.csb-unpaid { background:rgba(245,201,122,0.14); color:var(--warn); box-shadow:inset 0 0 0 1.5px var(--warn); }
+.csb-unpaid:hover { background:rgba(245,201,122,0.24); }
+.csb-paid   { background:rgba(138,255,122,0.12); color:var(--accent); box-shadow:inset 0 0 0 1.5px var(--accent-line); }
+.csb-paid:hover { background:rgba(138,255,122,0.22); }
+.credit-summary { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.credit-sum-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); padding:14px 16px; }
+.credit-sum-lbl { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; }
+.credit-sum-val { font-size:20px; font-weight:700; font-family:var(--font-mono); letter-spacing:-0.02em; }
+.credit-sum-sub { font-size:11.5px; color:var(--text-muted); margin-top:3px; font-family:var(--font-mono); }
+
+/* ============================================================
+   CATALOGUE SCREEN — supplier grid
+   ============================================================ */
+.cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+.cat-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 18px; display:grid; grid-template-columns:48px 1fr auto; gap:14px; align-items:center; cursor:pointer; transition:border-color .15s, background .15s; }
+.cat-card:hover { border-color:var(--border-strong); background:var(--panel-hover); }
+.cat-emoji { width:48px; height:48px; border-radius:12px; background:var(--panel-2); border:1px solid var(--border); display:grid; place-items:center; font-size:22px; }
+.cat-name  { font-size:15px; font-weight:600; margin:0 0 2px; }
+.cat-meta  { font-size:12.5px; color:var(--text-muted); font-family:var(--font-mono); }
+.cat-count { font-family:var(--font-mono); font-size:20px; font-weight:600; color:var(--warn); text-align:right; }
+.cat-clbl  { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.12em; text-align:right; }
+.cat-arrow { color:var(--text-faint); font-size:16px; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1100px) {
+  .kpis { grid-template-columns:1fr; }
+  .col6,.col4 { grid-column:span 12; }
+  .method-cards { grid-template-columns:repeat(2,1fr); }
+  .day-summary  { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:720px) {
+  .home-appbar { padding:18px 16px; }
+  .home-page   { padding:20px 16px 60px; }
+  .sec-appbar-inner { padding:14px 16px; }
+  .sec-page    { padding:18px 16px 80px; }
+  .kpi .kspark { display:none; }
+  .week-strip  { grid-template-columns:30px 1fr 30px; }
+  .day-cards-grid { grid-template-columns:repeat(7,minmax(44px,1fr)); }
+  .dcnum { font-size:16px; }
+  .dct,.dcc { font-size:9px; }
+  .inv-summ { grid-template-columns:36px 1fr auto; gap:10px; }
+  .inv-amt { min-width:0; }
+  .method-cards { grid-template-columns:1fr 1fr; }
+  .day-summary  { grid-template-columns:1fr 1fr; }
+  .cat-grid { grid-template-columns:1fr; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING BACK BUTTON — iPad / tablet accessibility
+   Visible on screens ≥ 600 px (tablet+). Thumb-reachable at
+   bottom-left. Hides on tiny phones where the top bar is fine.
+   ══════════════════════════════════════════════════════════════ */
+.back-fab {
+  display: none; /* off by default, enabled on tablet via media query */
+  position: fixed;
+  bottom: max(32px, calc(28px + env(safe-area-inset-bottom)));
+  left: 28px;
+  z-index: 900;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #0a1a06;
+  border: none;
+  border-radius: 999px;
+  padding: 18px 28px;
+  font-size: 17px;
+  font-weight: 800;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  min-height: 56px;
+  letter-spacing: -0.01em;
+  box-shadow: 0 6px 28px rgba(138,255,122,0.45), 0 2px 10px rgba(0,0,0,0.45);
+  transition: transform .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-fab:hover  { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(138,255,122,0.55), 0 3px 12px rgba(0,0,0,0.45); }
+.back-fab:active { transform: scale(0.95); }
+.back-fab svg    { width: 20px; height: 20px; flex-shrink: 0; }
+@media (min-width: 600px) { .back-fab { display: inline-flex; } }
+
+/* ══════════════════════════════════════════════════════════════
+   INVOICE PHOTO PREVIEW — full-screen overlay
+   ══════════════════════════════════════════════════════════════ */
+.photo-preview-wrap {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; flex-direction: column;
+  background: #000;
+}
+.photo-preview-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: max(14px, calc(12px + env(safe-area-inset-top))) 18px 14px;
+  background: rgba(0,0,0,.8);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #222;
+  gap: 12px; flex-shrink: 0;
+}
+.photo-preview-bar .pbk {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px solid var(--accent-line); border-radius: 999px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-sans); flex-shrink: 0;
+  transition: background .15s;
+}
+.photo-preview-bar .pbk:hover { background: #8aff7a30; }
+.photo-preview-bar .pbk svg  { width: 12px; height: 12px; }
+.photo-preview-bar .ptitle { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.photo-preview-bar .pdate  { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+.photo-preview-img {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  overflow: auto; padding: 16px;
+  background: #0a0a0a;
+}
+.photo-preview-img img {
+  max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.7);
+  display: block;
+}
+.photo-preview-footer {
+  padding: max(12px, calc(10px + env(safe-area-inset-bottom))) 18px 12px;
+  background: rgba(0,0,0,.85); border-top: 1px solid #222;
+  display: flex; gap: 10px; flex-shrink: 0;
+}
+.photo-preview-footer button {
+  flex: 1; padding: 13px; border-radius: 12px; font-size: 14px;
+  font-weight: 600; cursor: pointer; border: none; font-family: var(--font-sans);
+  transition: opacity .15s;
+}
+.photo-preview-footer button:active { opacity: .75; }
+.pbtn-close   { background: var(--panel-2); color: var(--text-muted); border: 1px solid var(--border) !important; }
+.pbtn-keep    { background: var(--accent); color: #0a1a06; }
+
 /* ── Order module ── */
 .fowdar-order-module { font-family: var(--font-sans); }
 
@@ -1045,9 +1455,11 @@ const LS_KEY = "fowdar_v4";
 const DESC_KEYS = ["description","item description","product description","article description","product","products","desc","item","product name","article","brands","brand"];
 
 const C = {
-  bg:"#0d0f14", surf:"#161920", surf2:"#1e2230", bdr:"#2a2f3f",
-  accent:"#00e5a0", blue:"#0077ff", warn:"#ff9f43", text:"#e8eaf0",
-  muted:"#6b7280", danger:"#ff5e5e", rec:"#ffa500", purple:"#a855f7"
+  bg:"#0a0a0a", surf:"#151515", surf2:"#1d1d1d", bdr:"#242424",
+  accent:"#8aff7a", blue:"#7ab7ff", warn:"#f5b34a", text:"#f5f5f5",
+  muted:"#6e6e6e", danger:"#ff6f6f", rec:"#f5b34a", purple:"#a855f7",
+  accentSoft:"rgba(138,255,122,0.15)", accentLine:"rgba(138,255,122,0.24)",
+  warnSoft:"rgba(245,179,74,0.12)", warnLine:"rgba(245,179,74,0.24)"
 };
 
 function fmt(n){
@@ -1085,17 +1497,263 @@ async function pushStore(ce,rr,pay,inv,ord,cord){
     });
   }catch(e){}
 }
+// ── PACK SIZE DETECTION ─────────────────────────────────────────────────────
+// Extracts N from "NxWEIGHT" patterns in product descriptions.
+// e.g. "LAY'S BBQ 20x45g" → 20,  "Coca-Cola 12x330ml" → 12,  "6x1.5L Water" → 6
+function detectPackSize(desc){
+  if(!desc)return null;
+  var s=String(desc);
+  // Pattern A: WEIGHTxN — unit letter between weight and X → number AFTER X = pack count
+  // e.g. "70GX24"→24, "3LTX6"→6, "150GX72"→72, "300MLX24"→24, "2.5KGX12"→12
+  var mA=s.match(/\b\d+(?:\.\d+)?\s*[gGmMlLkK][a-zA-Z]*\s*[xX×]\s*(\d+)/);
+  if(mA)return parseInt(mA[1],10);
+  // Pattern B: NxWEIGHT — unit letter immediately after second number → N before X = pack count
+  // e.g. "20 X 45g"→20, "12X330ml"→12, "6X1L"→6
+  var mB=s.match(/\b(\d+)\s*[xX×]\s*\d+(?:\.\d+)?\s*[gGmMlLkK]/);
+  if(mB)return parseInt(mB[1],10);
+  // Pattern C: pure numeric "LARGExSMALL" → SMALLER number = pack count
+  // e.g. "300X30"→30, "2500X12"→12, "500X12"→12, "1000X6"→6
+  // Works because product size (g/ml) is always larger than pack count in practice.
+  var mC=s.match(/\b(\d+)\s*[xX×]\s*(\d+)\b/);
+  if(mC){
+    var n1=parseInt(mC[1],10),n2=parseInt(mC[2],10);
+    return n1<=n2?n1:n2;
+  }
+  return null;
+}
+
+// ── VAT RATE DETECTION ──────────────────────────────────────────────────────
+// Determines whether VAT is already included in the invoice line totals.
+// Returns 1.15 (VAT must be added) or 1.0 (VAT already included).
+// Rules (in order):
+//  1. Separate non-zero VAT column → add VAT (1.15)
+//  2. Amount column name contains "excl"/"ex vat"/"net" → add VAT (1.15)
+//  3. Invoice header states "Incl. VAT"/"Incl Vat" → already included (1.0)
+//  4. Back-calculate: if any row total ÷ 1.15 × 1.15 ≈ total AND a VAT subtotal exists → 1.15
+//  5. Fall back to stored vatRate, then 1.0
+function detectVatRate(inv){
+  // Only called for invoices with NO stored vatRate (null/undefined).
+  // Checks the AMOUNT COLUMN NAME only — scanning all columns causes false
+  // positives (e.g. a "Vat" display column in a row where Total already
+  // includes VAT would incorrectly trigger "add VAT").
+  if(!inv.cols)return 1.0;
+  var cols=(inv.cols||[]).map(function(c){return(c||"").toLowerCase().trim();});
+
+  // 1. Amount column name says "excl"/"ex"/"net" → Total is excl-VAT → add it
+  if(inv.amountCol!=null){
+    var acn=cols[inv.amountCol]||"";
+    if(/excl|ex\s*vat|net\s*vat|net\s*amount|\(ex\)|excl\./.test(acn)){return 1.15;}
+    // Amount column says "incl vat" → already included
+    if(/incl\s*\.?\s*vat/.test(acn)){return 1.0;}
+  }
+
+  // 2. Any column is named exactly "price (ex)" or "unit price excl vat" → excl-VAT pricing
+  if(cols.some(function(c){return c==="price (ex)"||c==="unit price excl vat"||c==="unit prc excl vat";})){return 1.15;}
+
+  // 3. Any column explicitly states "incl vat" → VAT already in totals
+  if(cols.some(function(c){return/incl\.?\s*vat/.test(c);})){return 1.0;}
+
+  // 4. Default: assume VAT is already included (safest assumption)
+  return 1.0;
+}
+
+// ── INVOICE NORMALISATION ───────────────────────────────────────────────────
+// Maps AI-generated item field names → human-readable column headers.
+// Extend this when new AI formats introduce new field names.
+var ITEM_FIELD_LABELS={
+  // Description / product identification
+  description:"Description",product:"Product",name:"Name",item:"Item",
+  code:"Code",sku:"SKU",
+  // Quantity variants
+  qty:"Qty",quantity:"Qty",totalUnits:"Total Units",noOfCtns:"No of CTNS",
+  qtyKg:"Qty/kg",units:"Units",pieces:"Pcs",pcs:"Pcs",
+  ctns:"Ctns",
+  // Pack / unit info
+  packSize:"Pack Size",packs:"Packs",uom:"UoM",um:"UM",pcb:"PCB",unit:"Unit",
+  unitWt:"Unit Wt",
+  // Price columns
+  unitPrice:"Unit Price",unitPriceExcl:"Unit Price (Excl. VAT)",price:"Price",
+  priceEx:"Price (Ex)",totalUnitPrice:"Total Unit Price",
+  // Net VAT / Net Amount (Grays)
+  netVat:"Net VAT",netAmount:"Net Amount",
+  // RSP (Freelance, Grays)
+  rsp:"RSP",
+  // Exempt / taxable split
+  exempted:"Exempted",taxable:"Taxable",vatType:"VAT Type",vatCode:"VAT Code",
+  // Discounts / taxes
+  disc:"Disc%",discount:"Discount",discAmt:"Disc. Amt",discPct:"Disc %",
+  tax:"Tax",petTax:"PET Tax",
+  vat:"VAT",vatAmt:"VAT Amt",vatPct:"VAT %",
+  // Line totals
+  total:"Total",totalRs:"Total (Rs)",totalExcl:"Total (Excl. VAT)",
+  totalExclVat:"Total (Excl. VAT)",totalInclVat:"Total (Incl. VAT)",
+  amountExcl:"Amount (Excl)",itemAmt:"Amount",exclVat:"Excl. VAT",
+};
+// Fields present in every item but not shown as invoice columns (computed values)
+var ITEM_META_FIELDS={buyPlusVat:1,recPrice:1};
+// Canonical left-to-right column order when all fields are present
+var ITEM_FIELD_ORDER=[
+  // RSP (Freelance, Grays — first column on paper)
+  "rsp",
+  // Identification
+  "description","product","name","item","code","sku",
+  // Quantity / carton counts
+  "qty","quantity","totalUnits","noOfCtns","qtyKg","units","ctns","pieces","pcs",
+  // Pack info
+  "packSize","packs","uom","um","pcb","unit","unitWt",
+  // Prices
+  "unitPrice","unitPriceExcl","priceEx","price","totalUnitPrice",
+  // Exempt / taxable / VAT type (butcher-style columns)
+  "exempted","taxable","vatType","vatCode",
+  // Discounts and taxes per line
+  "disc","discount","discAmt","discPct","tax","petTax","vat","vatAmt","vatPct",
+  // Net VAT (Grays)
+  "netVat",
+  // Line totals
+  "exclVat","total","totalExcl","totalExclVat","totalInclVat","totalRs","amountExcl","itemAmt","netAmount"
+];
+
+// Converts new "items"-format invoices (pushed by Claude AI) to the legacy
+// cols/rows format so every downstream function works without changes.
+// Also applies VAT detection and totals normalisation to ALL invoices.
+function normalizeInv(inv){
+  var result;
+
+  if(inv.cols&&inv.rows){
+    // Legacy format — trust the stored vatRate completely.
+    // Only auto-detect when vatRate is genuinely absent (null/undefined).
+    var storedRate=inv.vatRate!=null?Number(inv.vatRate):null;
+    var finalRate=storedRate!==null?storedRate:detectVatRate(inv);
+    // normalizeTotals handles both [[label,val]] arrays and legacy object formats
+    result=Object.assign({},inv,{vatRate:finalRate,totals:normalizeTotals(inv.totals)});
+    return result;
+  }
+
+  if(!inv.items)return inv; // Unknown format — degrade gracefully
+
+  // ── New "items" format ──────────────────────────────────────────────────
+  // Each AI invoice stores items with different field names.
+  // Detect the actual fields present in this invoice's items and build
+  // the column headers + rows dynamically so nothing is dropped.
+  var firstItem=inv.items[0]||{};
+  var displayFields=Object.keys(firstItem).filter(function(k){return!ITEM_META_FIELDS[k];});
+
+  // Column ordering: explicit colOrder wins; inv.cols accepted as fallback for older
+  // items-format invoices that stored the key order there (e.g. Freelance Distributors).
+  // Last resort: canonical ITEM_FIELD_ORDER heuristic.
+  var _effectiveColOrder=(Array.isArray(inv.colOrder)&&inv.colOrder.length>0)?inv.colOrder
+    :((Array.isArray(inv.cols)&&inv.cols.length>0)?inv.cols:null);
+  if(_effectiveColOrder){
+    var _coIdx={};
+    _effectiveColOrder.forEach(function(k,i){_coIdx[k]=i;});
+    displayFields.sort(function(a,b){
+      var ai=_coIdx[a]!=null?_coIdx[a]:999+ITEM_FIELD_ORDER.indexOf(a);
+      var bi=_coIdx[b]!=null?_coIdx[b]:999+ITEM_FIELD_ORDER.indexOf(b);
+      return ai-bi;
+    });
+  }else{
+    displayFields.sort(function(a,b){
+      var ai=ITEM_FIELD_ORDER.indexOf(a);var bi=ITEM_FIELD_ORDER.indexOf(b);
+      if(ai<0)ai=999;if(bi<0)bi=999;return ai-bi;
+    });
+  }
+
+  var cols=displayFields.map(function(k){return ITEM_FIELD_LABELS[k]||k;});
+  var rows=inv.items.map(function(item){
+    return displayFields.map(function(k){return item[k]!=null?item[k]:"";});
+  });
+
+  // Pre-computed per-row values (already calculated by Claude AI)
+  var precomputed=inv.items.map(function(item){
+    return{buyPlusVat:item.buyPlusVat!=null?item.buyPlusVat:null,
+           recPrice:item.recPrice!=null?item.recPrice:null};
+  });
+
+  // Detect qtyCol: check expanded list of known quantity-field names
+  var QTY_KEYS=["qty","quantity","totalUnits","noOfCtns","qtyKg","qtykg","units","pieces","pcs"];
+  var qtyCol=0;
+  for(var qi=0;qi<QTY_KEYS.length;qi++){var qi2=displayFields.indexOf(QTY_KEYS[qi]);if(qi2>=0){qtyCol=qi2;break;}}
+
+  // Detect amountCol: check expanded list of known line-total field names, then
+  // fall back to a regex scan so future unknown amount-column names still resolve correctly.
+  var AMT_KEYS=[
+    "total","amountExcl","itemAmt","totalPayable",   // legacy
+    "totalRs","totalExcl","totalExclVat","totalInclVat", // ocean, eagle, moroil variants
+    "taxable","itemTotal","lineTotal","netTotal","amount","totalInclDisc"
+  ];
+  var amountCol=displayFields.length>0?displayFields.length-1:0;
+  var _amtMatched=false;
+  for(var ai=0;ai<AMT_KEYS.length;ai++){var ai2=displayFields.indexOf(AMT_KEYS[ai]);if(ai2>=0){amountCol=ai2;_amtMatched=true;break;}}
+  if(!_amtMatched){
+    // Scan column names ending in "total", "amount", "amt", or "Rs"
+    for(var si=displayFields.length-1;si>=0;si--){
+      if(/total$|amount$|amt$|rs$/.test(displayFields[si].toLowerCase())){amountCol=si;break;}
+    }
+  }
+
+  return{
+    id:inv.invoiceId||inv.id||"",
+    date:inv.date||"",
+    total:inv.total||0,
+    receivedAt:inv.receivedAt||"",
+    cols:cols,
+    rows:rows,
+    qtyCol:qtyCol,
+    amountCol:amountCol,
+    packCol:null,
+    vatRate:1.0,   // AI-computed buyPlusVat already includes VAT
+    totals:normalizeTotals(inv.totals),
+    _precomputed:precomputed
+  };
+}
+
+// Supplier name aliases — any key is treated as the same supplier as its value.
+// Add new pairs here whenever Claude uses a slightly different name.
+const SUPPLIER_ALIASES={
+  "Quality Bev.":"Quality Beverages Limited",
+  "Quality Beverages":"Quality Beverages Limited",
+  "Qualitybev":"Quality Beverages Limited",
+};
+
 function buildSuppliers(rows){
   const out={};
   if(!rows)return out;
   rows.forEach(function(row){
-    const name=row.supplier_name||row.id;
-    const invoices=(row.invoices||[]).slice().sort(function(a,b){return(b.date||"").localeCompare(a.date||"");});
-    out[name]={meta:row.meta||{},invoices:invoices};
+    const raw=row.supplier_name||row.id;
+    // Resolve to canonical name if an alias is defined
+    const name=SUPPLIER_ALIASES[raw]||raw;
+    const invoices=(row.invoices||[]).map(normalizeInv);
+    if(out[name]){
+      // Merge invoices from duplicate/alias rows
+      out[name].invoices=out[name].invoices.concat(invoices);
+      // Keep whichever meta has more keys (richer data wins)
+      if(Object.keys(row.meta||{}).length>Object.keys(out[name].meta).length){
+        out[name].meta=row.meta||{};
+      }
+    }else{
+      out[name]={meta:row.meta||{},invoices:invoices};
+    }
+  });
+  // Sort each supplier's invoices newest-first after merging.
+  // Must use toISODate() on both sides — raw string compare breaks when old invoices
+  // use DD/MM/YYYY and new ones use YYYY-MM-DD (e.g. "22/..." > "2026-..." as strings).
+  Object.keys(out).forEach(function(n){
+    out[n].invoices.sort(function(a,b){
+      return toISODate(b.receivedAt||b.date||"").localeCompare(
+             toISODate(a.receivedAt||a.date||""));
+    });
   });
   return out;
 }
 function calcRec(inv,ri,row,supMeta){
+  // ── New-format invoices: pre-computed by Claude AI ──────────────────────
+  // Divide by pack size extracted from description so we get per-UNIT cost.
+  if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].buyPlusVat!=null){
+    var bv=inv._precomputed[ri].buyPlusVat;
+    var descNew=String(row[0]||""); // col 0 is always "Description" for normalised invoices
+    var N=detectPackSize(descNew);
+    return(N&&N>1)?bv/N:bv;
+  }
   // Returns BUYING PRICE + VAT (cost per unit inclusive of VAT, no margin)
   const cols=inv.cols||[];
   const vat=inv.vatRate||1.0;
@@ -1194,31 +1852,318 @@ function calcRec(inv,ri,row,supMeta){
 
   // 8. Fallback: amount / qty / pack * vat
   const amt=parseFloat(row[inv.amountCol]);
-  if(!isNaN(amt)&&qty>0&&pack>0)return(amt/qty/pack)*vat;
+  if(!isNaN(amt)&&qty>0&&pack>0){
+    // Safety: if the amountCol column name makes clear the value is already incl-VAT,
+    // suppress the vatRate multiplier to prevent double-VAT (e.g. "Total Incl VAT").
+    const _amtColName=(cols[inv.amountCol]||"").toLowerCase();
+    const _amtIsInclVat=/incl\.?\s*vat|total\s*incl|inc\s*vat|amount\s*incl/.test(_amtColName);
+    const _effectiveVat=_amtIsInclVat?1.0:vat;
+    var basePrice=(amt/qty/pack)*_effectiveVat;
+    // If no explicit pack column, check description for NxWEIGHT pack size
+    if(inv.packCol===null||inv.packCol===undefined){
+      const di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+      if(di>=0){
+        var N=detectPackSize(String(row[di]||""));
+        if(N&&N>1)return basePrice/N;
+      }
+    }
+    return basePrice;
+  }
   return null;
 }
+
+// ── PRICE TRACKER VALUE ─────────────────────────────────────────────────────
+// Returns the canonical incl-VAT unit price used ONLY for price-change tracking
+// (buildPriceHistory). NOT used for rec-price display — use calcRec() for that.
+//
+// Priority (same logic as calcRec but expressed cleanly without rec-price rules):
+//   1. Pre-computed buyPlusVat from AI-processed invoice (most accurate)
+//   2. Explicit excl-VAT unit-price column × vatRate
+//      (e.g. BrandActiv "Unit prc excl Vat", Lim How "Price (Ex)", generic "UCP")
+//   3. Supplier-specific quantity adjustments (RR Rapid per-dozen, Innodis CT)
+//   4. Fallback: amount ÷ qty ÷ pack × vatRate
+// Pack size from product description is divided out at every level via detectPackSize().
+// vatRate already stored correctly in Supabase after audit (1.0 = already incl, 1.15 = excl).
+function extractPriceTrackerValue(inv,ri,row,supMeta){
+  var cols=inv.cols||[];
+  var vat=inv.vatRate||1.0;
+  var qty=(inv.qtyCol!=null)?(parseFloat(row[inv.qtyCol])||1):1;
+  var pack=(inv.packCol!=null)?(parseFloat(row[inv.packCol])||1):1;
+  var di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+
+  // Divide by pack size from description (when no explicit packCol)
+  function packDivide(unitVal){
+    if((inv.packCol===null||inv.packCol===undefined)&&di>=0){
+      var N=detectPackSize(String(row[di]||""));
+      if(N&&N>1)return unitVal/N;
+    }
+    return unitVal;
+  }
+
+  // 1. Pre-computed buyPlusVat — highest confidence (AI-processed invoice)
+  if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].buyPlusVat!=null){
+    return packDivide(inv._precomputed[ri].buyPlusVat);
+  }
+
+  // 2. Explicit excl-VAT unit price column × vatRate
+  //    Matches: "Unit Price Excl", "Unit Prc Excl Vat", "Price (Ex)", "UCP", "Unit Disc Prc Excl Vat"
+  var exclIdx=cols.findIndex(function(c){
+    var cl=c.toLowerCase().trim();
+    return /^(unit\s*pric?e?\s*(excl|ex\b|ex\s*vat)|price\s*\(ex\)|ucp|unit\s*prc\s*excl)/.test(cl);
+  });
+  if(exclIdx>=0){
+    // Prefer discounted unit price when it exists
+    var discIdx=cols.findIndex(function(c){return/unit\s*disc\s*prc\s*excl|disc.*unit.*prc/.test(c.toLowerCase());});
+    var rawV=(discIdx>=0)?parseFloat(row[discIdx]):NaN;
+    if(isNaN(rawV)||rawV<=0)rawV=parseFloat(row[exclIdx]);
+    if(!isNaN(rawV)&&rawV>0)return packDivide(rawV*vat);
+  }
+
+  // 3a. RR Rapid: items sold by the dozen — divide qty by dozen size
+  if(supMeta&&supMeta.recPriceRule==="per_unit_dozen"){
+    var dozSize=supMeta.dozSize||12;
+    var amt3=parseFloat(row[inv.amountCol]);
+    if(!isNaN(amt3)&&qty>0)return packDivide((amt3/qty/dozSize)*vat);
+    return null;
+  }
+  // 3b. Innodis: carton (CT) quantities — extract units-per-carton from product name
+  if(supMeta&&(supMeta.supplier||"").indexOf("Innodis")>=0){
+    var qtyStr=String(row[inv.qtyCol]||"");
+    if(qtyStr.toUpperCase().indexOf("CT")>=0){
+      var ctQty=parseFloat(qtyStr)||1;
+      var pm=String(row[1]||"").match(/[xX]([0-9]+)/);
+      var upc=pm?parseInt(pm[1]):1;
+      var amt3b=parseFloat(row[inv.amountCol]);
+      if(!isNaN(amt3b)&&ctQty*upc>0)return packDivide((amt3b/(ctQty*upc))*vat);
+      return null;
+    }
+  }
+
+  // 4. Fallback: amount ÷ qty ÷ pack × vatRate
+  var amt=parseFloat(row[inv.amountCol]);
+  if(isNaN(amt)||qty<=0||pack<=0)return null;
+  var amtColName=(cols[inv.amountCol]||"").toLowerCase();
+  var effectiveVat=/incl\.?\s*vat|total\s*incl|inc\s*vat|amount\s*incl/.test(amtColName)?1.0:vat;
+  return packDivide((amt/qty/pack)*effectiveVat);
+}
+
+// Converts any date string to YYYY-MM-DD for reliable sorting.
+// Handles: "2026-05-25", "25/05/2026", "25/05/2026 10:38", ISO timestamps.
+function toISODate(str){
+  if(!str)return"";
+  var s=String(str).split("T")[0].trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.substring(0,10);
+  var parts=s.split(" ")[0].split("/");
+  if(parts.length===3&&parts[2].length>=4){
+    return parts[2].substring(0,4)+"-"+parts[1].padStart(2,"0")+"-"+parts[0].padStart(2,"0");
+  }
+  return s;
+}
+
+// Formats any date string as DD/MM/YYYY for display only.
+// Never use for sorting or storage — call toISODate() for those.
+function fmtDD(str){
+  if(!str)return"";
+  var iso=toISODate(str);
+  if(!iso||iso.length<10)return str;
+  var p=iso.split("-");
+  return p[2]+"/"+p[1]+"/"+p[0];
+}
+
+// Converts any stored totals value to [[label, amount], ...] pairs.
+// Handles: already-correct [[label,val]] arrays, AI object format {exclVat,vat,inclVat,...},
+// and legacy single-field objects {net, totalExcl, totalIncl, invoiceTotal, ...}.
+// ── UNIVERSAL TOTALS NORMALIZER ─────────────────────────────────────────────
+// Converts ANY totals format (array or object) to [[label, value], ...] rows
+// for display in the invoice footer.
+//
+// Design goals:
+//  • Array format is returned as-is (already labelled by the AI).
+//  • Object format: emit ALL non-zero numeric values in a sensible order using
+//    a comprehensive key→label map covering every format seen across suppliers.
+//  • Unknown keys (future invoices) are auto-formatted from camelCase → words.
+//  • Duplicate labels are suppressed — the first occurrence wins.
+//  • Zero values are skipped EXCEPT for explicitly exempted/taxable amounts
+//    (where zero is meaningful for display completeness).
+//
+// Adding support for a new totals key requires only a line in TOTAL_LABELS and
+// KEY_ORDER — no other code changes needed.
+function normalizeTotals(t){
+  if(!t)return[];
+  if(Array.isArray(t)){
+    return t.filter(function(r){return Array.isArray(r)&&r.length>=2;});
+  }
+  if(typeof t!=="object")return[];
+
+  // ── Key → display label (covers every supplier variant observed so far) ────
+  var TOTAL_LABELS={
+    // Exempt / taxable split (VKS, Kool Food, Best Foods…)
+    totalExempted:"Total Exempted",totalTaxable:"Total Taxable",
+    exempted:"Exempted",taxable:"Taxable",zeroRated:"Zero Rated",
+    // Excl-VAT subtotals
+    exclVat:"Excl. VAT",exclAmt:"Excl. VAT",totalExcl:"Excl. VAT",
+    totalBeforeVat:"Excl. VAT",totalExclVat:"Excl. VAT",
+    subtotalExVat:"Subtotal Excl. VAT",subTotal:"Sub Total",
+    subTotalInclLineDisc:"Subtotal (after disc.)",
+    // Discounts
+    discount:"Discount",discountTotal:"Discount",
+    // VAT
+    vat:"VAT",vatTotal:"VAT",vatAmt:"VAT",vatAmount:"VAT",
+    vat15:"VAT 15%",totalVatAmt:"VAT",totalVatAmount:"VAT",
+    // Other taxes
+    petTax:"PET Tax",
+    // Net / after-discount amounts
+    net:"Net Total",netTotal:"Net Total",totalNet:"Net Total",
+    // Incl-VAT / grand totals
+    inclVat:"Total Incl. VAT",totalIncl:"Total Incl. VAT",totalInclVat:"Total Incl. VAT",totalIncVat:"Total Incl. VAT",
+    totalPayable:"Total Payable",invoiceTotal:"Total Payable",
+    gross:"Gross Total",grossTotal:"Gross Total",grandTotal:"Grand Total",
+    total:"Total",
+  };
+
+  // ── Preferred display order ─────────────────────────────────────────────────
+  var KEY_ORDER=[
+    "totalExempted","totalTaxable","exempted","taxable","zeroRated",
+    "exclVat","exclAmt","totalExcl","totalBeforeVat","totalExclVat",
+    "subtotalExVat","subTotal","subTotalInclLineDisc",
+    "discount","discountTotal",
+    "vat","vatTotal","vatAmt","vatAmount","vat15","totalVatAmt","totalVatAmount","petTax",
+    "net","netTotal","totalNet",
+    "inclVat","totalIncl","totalInclVat","totalIncVat","totalPayable","invoiceTotal",
+    "gross","grossTotal","grandTotal","total"
+  ];
+
+  var used={};
+  var seenLabels={};
+  var arr=[];
+
+  // Pass 1 — known keys in preferred order
+  KEY_ORDER.forEach(function(k){
+    if(used[k]||t[k]==null)return;
+    used[k]=true;
+    var v=Number(t[k]);
+    if(isNaN(v))return;
+    // Zero is meaningful for exempted/taxable breakdown; skip elsewhere
+    var meaningful=(k==="totalExempted"||k==="totalTaxable"||k==="exempted"||k==="taxable"||k==="zeroRated");
+    if(v===0&&!meaningful)return;
+    var label=TOTAL_LABELS[k];
+    if(seenLabels[label])return;
+    seenLabels[label]=true;
+    arr.push([label,v]);
+  });
+
+  // Pass 2 — any remaining keys not listed above (future-proof)
+  Object.keys(t).forEach(function(k){
+    if(used[k]||t[k]==null)return;
+    var v=Number(t[k]);
+    if(isNaN(v)||v===0)return;
+    var label=TOTAL_LABELS[k]||k.replace(/([A-Z])/g," $1").replace(/^./,function(c){return c.toUpperCase();}).trim();
+    if(seenLabels[label])return;
+    seenLabels[label]=true;
+    arr.push([label,v]);
+  });
+
+  return arr;
+}
+
+// Returns the grand total value from a normalized invoice (after normalizeInv has run).
+// Used by Credit Invoices tab to display the invoice amount.
+function getInvGrandTotal(inv){
+  var t=normalizeTotals(inv.totals||[]);
+  if(t.length>0) return t[t.length-1][1];
+  // Fallback: sum the amountCol across rows
+  if(inv.rows&&inv.amountCol!=null){
+    return inv.rows.reduce(function(a,r){return a+(parseFloat(r[inv.amountCol])||0);},0);
+  }
+  return 0;
+}
+
 function buildPriceHistory(SUPPLIERS){
+  // Produces hist[supplierName][productName] = [{date,price,invoiceId}, ...]
+  //
+  // Key design rules:
+  //  • Uses extractPriceTrackerValue() — gives raw incl-VAT unit price from the
+  //    invoice itself (pre-computed buyPlusVat → explicit unit-price col → total÷qty×vatRate).
+  //    This ensures the SAME metric is compared across invoices for the same supplier,
+  //    making price-change detection meaningful.
+  //  • Date sorting uses receivedAt → toISODate (handles mixed DD/MM & ISO formats).
+  //  • One entry per invoice per product (last row in that invoice wins) to prevent
+  //    duplicate lines inflating the history.
+  //  • Prices are rounded to 2 dp so floating-point noise never registers as a change.
+  //  • Entries are in chronological order (oldest first).
   const hist={};
   Object.keys(SUPPLIERS).forEach(function(sn){
-    const sup=SUPPLIERS[sn];hist[sn]={};
-    sup.invoices.forEach(function(inv){
-      const cols=inv.cols||[];
-      const di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
+    const sup=SUPPLIERS[sn];
+    hist[sn]={};
+
+    // Sort invoices chronologically so entries land in the right order
+    var sorted=sup.invoices.slice().sort(function(a,b){
+      return toISODate(a.receivedAt||a.date||"").localeCompare(
+             toISODate(b.receivedAt||b.date||""));
+    });
+
+    sorted.forEach(function(inv){
+      var cols=inv.cols||[];
+      var di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
       if(di<0)return;
-      inv.rows.forEach(function(row){
-        const name=String(row[di]||"").trim();if(!name)return;
-        const price=parseFloat(row[inv.amountCol]);
-        const qty=(inv.qtyCol!==null&&inv.qtyCol!==undefined)?(parseFloat(row[inv.qtyCol])||1):1;
-        const unitPrice=(!isNaN(price)&&qty>0)?price/qty:null;
-        if(unitPrice===null)return;
+
+      var isoDate=toISODate(inv.receivedAt||inv.date||"");
+      var invId=inv.id||isoDate; // stable per-invoice key
+
+      inv.rows.forEach(function(row,ri){
+        var name=String(row[di]||"").trim();
+        if(!name)return;
+
+        // ── Compute unit incl-VAT price for tracking ─────────────────
+        var unitPrice=extractPriceTrackerValue(inv,ri,row,sup.meta);
+        if(!unitPrice||isNaN(unitPrice)||unitPrice<=0)return;
+
+        // Round to 2 dp — eliminates floating-point noise from false changes
+        var price=Math.round(unitPrice*100)/100;
+
         if(!hist[sn][name])hist[sn][name]=[];
-        hist[sn][name].push({date:inv.date||"",price:unitPrice,invoiceId:inv.id});
+
+        // One entry per invoice: if already recorded for this invId, last row wins
+        var ei=hist[sn][name].findIndex(function(e){return e.invoiceId===invId;});
+        var entry={date:isoDate,price:price,invoiceId:invId};
+        if(ei>=0){hist[sn][name][ei]=entry;}
+        else{hist[sn][name].push(entry);}
       });
     });
-    Object.keys(hist[sn]).forEach(function(pn){hist[sn][pn].sort(function(a,b){return a.date.localeCompare(b.date);});});
+    // Entries are already chronological (invoices were sorted above) —
+    // just re-sort each product list to be safe after possible overwrites
+    Object.keys(hist[sn]).forEach(function(pn){
+      hist[sn][pn].sort(function(a,b){return a.date.localeCompare(b.date);});
+    });
   });
   return hist;
 }
+// ── PRICE AMENDMENT PERSISTENCE ────────────────────────────────────────────
+// Reads/writes to Supabase price_amendments table so "amended" state survives
+// page refreshes. Each record is keyed by (supplier_name, product_name, invoice_id).
+async function fetchAmendments(){
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/price_amendments?select=*",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
+    if(!r.ok)return{};
+    const rows=await r.json();
+    const out={};
+    rows.forEach(function(row){
+      var key=row.supplier_name+"||"+row.product_name+"||"+row.invoice_id;
+      out[key]={amended:row.amended,amendedAt:row.amended_at};
+    });
+    return out;
+  }catch(e){return{};}
+}
+async function upsertAmendment(sn,pn,invoiceId,amended,amendedAt){
+  try{
+    await fetch(SUPABASE_URL+"/rest/v1/price_amendments",{
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates"},
+      body:JSON.stringify({supplier_name:sn,product_name:pn,invoice_id:invoiceId,amended:amended,amended_at:amendedAt||null})
+    });
+  }catch(e){}
+}
+
 function getWeekLabel(){
   // Returns "Week X of MonthName YYYY" for the FOLLOWING week (used on Sundays)
   const now=new Date();
@@ -1251,7 +2196,7 @@ function getLatestUnitPrice(SUPPLIERS,supName,prodName){
       const pack=(inv.packCol!==null&&inv.packCol!==undefined)?(parseFloat(row[inv.packCol])||1):1;
       const unitPrice=(!isNaN(amt)&&qty>0&&pack>0)?(amt/qty/pack):null;
       if(unitPrice!==null){
-        if(!latest||inv.date>latest.date){
+        if(!latest||toISODate(inv.date)>toISODate(latest.date)){
           latest={price:unitPrice,date:inv.date,total:amt,qty:qty};
         }
       }
@@ -1292,6 +2237,7 @@ function App(){
   const [sortMode,    setSortMode]    = React.useState("received");
   const [catSort,     setCatSort]     = React.useState("az");
   const [priceFilter, setPriceFilter] = React.useState("changed");
+  const [invoicePhoto, setInvoicePhoto] = React.useState(null); // { url, name, supplierName }
   const [invFilter,   setInvFilter]   = React.useState("all"); // all | low | ok
   const [toast,       setToast]       = React.useState(null);
   const [orderItems,  setOrderItems]  = React.useState({});
@@ -1316,7 +2262,18 @@ function App(){
   const [histStatus,   setHistStatus]   = React.useState("all");
   const [catQ,         setCatQ]         = React.useState("");
   const [catFilter,    setCatFilter]    = React.useState("all");
+  // ── Price Tracker interactive controls ──
+  const [priceSortBy,  setPriceSortBy]  = React.useState("date");
+  const [priceSortDir, setPriceSortDir] = React.useState("desc");
+  const [priceAmendFilter,setPriceAmendFilter]=React.useState("all");
+  const [amendments,   setAmendments]   = React.useState({});
+  // ── Credit Invoices Tab ──
+  const [payTab,       setPayTab]       = React.useState("methods"); // "methods" | "credit"
+  const [creditStatus, setCreditStatus] = React.useState(function(){try{return JSON.parse(localStorage.getItem("fw_creditStatus")||"{}");}catch(e){return{};}});
+  const [creditDue,    setCreditDue]    = React.useState(function(){try{return JSON.parse(localStorage.getItem("fw_creditDue")||"{}");}catch(e){return{};}});
 
+  React.useEffect(function(){try{localStorage.setItem("fw_creditStatus",JSON.stringify(creditStatus));}catch(e){};},[creditStatus]);
+  React.useEffect(function(){try{localStorage.setItem("fw_creditDue",JSON.stringify(creditDue));}catch(e){};},[creditDue]);
   React.useEffect(function(){if(!orderToast)return;const t=setTimeout(function(){setOrderToast(null);},2400);return function(){clearTimeout(t);};},[orderToast]);
   const totalCartLines=React.useMemo(function(){var n=0;Object.values(orderCarts).forEach(function(c){n+=Object.keys(c).length;});return n;},[orderCarts]);
   const totalCartValue=React.useMemo(function(){
@@ -1354,6 +2311,7 @@ function App(){
         setLoading(false);
       });
     });
+    fetchAmendments().then(function(amds){setAmendments(amds);});
   },[]);
 
   function showToast(msg){setToast(msg);setTimeout(function(){setToast(null);},2000);}
@@ -1373,6 +2331,7 @@ function App(){
           saveLS(ce,rr,pay,inv);
         }
         setRefreshing(false);showToast("Refreshed");
+        fetchAmendments().then(function(amds){setAmendments(amds);});
       });
     });
   }
@@ -1437,17 +2396,26 @@ function App(){
 
   // BACK BAR component
   function BackBar(props){
+    var label="← "+(props.backLabel||"Back");
     return(
-      <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,paddingTop:"max(10px,env(safe-area-inset-top))",paddingBottom:"10px",paddingLeft:"12px",paddingRight:"12px",position:"sticky",top:0,zIndex:200}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={props.onBack}
-            style={{background:props.accent?C.accent:C.surf2,border:props.accent?"none":"1px solid "+C.bdr,borderRadius:10,padding:"10px 16px",color:props.accent?"#000":C.accent,fontWeight:800,fontSize:14,cursor:"pointer",flexShrink:0}}>
-            {"< "+(props.backLabel||"Back")}
-          </button>
-          {props.title&&<div style={{fontWeight:800,fontSize:15,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:C.text}}>{props.title}</div>}
-          {props.right&&props.right}
+      <React.Fragment>
+        {/* ── Sticky top bar ── */}
+        <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,paddingTop:"max(10px,env(safe-area-inset-top))",paddingBottom:"10px",paddingLeft:"12px",paddingRight:"12px",position:"sticky",top:0,zIndex:200}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <button onClick={props.onBack}
+              style={{background:props.accent?C.accent:C.surf2,border:props.accent?"none":"1px solid "+C.bdr,borderRadius:12,padding:"12px 20px",color:props.accent?"#000":C.accent,fontWeight:800,fontSize:15,cursor:"pointer",flexShrink:0,minHeight:44,minWidth:80,letterSpacing:"-0.01em"}}>
+              {"‹ "+(props.backLabel||"Back")}
+            </button>
+            {props.title&&<div style={{fontWeight:800,fontSize:15,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:C.text}}>{props.title}</div>}
+            {props.right&&props.right}
+          </div>
         </div>
-      </div>
+        {/* ── Floating back fab — visible on iPad/tablet (≥600px) ── */}
+        <button className="back-fab" onClick={props.onBack} aria-label={"Back to "+(props.backLabel||"previous screen")}>
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 2L4 7l5 5"/></svg>
+          {props.backLabel||"Back"}
+        </button>
+      </React.Fragment>
     );
   }
 
@@ -1470,17 +2438,59 @@ function App(){
     );
   }
 
+  // ── INVOICE PHOTO PREVIEW ────────────────────────────────────────
+  if(invoicePhoto){
+    return(
+      <div className="photo-preview-wrap">
+        {/* Top bar */}
+        <div className="photo-preview-bar">
+          <button className="pbk" onClick={function(){
+            URL.revokeObjectURL(invoicePhoto.url);
+            setInvoicePhoto(null);
+          }}>
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 2L4 7l5 5"/></svg>
+            Back
+          </button>
+          <div className="ptitle">{invoicePhoto.supplierName || "Invoice Photo"}</div>
+          <div className="pdate">{invoicePhoto.name}</div>
+        </div>
+
+        {/* Image area — explicit white/dark-neutral bg so image is never hidden */}
+        <div className="photo-preview-img">
+          <img
+            src={invoicePhoto.url}
+            alt={"Invoice photo for "+(invoicePhoto.supplierName||"supplier")}
+            onLoad={function(e){e.target.style.opacity=1;}}
+            onError={function(e){e.target.parentNode.innerHTML='<div style="color:#ff6f6f;font-size:14px;text-align:center;padding:24px">Could not load image.<br/>The file may be corrupt or unsupported.</div>';}}
+            style={{opacity:0,transition:"opacity .3s"}}
+          />
+        </div>
+
+        {/* Footer actions */}
+        <div className="photo-preview-footer">
+          <button className="pbtn-close" onClick={function(){
+            URL.revokeObjectURL(invoicePhoto.url);
+            setInvoicePhoto(null);
+          }}>Discard</button>
+          <button className="pbtn-keep" onClick={function(){
+            setInvoicePhoto(null);
+          }}>Done ✓</button>
+        </div>
+      </div>
+    );
+  }
+
   // ── SUPPLIER INVOICE DETAIL ──────────────────────────────────────
   if(screen==="supplier"&&tab){
     const sup=SUPPLIERS[tab];
     if(!sup)return <div style={{background:C.bg,padding:20,color:C.text,fontFamily:"-apple-system,sans-serif"}}><BackBar onBack={goMenu} title="Not found" accent/></div>;
     const spend=sup.invoices.reduce(function(a,i){return a+i.total;},0);
-    const items=sup.invoices.reduce(function(a,i){return a+i.rows.length;},0);
+    const items=sup.invoices.reduce(function(a,i){return a+(i.rows?i.rows.length:0);},0);
     const lq=search.toLowerCase();
     const groups={};
     sup.invoices.forEach(function(inv){
-      if(search&&!inv.rows.some(function(r){return r.some(function(c){return String(c).toLowerCase().includes(lq);});}))return;
-      const d=inv.date?inv.date.split(" ")[0]:"Unknown";
+      if(search&&!(inv.rows||[]).some(function(r){return r.some(function(c){return String(c).toLowerCase().includes(lq);});}))return;
+      const d=inv.date?toISODate(inv.date):"Unknown"; // ISO key — sorts correctly
       if(!groups[d])groups[d]=[];groups[d].push(inv);
     });
     const groupDates=Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
@@ -1500,6 +2510,26 @@ function App(){
           </div>
           <div style={{display:"flex",gap:8,marginBottom:14,alignItems:"center"}}>
             <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products..." style={Object.assign({},ISt,{marginBottom:0,flex:1})}/>
+            {/* Hidden file input — accepts images from camera or gallery */}
+            <input
+              id="inv-photo-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              style={{display:"none"}}
+              onChange={function(e){
+                var file=e.target.files&&e.target.files[0];
+                e.target.value=""; // reset so same file can be re-selected
+                if(!file)return;
+                var url=URL.createObjectURL(file);
+                setInvoicePhoto({url:url,name:file.name,supplierName:tab});
+              }}
+            />
+            <button
+              title="Attach invoice photo"
+              onClick={function(){document.getElementById("inv-photo-input").click();}}
+              style={{padding:"9px 12px",borderRadius:8,fontWeight:700,fontSize:14,cursor:"pointer",flexShrink:0,background:C.surf2,color:C.muted,border:"1px solid "+C.bdr}}
+            >📷</button>
             <button onClick={function(){setEditMode(function(v){return !v;});}}
               style={{padding:"9px 14px",borderRadius:8,fontWeight:700,fontSize:12,cursor:"pointer",flexShrink:0,background:editMode?C.accent:C.surf2,color:editMode?"#000":C.muted,border:"1px solid "+(editMode?C.accent:C.bdr)}}>
               {editMode?"Done":"Edit"}
@@ -1507,7 +2537,7 @@ function App(){
           </div>
           {groupDates.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No results</div>):groupDates.map(function(dateKey){
             return(<div key={dateKey}>
-              <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:6,marginTop:10,paddingLeft:2}}>{dateKey}</div>
+              <div style={{fontSize:11,color:C.muted,fontWeight:700,marginBottom:6,marginTop:10,paddingLeft:2}}>{fmtDD(dateKey)}</div>
               {groups[dateKey].map(function(inv){
                 const invKey=tab+"||"+inv.id;const removed=removedRows[invKey]||{};
                 return(
@@ -1529,7 +2559,9 @@ function App(){
                         <tbody>
                           {inv.rows.map(function(row,ri){
                             if(removed[ri])return null;
-                            const rec=calcRec(inv,ri,row,sup.meta);const rec20=rec!==null?rec*1.2:null;
+                            const rec=calcRec(inv,ri,row,sup.meta);
+                            // New-format invoices carry a pre-computed recPrice; use it if available
+                            var rec20;if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].recPrice!=null){var rp=inv._precomputed[ri].recPrice;var _N=detectPackSize(String(row[0]||""));rec20=(_N&&_N>1)?rp/_N:rp;}else{rec20=rec!==null?rec*1.2:null;}
                             const spKey=invKey+"||"+ri+"||sp";const ntKey=invKey+"||"+ri+"||nt";
                             const spVal=cellEdits[spKey]!==undefined?cellEdits[spKey]:(rec20!==null?fmt(rec20):"");
                             const ntVal=cellEdits[ntKey]!==undefined?cellEdits[ntKey]:"";
@@ -1549,7 +2581,25 @@ function App(){
                             );
                           })}
                         </tbody>
-                        {(inv.totals||[]).length>0&&(<tfoot>{inv.totals.map(function(t,ti){return(<tr key={ti} style={{background:C.surf2}}><td colSpan={(inv.cols||[]).length+3} style={{padding:"5px 8px",textAlign:"right",color:C.muted,fontSize:11}}>{t[0]}</td><td style={{padding:"5px 8px",textAlign:"right",color:C.accent,fontWeight:800,fontSize:12,fontFamily:"monospace",whiteSpace:"nowrap"}}>MUR {fmt(t[1])}</td>{editMode&&<td></td>}</tr>);})}</tfoot>)}
+                        {(function(){
+                          var totRows=inv.totals||[];
+                          // Fallback: if the AI invoice has no totals but carries a total value, synthesise a row
+                          if(totRows.length===0&&inv.total>0)totRows=[["Grand Total",inv.total]];
+                          if(totRows.length===0)return null;
+                          var lastTi=totRows.length-1;
+                          return(
+                            <tfoot>{totRows.map(function(t,ti){
+                              var isLast=ti===lastTi;
+                              return(
+                                <tr key={ti} style={{background:isLast?"rgba(138,255,122,0.08)":C.surf2,borderTop:isLast?"2px solid rgba(138,255,122,0.32)":"none"}}>
+                                  <td colSpan={(inv.cols||[]).length+3} style={{padding:isLast?"9px 10px":"5px 8px",textAlign:"right",color:isLast?C.text:C.muted,fontSize:isLast?12:11,fontWeight:isLast?700:400,letterSpacing:isLast?0.02:0}}>{t[0]}</td>
+                                  <td style={{padding:isLast?"9px 10px":"5px 8px",textAlign:"right",color:C.accent,fontWeight:800,fontSize:isLast?14:12,fontFamily:"monospace",whiteSpace:"nowrap"}}>MUR {fmt(t[1])}</td>
+                                  {editMode&&<td></td>}
+                                </tr>
+                              );
+                            })}</tfoot>
+                          );
+                        })()}
                       </table>
                     </div>
                   </div>
@@ -1671,71 +2721,288 @@ function App(){
   // ── PRICE TRACKER ────────────────────────────────────────────────
   if(screen==="prices"){
     const lq=search.toLowerCase();
+
+    // Build trackable products (≥2 purchases = real history)
     const flagged=[];
     Object.keys(priceHistory).forEach(function(sn){
       Object.keys(priceHistory[sn]).forEach(function(pn){
-        const hist=priceHistory[sn][pn];
-        if(hist.length<2)return;
-        const first=hist[0];const last=hist[hist.length-1];
-        const changed=Math.abs(last.price-first.price)>0.001;
-        if(priceFilter==="changed"&&!changed)return;
+        const entries=priceHistory[sn][pn];
+        if(entries.length<2)return;
+        const latest=entries[entries.length-1];
+        const previous=entries[entries.length-2];
+        const first=entries[0];
+        const diff=latest.price-previous.price;
+        const changed=Math.abs(diff)>=0.01;
+        const pct=previous.price>0?(diff/previous.price)*100:0;
+        const trendDiff=latest.price-first.price;
+        const trendPct=first.price>0?(trendDiff/first.price)*100:0;
+        // Amendment key — tracks latest invoice for this product
+        const amendKey=sn+"||"+pn+"||"+latest.invoiceId;
+        const amend=amendments[amendKey];
+        const isAmended=!!(amend&&amend.amended);
+
         if(lq&&!pn.toLowerCase().includes(lq)&&!sn.toLowerCase().includes(lq))return;
-        const pct=((last.price-first.price)/first.price)*100;
-        flagged.push({sn:sn,pn:pn,hist:hist,first:first,last:last,pct:pct,changed:changed});
+        if(priceFilter==="changed"&&!changed)return;
+        if(priceAmendFilter==="pending"&&isAmended)return;
+        if(priceAmendFilter==="amended"&&!isAmended)return;
+
+        flagged.push({sn,pn,entries,latest,previous,first,diff,pct,changed,trendDiff,trendPct,amendKey,isAmended});
       });
     });
-    flagged.sort(function(a,b){if(a.changed&&!b.changed)return -1;if(!a.changed&&b.changed)return 1;return Math.abs(b.pct)-Math.abs(a.pct);});
-    const changedCount=flagged.filter(function(f){return f.changed;}).length;
+
+    // ── Sort ─────────────────────────────────────────────────────
+    flagged.sort(function(a,b){
+      // Amended items always sink to the bottom when viewing "all"
+      if(priceAmendFilter==="all"&&a.isAmended!==b.isAmended)return a.isAmended?1:-1;
+      if(priceSortBy==="date"){
+        var dc=b.latest.date.localeCompare(a.latest.date);
+        return priceSortDir==="asc"?-dc:dc;
+      }
+      if(priceSortBy==="price"){
+        var pc=b.latest.price-a.latest.price;
+        return priceSortDir==="asc"?-pc:pc;
+      }
+      if(priceSortBy==="name"){
+        var nc=a.pn.localeCompare(b.pn);
+        return priceSortDir==="desc"?-nc:nc;
+      }
+      if(priceSortBy==="supplier"){
+        var sc=a.sn.localeCompare(b.sn);
+        return priceSortDir==="desc"?-sc:sc;
+      }
+      // Default: price-up first → down → stable; within group by |pct|
+      const rank=function(f){return f.changed?(f.diff>0?0:1):2;};
+      if(rank(a)!==rank(b))return rank(a)-rank(b);
+      return Math.abs(b.pct)-Math.abs(a.pct);
+    });
+
+    const upCount=flagged.filter(function(f){return f.changed&&f.diff>0;}).length;
+    const downCount=flagged.filter(function(f){return f.changed&&f.diff<0;}).length;
+    const pendingCount=flagged.filter(function(f){return!f.isAmended;}).length;
+    const trackedTotal=Object.keys(priceHistory).reduce(function(a,sn){return a+Object.keys(priceHistory[sn]).length;},0);
+    const filtersActive=priceSortBy!=="date"||priceSortDir!=="desc"||priceAmendFilter!=="all"||priceFilter!=="changed"||!!search;
+
+    function dayLabel(iso){
+      if(!iso)return"";
+      var p=iso.split("-");if(p.length<3)return iso;
+      var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return parseInt(p[2],10)+" "+months[parseInt(p[1],10)-1];
+    }
+
+    function toggleSort(field){
+      if(priceSortBy===field){setPriceSortDir(function(d){return d==="asc"?"desc":"asc";});}
+      else{
+        setPriceSortBy(field);
+        setPriceSortDir(field==="name"||field==="supplier"?"asc":"desc");
+      }
+    }
+
+    function SortBtn(props){
+      var active=priceSortBy===props.id;
+      var arrow=active?(priceSortDir==="asc"?"↑":"↓"):"";
+      return(
+        <button onClick={function(){toggleSort(props.id);}}
+          style={{minHeight:44,padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",
+            whiteSpace:"nowrap",border:"1px solid "+(active?C.warn:C.bdr),
+            background:active?"rgba(245,179,74,0.18)":C.surf2,
+            color:active?C.warn:C.muted,fontFamily:"-apple-system,sans-serif"}}>
+          {props.label}{arrow?" "+arrow:""}
+        </button>
+      );
+    }
+
+    function toggleAmendment(f){
+      var nowAmended=!f.isAmended;
+      var nowAt=nowAmended?new Date().toISOString():null;
+      setAmendments(function(prev){
+        var next=Object.assign({},prev);
+        next[f.amendKey]={amended:nowAmended,amendedAt:nowAt};
+        return next;
+      });
+      upsertAmendment(f.sn,f.pn,f.latest.invoiceId,nowAmended,nowAt);
+    }
+
     return(
-      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:40}}>
+      <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:80}}>
         <BackBar onBack={goMenu} backLabel="Menu" title="Price Tracker"/>
-        <div style={{padding:"12px 10px"}}>
-          <div style={{display:"flex",gap:8,marginBottom:14}}>
-            <div style={Object.assign({},SC,{borderColor:changedCount>0?C.warn:C.bdr})}>
-              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Changes</div>
-              <div style={{fontSize:18,fontWeight:800,color:changedCount>0?C.warn:C.muted}}>{changedCount}</div>
-            </div>
-            <div style={SC}>
-              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Tracked</div>
-              <div style={{fontSize:18,fontWeight:800,color:C.text}}>{Object.keys(priceHistory).reduce(function(a,sn){return a+Object.keys(priceHistory[sn]).length;},0)}</div>
+
+        {/* Sticky control bar — sits immediately below the BackBar */}
+        <div style={{position:"sticky",top:62,zIndex:150,background:C.surf,borderBottom:"1px solid "+C.bdr,padding:"8px 10px 6px",display:"flex",flexDirection:"column",gap:6}}>
+          {/* Row 1: sort buttons + reset */}
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
+            <span style={{fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.1em",flexShrink:0,minWidth:32,fontWeight:600}}>Sort</span>
+            <SortBtn id="date" label="Date"/>
+            <SortBtn id="price" label="Price"/>
+            <SortBtn id="name" label="Name"/>
+            <SortBtn id="supplier" label="Supplier"/>
+            {filtersActive&&(
+              <button onClick={function(){setPriceSortBy("date");setPriceSortDir("desc");setPriceAmendFilter("all");setPriceFilter("changed");setSearch("");}}
+                style={{minHeight:44,marginLeft:"auto",padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",
+                  border:"1px solid rgba(255,111,111,0.5)",background:"rgba(255,111,111,0.1)",color:C.danger,whiteSpace:"nowrap",fontFamily:"-apple-system,sans-serif"}}>
+                ✕ Reset
+              </button>
+            )}
+          </div>
+          {/* Row 2: amendment filter + summary counter */}
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
+            <span style={{fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.1em",flexShrink:0,minWidth:32,fontWeight:600}}>Show</span>
+            {[["all","All"],["pending","Pending"],["amended","Amended"]].map(function(opt){
+              var active=priceAmendFilter===opt[0];
+              return(
+                <button key={opt[0]} onClick={function(){setPriceAmendFilter(opt[0]);}}
+                  style={{minHeight:44,padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",
+                    whiteSpace:"nowrap",border:"1px solid "+(active?C.warn:C.bdr),
+                    background:active?"rgba(245,179,74,0.18)":C.surf2,
+                    color:active?C.warn:C.muted,fontFamily:"-apple-system,sans-serif"}}>
+                  {opt[1]}
+                </button>
+              );
+            })}
+            <div style={{marginLeft:"auto",fontSize:12,color:C.muted,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:4}}>
+              <span style={{color:C.text,fontFamily:"monospace"}}>{flagged.filter(function(f){return f.changed;}).length}</span>
+              <span> changes —</span>
+              <button onClick={function(){setPriceAmendFilter("pending");}}
+                style={{background:"none",border:"none",padding:"4px 6px",cursor:"pointer",fontWeight:700,fontSize:12,fontFamily:"monospace",
+                  color:pendingCount>0?C.warn:C.muted,minHeight:32}}>
+                {pendingCount} pending
+              </button>
             </div>
           </div>
-          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products or suppliers..." style={ISt}/>
-          <SortPills value={priceFilter} onChange={setPriceFilter} color={C.warn} options={[["changed","Changes Only"],["all","All Products"]]}/>
-          {flagged.length===0?(<div style={{color:C.muted,textAlign:"center",padding:40}}>{priceFilter==="changed"?"No price changes detected yet":"No products found"}</div>):
-          flagged.map(function(f,fi){
-            const up=f.pct>0;const flagColor=f.changed?(up?C.danger:C.accent):C.muted;
+        </div>
+
+        <div style={{padding:"12px 10px"}}>
+
+          {/* KPI strip */}
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            <div style={Object.assign({},SC,{borderColor:upCount>0?C.danger:C.bdr,flex:1})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Up</div>
+              <div style={{fontSize:22,fontWeight:800,color:upCount>0?C.danger:C.muted,fontFamily:"monospace"}}>{upCount}</div>
+              <div style={{fontSize:9,color:C.muted}}>price rises</div>
+            </div>
+            <div style={Object.assign({},SC,{borderColor:downCount>0?C.accent:C.bdr,flex:1})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Down</div>
+              <div style={{fontSize:22,fontWeight:800,color:downCount>0?C.accent:C.muted,fontFamily:"monospace"}}>{downCount}</div>
+              <div style={{fontSize:9,color:C.muted}}>price drops</div>
+            </div>
+            <div style={Object.assign({},SC,{flex:1})}>
+              <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Tracked</div>
+              <div style={{fontSize:22,fontWeight:800,color:C.text,fontFamily:"monospace"}}>{trackedTotal}</div>
+              <div style={{fontSize:9,color:C.muted}}>products</div>
+            </div>
+          </div>
+
+          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search products or suppliers…" style={ISt}/>
+          <SortPills value={priceFilter} onChange={setPriceFilter} color={C.warn}
+            options={[["changed","Changes Only"],["all","All Products"]]}/>
+
+          {flagged.length===0?(
+            <div style={{textAlign:"center",padding:"48px 20px",color:C.muted}}>
+              <div style={{fontSize:36,marginBottom:12}}>✓</div>
+              <div style={{fontSize:15,fontWeight:700,marginBottom:4,color:C.text}}>
+                {priceFilter==="changed"?"No price changes since last purchase":"No products found"}
+              </div>
+              <div style={{fontSize:12}}>{priceFilter==="changed"?"All buying prices are stable":"Try a different search"}</div>
+            </div>
+          ):flagged.map(function(f,fi){
+            const up=f.diff>0;
+            const changeColor=f.changed?(up?C.danger:C.accent):C.muted;
+            const borderColor=f.isAmended?"rgba(138,255,122,0.25)":(f.changed?(up?"rgba(255,111,111,0.4)":"rgba(138,255,122,0.3)"):C.bdr);
+
             return(
-              <div key={fi} style={{background:C.surf,borderRadius:12,marginBottom:10,border:"1px solid "+(f.changed?(up?C.danger:C.accent):C.bdr),overflow:"hidden"}}>
-                <div style={{padding:"10px 12px"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                    <div style={{flex:1,minWidth:0,marginRight:8}}>
-                      <div style={{fontWeight:700,fontSize:13,marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{f.pn}</div>
+              <div key={fi} style={{background:C.surf,borderRadius:14,marginBottom:12,border:"1px solid "+borderColor,overflow:"hidden",opacity:f.isAmended?0.55:1,transition:"opacity .2s"}}>
+
+                {/* Header band */}
+                {f.changed&&(
+                  <div style={{background:up?"rgba(255,111,111,0.1)":"rgba(138,255,122,0.08)",borderBottom:"1px solid "+borderColor,padding:"7px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    <div style={{fontSize:12,fontWeight:700,color:f.isAmended?C.muted:changeColor}}>
+                      {up?"▲ Price Up":"▼ Price Down"}
+                    </div>
+                    <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                      <span style={{fontSize:13,fontWeight:800,color:f.isAmended?C.muted:changeColor,fontFamily:"monospace"}}>
+                        {up?"+":""}{f.pct.toFixed(1)}%
+                      </span>
+                      <span style={{fontSize:11,color:f.isAmended?C.muted:changeColor,fontFamily:"monospace"}}>
+                        {up?"+":""}{fmt(f.diff)} MUR/unit
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{padding:"12px 14px"}}>
+                  {/* Product name + supplier + amendment button */}
+                  <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10,marginBottom:10}}>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:700,fontSize:14,marginBottom:2,lineHeight:1.3}}>{f.pn}</div>
                       <div style={{fontSize:11,color:C.muted}}>{f.sn}</div>
                     </div>
-                    {f.changed&&(<div style={{textAlign:"right",flexShrink:0}}>
-                      <div style={{fontSize:16,fontWeight:800,color:flagColor}}>{up?"▲":"▼"} {Math.abs(f.pct).toFixed(1)}%</div>
-                      <div style={{fontSize:10,color:flagColor}}>{up?"Price Up":"Price Down"}</div>
-                    </div>)}
+                    {/* Large touch-target amendment toggle */}
+                    <button onClick={function(){toggleAmendment(f);}}
+                      title={f.isAmended?"Mark as pending again":"Mark price amended in system"}
+                      style={{minWidth:76,minHeight:44,padding:"8px 10px",borderRadius:10,flexShrink:0,cursor:"pointer",
+                        display:"flex",alignItems:"center",justifyContent:"center",gap:5,
+                        background:f.isAmended?"rgba(138,255,122,0.14)":"rgba(245,179,74,0.1)",
+                        border:"1px solid "+(f.isAmended?"rgba(138,255,122,0.45)":"rgba(245,179,74,0.45)"),
+                        color:f.isAmended?C.accent:C.warn,fontWeight:700,fontSize:11,fontFamily:"-apple-system,sans-serif"}}>
+                      <span style={{fontSize:18,lineHeight:1}}>{f.isAmended?"✓":"●"}</span>
+                      <span>{f.isAmended?"Done":"Pending"}</span>
+                    </button>
                   </div>
-                  <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4}}>
-                    {f.hist.map(function(h,hi){
-                      const isLast=hi===f.hist.length-1;
-                      const prev=hi>0?f.hist[hi-1].price:null;
-                      const wentUp=prev!==null&&h.price>prev+0.001;
-                      const wentDown=prev!==null&&h.price<prev-0.001;
-                      const dotColor=hi===0?C.muted:(wentUp?C.danger:(wentDown?C.accent:C.muted));
-                      return(<div key={hi} style={{flexShrink:0,textAlign:"center",minWidth:60}}>
-                        <div style={{fontSize:9,color:C.muted,marginBottom:2}}>{h.date.split(" ")[0]}</div>
-                        <div style={{fontSize:12,fontWeight:isLast?800:400,color:isLast?C.text:C.muted,fontFamily:"monospace"}}>{fmt(h.price)}</div>
-                        <div style={{width:8,height:8,borderRadius:"50%",background:dotColor,margin:"4px auto 0"}}></div>
-                      </div>);
-                    })}
+
+                  {/* Was → Now */}
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,flexWrap:"wrap"}}>
+                    <div style={{background:C.surf2,borderRadius:8,padding:"6px 10px",textAlign:"center"}}>
+                      <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Previous</div>
+                      <div style={{fontSize:14,fontWeight:700,fontFamily:"monospace",color:C.muted}}>{fmt(f.previous.price)}</div>
+                      <div style={{fontSize:9,color:C.muted}}>{dayLabel(f.previous.date)}</div>
+                    </div>
+                    <div style={{fontSize:18,color:changeColor,fontWeight:800,flexShrink:0}}>→</div>
+                    <div style={{background:f.changed?(up?"rgba(255,111,111,0.12)":"rgba(138,255,122,0.1)"):C.surf2,borderRadius:8,padding:"6px 10px",textAlign:"center",border:"1px solid "+borderColor}}>
+                      <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Latest</div>
+                      <div style={{fontSize:14,fontWeight:800,fontFamily:"monospace",color:f.isAmended?C.muted:changeColor}}>{fmt(f.latest.price)}</div>
+                      <div style={{fontSize:9,color:C.muted}}>{dayLabel(f.latest.date)}</div>
+                    </div>
+                    {f.entries.length>2&&(
+                      <div style={{marginLeft:"auto",textAlign:"right",flexShrink:0}}>
+                        <div style={{fontSize:9,color:C.muted,textTransform:"uppercase",marginBottom:2}}>First seen</div>
+                        <div style={{fontSize:11,fontFamily:"monospace",color:C.muted}}>{fmt(f.first.price)}</div>
+                        <div style={{fontSize:9,color:C.muted}}>{dayLabel(f.first.date)}</div>
+                      </div>
+                    )}
                   </div>
-                  <div style={{display:"flex",justifyContent:"space-between",marginTop:8,paddingTop:8,borderTop:"1px solid "+C.bdr}}>
-                    <div style={{fontSize:11,color:C.muted}}>First: <span style={{color:C.text,fontFamily:"monospace"}}>{fmt(f.first.price)}</span><span style={{color:C.muted}}> {f.first.date.split(" ")[0]}</span></div>
-                    <div style={{fontSize:11,color:C.muted}}>Latest: <span style={{color:flagColor,fontFamily:"monospace",fontWeight:700}}>{fmt(f.last.price)}</span><span style={{color:C.muted}}> {f.last.date.split(" ")[0]}</span></div>
-                  </div>
+
+                  {/* Full price timeline */}
+                  {f.entries.length>0&&(
+                    <div style={{overflowX:"auto",paddingBottom:4}}>
+                      <div style={{display:"flex",alignItems:"flex-end",gap:0,minWidth:"max-content"}}>
+                        {f.entries.map(function(h,hi){
+                          const isLatest=hi===f.entries.length-1;
+                          const isPrev=hi===f.entries.length-2;
+                          const prevP=hi>0?f.entries[hi-1].price:null;
+                          const wentUp=prevP!==null&&h.price>prevP+0.005;
+                          const wentDown=prevP!==null&&h.price<prevP-0.005;
+                          const dotC=isLatest?changeColor:(wentUp?C.danger:(wentDown?C.accent:C.muted));
+                          const dotSize=isLatest?10:6;
+                          return(
+                            <React.Fragment key={hi}>
+                              {hi>0&&(<div style={{height:1,width:16,background:C.bdr,marginBottom:14,flexShrink:0}}/>)}
+                              <div style={{textAlign:"center",flexShrink:0,minWidth:52}}>
+                                <div style={{fontSize:9,color:isLatest?C.text:C.muted,marginBottom:3,fontWeight:isLatest?700:400}}>{dayLabel(h.date)}</div>
+                                <div style={{fontSize:11,fontWeight:isLatest?800:400,color:isLatest?(f.isAmended?C.muted:changeColor):(isPrev?C.text:C.muted),fontFamily:"monospace"}}>{fmt(h.price)}</div>
+                                <div style={{width:dotSize,height:dotSize,borderRadius:"50%",background:isLatest&&f.isAmended?C.muted:dotC,margin:"5px auto 0",border:isLatest?"2px solid "+(f.isAmended?C.muted:changeColor):"none"}}/>
+                              </div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Amendment timestamp */}
+                  {f.isAmended&&amendments[f.amendKey]&&amendments[f.amendKey].amendedAt&&(
+                    <div style={{marginTop:8,fontSize:10,color:C.accent,fontFamily:"monospace",opacity:0.8}}>
+                      ✓ Price amended in system — {fmtDD(amendments[f.amendKey].amendedAt.split("T")[0])}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -1840,7 +3107,9 @@ function App(){
     // ── Helpers ───────────────────────────────────────────────────
     function daysSince(isoDate){
       if(!isoDate)return null;
-      return Math.floor((new Date()-new Date(isoDate))/(1000*60*60*24));
+      var iso=toISODate(isoDate);
+      if(!iso)return null;
+      return Math.floor((new Date()-new Date(iso))/(1000*60*60*24));
     }
     function relDay(isoDate){
       var n=daysSince(isoDate);
@@ -2328,7 +3597,13 @@ function App(){
 
   if(screen==="menu"){
     const changedCount=Object.keys(priceHistory).reduce(function(a,sn){
-      return a+Object.keys(priceHistory[sn]).filter(function(pn){const h=priceHistory[sn][pn];return h.length>=2&&Math.abs(h[h.length-1].price-h[0].price)>0.001;}).length;
+      return a+Object.keys(priceHistory[sn]).filter(function(pn){
+        const h=priceHistory[sn][pn];
+        if(h.length<2)return false;
+        // Change = latest purchase price differs from immediately previous purchase
+        const diff=h[h.length-1].price-h[h.length-2].price;
+        return Math.abs(diff)>=0.01;
+      }).length;
     },0);
     const totalOut=supNames.reduce(function(a,sn){
       const prods=getSupProducts(SUPPLIERS[sn]);
@@ -2351,219 +3626,657 @@ function App(){
       {key:"inventory", icon:"📋", label:"Inventory",    sub:totalOut>0?totalOut+" out of stock"+(totalLow>0?", "+totalLow+" low":""):totalLow>0?totalLow+" low stock items":"Track stock & reorder levels", color:totalOut>0?C.danger:totalLow>0?C.warn:C.purple, badge:totalOut>0?totalOut:totalLow>0?totalLow:null, badgeColor:totalOut>0?C.danger:C.warn},
       {key:"order",     icon:"🛒", label:"Order",         sub:(function(){const p=custOrders.filter(function(o){return !o.ordered;}).length;return p>0?p+" order"+(p!==1?"s":"")+" pending":"Customer orders & weekly purchasing";}()), color:C.blue, badge:(function(){const p=custOrders.filter(function(o){return !o.ordered;}).length;return p>0?p:null;}()), badgeColor:C.warn},
     ];
+    const totalInvoices=(function(){var t=0;supNames.forEach(function(sn){t+=SUPPLIERS[sn].invoices.length;});return t;})();
+    const totalSKUs=(function(){var t=0;supNames.forEach(function(sn){t+=getSupProducts(SUPPLIERS[sn]).length;});return t;})();
+    const payMethodSummary=(function(){var mc={};supNames.forEach(function(sn){var pv=(payments[sn+"||pay"]||SUPPLIERS[sn].meta.payment||"").trim()||"Unset";mc[pv]=(mc[pv]||0)+1;});return Object.entries(mc).slice(0,3);})();
+    const pendingCustOrders=custOrders.filter(function(o){return !o.ordered;}).length;
+    const todayLabel=(function(){var d=new Date();var days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return days[d.getDay()]+", "+d.getDate()+" "+months[d.getMonth()]+" "+d.getFullYear();})();
+
     return(
-      <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-        style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:"max(40px,calc(40px + env(safe-area-inset-bottom)))"}}>
-        <div style={{height:"env(safe-area-inset-top)",background:C.surf}}></div>
+      <div className="home-wrap" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
+        style={{paddingTop:"env(safe-area-inset-top)",paddingBottom:"max(40px,calc(40px + env(safe-area-inset-bottom)))"}}>
         {(pulling||refreshing)&&(
-          <div style={{height:refreshing?50:pullY,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",transition:pulling?"none":"height 0.3s ease",background:C.bg}}>
-            <div style={{width:28,height:28,borderRadius:"50%",border:"3px solid "+C.bdr,borderTop:"3px solid "+C.accent,animation:refreshing?"spin 0.7s linear infinite":"none",transform:!refreshing?("rotate("+Math.min(pullY*3,270)+"deg)"):"none"}}></div>
+          <div style={{height:refreshing?50:pullY,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",transition:pulling?"none":"height 0.3s ease"}}>
+            <div style={{width:26,height:26,borderRadius:"50%",border:"2px solid var(--border-strong)",borderTop:"2px solid var(--accent)",animation:refreshing?"spin 0.7s linear infinite":"none",transform:!refreshing?("rotate("+Math.min(pullY*3,270)+"deg)"):"none"}}></div>
           </div>
         )}
-        <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div>
-            <div style={{fontWeight:800,fontSize:18}}>Fowdar Store</div>
-            <div style={{fontSize:11,color:C.muted}}>Veer Bisham Fowdar Trading Co. Ltd.</div>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <button onClick={refreshData} disabled={refreshing}
-              style={{background:"none",border:"1px solid "+C.bdr,borderRadius:8,padding:"6px 12px",color:refreshing?C.muted:C.accent,fontSize:20,cursor:"pointer",lineHeight:1}}>
-              {refreshing?"...":"\u21BB"}
-            </button>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontSize:10,color:C.muted}}>Total Spend</div>
-              <div style={{fontSize:15,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(totalAll)}</div>
+
+        <div className="home-appbar">
+          <div className="home-appbar-inner">
+            <div>
+              <h1 className="home-brand">Fowdar Store</h1>
+              <p className="home-sub">Veer Bisham Fowdar Trading Co. Ltd.</p>
+            </div>
+            <div className="home-meta">
+              <div className="home-totals">
+                <div className="ht-label">Total Spend · All time</div>
+                <div className="ht-value">MUR {fmt(totalAll)}</div>
+                <div className="ht-sub">{refreshing?"syncing\u2026":"\u2014 last sync just now"}</div>
+              </div>
+              <button className="home-refresh" onClick={refreshData} disabled={refreshing} title="Refresh">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 8a6 6 0 1 1-1.76-4.24"/><path d="M14 2v3.5h-3.5"/>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
-        {loading?(<div style={{textAlign:"center",padding:60,color:C.muted}}>Loading...</div>):(
-          <div style={{padding:"20px 14px"}}>
-            <div style={{fontSize:11,color:C.muted,marginBottom:16,fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Select a section</div>
-            {menuItems.map(function(item){
-              return(
-                <div key={item.key} onClick={function(){setScreen(item.key);setSearch("");setSubScreen(null);}}
-                  style={{background:C.surf,borderRadius:16,marginBottom:12,padding:"16px 16px",border:"1px solid "+(item.badge?item.badgeColor:C.bdr),cursor:"pointer",display:"flex",alignItems:"center",gap:14,position:"relative"}}>
-                  <div style={{fontSize:30,flexShrink:0,width:44,height:44,borderRadius:12,background:C.surf2,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.icon}</div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:800,fontSize:15,marginBottom:3,color:C.text}}>{item.label}</div>
-                    <div style={{fontSize:12,color:item.badge?item.badgeColor:C.muted,fontWeight:item.badge?700:400}}>{item.sub}</div>
-                  </div>
-                  {item.badge&&(<div style={{background:item.badgeColor,borderRadius:20,padding:"3px 10px",fontSize:12,fontWeight:800,color:item.badgeColor===C.warn?"#000":"#fff",flexShrink:0}}>{item.badge}</div>)}
-                  {!item.badge&&(<div style={{fontSize:18,color:C.muted,flexShrink:0}}>{">"}</div>)}
+
+        {loading?(<div style={{padding:"60px 24px",textAlign:"center",color:"var(--text-muted)"}}>Loading…</div>):(
+          <div className="home-page">
+            <div className="slabel" style={{marginBottom:14}}>
+              <span>Today</span><span className="rule"></span>
+              <span className="meta">{todayLabel}</span>
+            </div>
+
+            <div className="kpis">
+              <div className="kpi">
+                <span className="kl">Total spend</span>
+                <span className="kv">{fmt(totalAll).split(".")[0]}<span className="ku"> MUR</span></span>
+                <span className="kd flat">— {totalInvoices} invoice{totalInvoices!==1?"s":""} across {supNames.length} suppliers</span>
+                <svg className="kspark" viewBox="0 0 90 30" preserveAspectRatio="none">
+                  <polyline fill="none" stroke="#8aff7a" strokeWidth="1.5" points="0,24 15,20 30,22 45,16 60,12 75,14 90,8"/>
+                </svg>
+              </div>
+              <div className="kpi">
+                <span className="kl">Catalogue size</span>
+                <span className="kv">{totalSKUs}<span className="ku"> SKUs</span></span>
+                <span className="kd flat">— {supNames.length} active suppliers</span>
+                <svg className="kspark" viewBox="0 0 90 30" preserveAspectRatio="none">
+                  <polyline fill="none" stroke="#a3a3a3" strokeWidth="1.5" points="0,16 20,14 40,12 60,14 80,12 90,10"/>
+                </svg>
+              </div>
+              <div className="kpi">
+                <span className="kl">Price changes (tracked)</span>
+                <span className="kv" style={{color:changedCount>0?"var(--warn)":"var(--text)"}}>{changedCount}<span className="ku"> items</span></span>
+                <span className={"kd "+(changedCount>0?"down":"flat")}>{changedCount>0?"\u25B2 detected since last sync":"\u2014 no changes detected"}</span>
+                <svg className="kspark" viewBox="0 0 90 30" preserveAspectRatio="none">
+                  <polyline fill="none" stroke={changedCount>0?"#f5b34a":"#6e6e6e"} strokeWidth="1.5" points="0,20 20,18 40,16 55,12 70,10 80,12 90,6"/>
+                </svg>
+              </div>
+            </div>
+
+            <div className="slabel" style={{marginBottom:14}}><span>Sections</span><span className="rule"></span></div>
+
+            <div className="bento">
+              <div className="tile col6" onClick={function(){setScreen("invoices");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">🧾</div>
+                  <div className="t-titles"><h3 className="t-title">Invoices</h3><div className="t-sub">Browse supplier invoices</div></div>
+                  <span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>
                 </div>
-              );
-            })}
+                <div className="t-body">
+                  <div className="t-stat"><span className="t-num">{totalInvoices}</span><span className="t-unit">invoices · {supNames.length} suppliers</span></div>
+                  <div className="t-meta"><span>MUR {fmt(totalAll)}</span><span className="dot">·</span><span>all recorded</span></div>
+                </div>
+              </div>
+
+              <div className="tile col6 tile-order" onClick={function(){setScreen("order");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">🛒</div>
+                  <div className="t-titles"><h3 className="t-title">Order</h3><div className="t-sub">Customer orders & weekly purchasing</div></div>
+                  <span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>
+                </div>
+                <div className="t-body">
+                  <div className="t-stat">
+                    <span className="t-num accent">{pendingCustOrders}</span>
+                    <span className="t-unit">pending order{pendingCustOrders!==1?"s":""}</span>
+                  </div>
+                  <div className="t-actions">
+                    <button className="tqa primary" onClick={function(e){e.stopPropagation();setScreen("order");}}>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+                      New order
+                    </button>
+                    <button className="tqa" onClick={function(e){e.stopPropagation();setScreen("order");}}>View history</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className={"tile col6"+(changedCount>0?" tile-alert":"")} onClick={function(){setScreen("prices");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">📊</div>
+                  <div className="t-titles">
+                    <h3 className="t-title" style={{display:"flex",alignItems:"center",gap:10}}>
+                      Price Tracker{changedCount>0&&<span className="tile-pulse"></span>}
+                    </h3>
+                    <div className="t-sub">Monitor buying-price changes across suppliers</div>
+                  </div>
+                  {changedCount>0
+                    ?<span className="tile-badge">{changedCount} changes</span>
+                    :<span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>}
+                </div>
+                <div className="t-body">
+                  <div className="t-meta"><span>{changedCount>0?changedCount+" price change"+(changedCount!==1?"s":"")+" detected":"No changes since last sync"}</span></div>
+                </div>
+              </div>
+
+              <div className="tile col6" onClick={function(){setScreen("payments");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">💳</div>
+                  <div className="t-titles"><h3 className="t-title">Payments</h3><div className="t-sub">Payment methods & status</div></div>
+                  <span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>
+                </div>
+                <div className="t-body">
+                  <div className="t-meta">
+                    {payMethodSummary.map(function(e,i){return(
+                      <React.Fragment key={i}>{i>0&&<span className="dot">·</span>}<span>{e[1]} via {e[0]}</span></React.Fragment>
+                    );})}
+                  </div>
+                </div>
+              </div>
+
+              <div className="tile col6" onClick={function(){setScreen("catalogue");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">📦</div>
+                  <div className="t-titles"><h3 className="t-title">Catalogue</h3><div className="t-sub">Full product list by supplier</div></div>
+                  <span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>
+                </div>
+                <div className="t-body">
+                  <div className="t-meta">
+                    <span>{supNames.length} suppliers</span><span className="dot">·</span><span>{totalSKUs} SKUs</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={"tile col6"+(totalOut>0?" tile-alert":"")} onClick={function(){setScreen("inventory");setSearch("");setSubScreen(null);}}>
+                <div className="t-head">
+                  <div className="t-glyph">📋</div>
+                  <div className="t-titles"><h3 className="t-title">Inventory</h3><div className="t-sub">Track stock & reorder levels</div></div>
+                  <span className="t-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3l5 5-5 5"/></svg></span>
+                </div>
+                <div className="t-body">
+                  <div className="t-meta">
+                    {totalOut>0?<span style={{color:"var(--danger)"}}>{totalOut} out of stock</span>:<span>all items in stock</span>}
+                    {totalLow>0&&<React.Fragment><span className="dot">·</span><span style={{color:"var(--warn)"}}>{totalLow} low</span></React.Fragment>}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="home-foot">
+              <span>Fowdar Store Tracker · build 2026</span>
+              <span>Synced with Supabase</span>
+            </div>
           </div>
         )}
-        {toast&&(<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:C.accent,color:"#000",padding:"10px 20px",borderRadius:20,fontWeight:700,fontSize:13,zIndex:999,boxShadow:"0 4px 20px rgba(0,229,160,0.4)"}}>{toast}</div>)}
+        {toast&&<div className="toast">{toast}</div>}
       </div>
     );
   }
 
   // ── SECTION SCREENS (invoices / payments / catalogue) ────────────
+  // Derived vars for week strip
+  const wIdx = dayFilter ? allDays.indexOf(dayFilter) : 0;
+  const weekPage = Math.floor(Math.max(0, wIdx) / 7);
+  const weekDays = allDays.slice(weekPage * 7, weekPage * 7 + 7);
+  const totalWeekPages = Math.ceil(allDays.length / 7);
+  const largestSup = daySuppliers.length > 0 ? Math.max.apply(null, daySuppliers.map(function(s){return s.total;})) : 0;
+  const avgSup = daySuppliers.length > 0 ? dayTotal / daySuppliers.length : 0;
+
+  // Derived vars for payment method cards
+  const PMETHODS = ["Cash","Cheque","Credit","Bank Transfer"];
+  const methodStats = (function(){
+    const stats = {};
+    PMETHODS.forEach(function(m){ stats[m] = {count:0, total:0}; });
+    stats["Other"] = {count:0, total:0};
+    supNames.forEach(function(sn){
+      const sup = SUPPLIERS[sn];
+      const pk = sn+"||pay";
+      const pv = (payments[pk] !== undefined ? payments[pk] : (sup.meta.payment||"")).trim();
+      const tot = sup.invoices.reduce(function(a,i){return a+i.total;},0);
+      const key = PMETHODS.indexOf(pv) !== -1 ? pv : "Other";
+      stats[key].count++;
+      stats[key].total += tot;
+    });
+    return stats;
+  })();
+  const maxMethodTotal = Math.max.apply(null, Object.values(methodStats).map(function(s){return s.total;}).concat([1]));
+  const screenTitle = screen==="invoices" ? "Invoices" : screen==="payments" ? "Payments" : "Catalogue";
+
+  // ── Credit invoices data (for Credit Invoices tab) ────────────────────────
+  const creditRows = (function(){
+    var rows = [];
+    supNames.forEach(function(sn){
+      var pv = (payments[sn+"||pay"] !== undefined ? payments[sn+"||pay"] : (SUPPLIERS[sn].meta.payment||"")).trim();
+      if (!pv.toLowerCase().includes("credit")) return;
+      var sup = SUPPLIERS[sn];
+      sup.invoices.forEach(function(inv){
+        var norm = normalizeInv(inv);
+        var amount = getInvGrandTotal(norm);
+        var key = sn+"||"+(inv.id||inv.date);
+        rows.push({sn:sn, inv:inv, amount:amount, key:key});
+      });
+    });
+    rows.sort(function(a,b){
+      var as = creditStatus[a.key]||"unpaid", bs = creditStatus[b.key]||"unpaid";
+      if(as!==bs) return as==="unpaid"?-1:1;
+      return toISODate(b.inv.date).localeCompare(toISODate(a.inv.date));
+    });
+    return rows;
+  })();
+  const creditUnpaidCount = creditRows.filter(function(r){return (creditStatus[r.key]||"unpaid")==="unpaid";}).length;
+
   return(
-    <div style={{background:C.bg,minHeight:"100%",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",color:C.text,paddingBottom:"max(60px,calc(60px + env(safe-area-inset-bottom)))"}}>
-      <div style={{background:C.surf,borderBottom:"1px solid "+C.bdr,paddingTop:"max(10px,env(safe-area-inset-top))",paddingBottom:"10px",paddingLeft:"12px",paddingRight:"12px",position:"sticky",top:0,zIndex:200}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={goMenu}
-            style={{background:C.surf2,border:"1px solid "+C.bdr,borderRadius:10,padding:"10px 16px",color:C.accent,fontWeight:800,fontSize:14,cursor:"pointer",flexShrink:0}}>
-            {"< Menu"}
+    <div style={{background:"var(--bg)",minHeight:"100%",paddingBottom:"max(60px,calc(60px + env(safe-area-inset-bottom)))"}}>
+
+      {/* ── SECTION APPBAR ── */}
+      <div className="sec-appbar">
+        <div className="sec-appbar-inner">
+          <button className="sec-back" onClick={goMenu}>
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 2L4 7l5 5"/></svg>
+            Menu
           </button>
-          <div style={{fontWeight:800,fontSize:16,color:C.text}}>
-            {screen==="invoices"?"Invoices":screen==="payments"?"Payments":"Catalogue"}
+          <h1 className="sec-title">{screenTitle}</h1>
+          <div className="sec-totals">
+            <div className="stl">Total Spend</div>
+            <div className="stv">MUR {fmt(totalAll)}</div>
           </div>
         </div>
       </div>
 
-      {/* ── INVOICES ── */}
+      {/* ── Floating back fab — iPad/tablet (≥600px) ── */}
+      <button className="back-fab" onClick={goMenu} aria-label="Back to Menu">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 2L4 7l5 5"/></svg>
+        Menu
+      </button>
+
+      {/* ══════════════════════════════════════════════════════════════
+          INVOICES
+      ══════════════════════════════════════════════════════════════ */}
       {screen==="invoices"&&(
-        <div style={{padding:"12px 10px"}}>
-          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers or products..." style={ISt}/>
-          <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:12,paddingBottom:4}}>
-            {allDays.map(function(d){
-              const active=dayFilter===d;
-              return(<button key={d} onClick={function(){setDayFilter(d);setSortMode("received");}}
-                style={{padding:"6px 14px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",background:active?C.accent:C.surf2,color:active?"#000":C.muted,border:"1px solid "+(active?C.accent:C.bdr),flexShrink:0}}>
-                {getDayLabel(d)}
-              </button>);
-            })}
+        <div className="sec-page">
+
+          {/* Search */}
+          <input
+            value={search}
+            onChange={function(e){setSearch(e.target.value);}}
+            placeholder="Search suppliers or products…"
+            style={{display:"block",width:"100%",background:"var(--panel)",border:"1px solid var(--border)",borderRadius:10,padding:"10px 14px",color:"var(--text)",fontSize:13,outline:"none",marginBottom:20}}
+          />
+
+          {/* Week strip */}
+          <div className="week-strip">
+            {/* Older weeks (left / prev) */}
+            <button className="week-nav" disabled={weekPage >= totalWeekPages-1}
+              onClick={function(){
+                var prevFirst = allDays[Math.min((weekPage+1)*7, allDays.length-1)];
+                if(prevFirst) setDayFilter(prevFirst);
+              }}>
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 2L4 7l5 5"/></svg>
+            </button>
+
+            <div className="day-cards-grid">
+              {weekDays.map(function(d){
+                var dayData = getSupsForDay(d);
+                var daySupCount = dayData.length;
+                var dayT = dayData.reduce(function(a,s){return a+s.total;},0);
+                var active = dayFilter===d;
+                var parts = d.split("-");
+                var dObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+                var dow = ["SUN","MON","TUE","WED","THU","FRI","SAT"][dObj.getDay()];
+                var dayNum = parts[2];
+                var cls = "day-card" + (active?" dc-active":"") + (daySupCount===0?" dc-empty":"");
+                return(
+                  <div key={d} className={cls} onClick={function(){setDayFilter(d);setSortMode("received");}}>
+                    <div className="dcn">{dow}</div>
+                    <div className="dcnum">{dayNum}</div>
+                    <div className="dct">{daySupCount>0 ? "MUR "+fmt(dayT) : "—"}</div>
+                    <div className="dcc">{daySupCount>0 ? daySupCount+" sup" : ""}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Newer weeks (right / next) */}
+            <button className="week-nav" disabled={weekPage <= 0}
+              onClick={function(){
+                var nextFirst = allDays[Math.max((weekPage-1)*7, 0)];
+                if(nextFirst) setDayFilter(nextFirst);
+              }}>
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 2l5 5-5 5"/></svg>
+            </button>
           </div>
+
+          {/* Day summary */}
           {dayFilter&&(
-            <div style={{background:C.surf,borderRadius:10,padding:"10px 14px",marginBottom:12,border:"1px solid "+C.bdr,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <div><div style={{fontSize:10,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Day Total</div><div style={{fontSize:15,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(dayTotal)}</div></div>
-              <div style={{textAlign:"right"}}><div style={{fontSize:10,color:C.muted,textTransform:"uppercase",marginBottom:2}}>Suppliers</div><div style={{fontSize:15,fontWeight:800,color:C.text}}>{daySuppliers.length}</div></div>
+            <div className="day-summary">
+              <div className="dstat">
+                <div className="dsl">Day Total</div>
+                <div className="dsv accent">MUR {fmt(dayTotal)}</div>
+                <div className="dsm">{getDayLabel(dayFilter)}</div>
+              </div>
+              <div className="dstat">
+                <div className="dsl">Suppliers</div>
+                <div className="dsv">{daySuppliers.length}</div>
+                <div className="dsm">active</div>
+              </div>
+              <div className="dstat">
+                <div className="dsl">Largest</div>
+                <div className="dsv">MUR {fmt(largestSup)}</div>
+                <div className="dsm">single supplier</div>
+              </div>
+              <div className="dstat">
+                <div className="dsl">Average</div>
+                <div className="dsv">MUR {fmt(avgSup)}</div>
+                <div className="dsm">per supplier</div>
+              </div>
             </div>
           )}
-          <SortPills value={sortMode} onChange={setSortMode} color={C.blue} options={[["received","Received"],["az","A-Z"],["za","Z-A"],["high","$ High"],["low","$ Low"]]}/>
-          {filteredDaySups.length===0?(<div style={{color:C.muted,textAlign:"center",padding:30}}>No suppliers for this day</div>):
-          filteredDaySups.map(function(s){
-            const sup=SUPPLIERS[s.name];
-            const invCount=(sup.invoices||[]).filter(function(inv){return(inv.receivedAt?inv.receivedAt.split("T")[0]:null)===dayFilter;}).length;
-            return(
-              <div key={s.name} onClick={function(){setTab(s.name);setScreen("supplier");setSubScreen("invoices");setSearch("");setEditMode(false);}}
-                style={{background:C.surf,borderRadius:12,marginBottom:10,padding:"12px 14px",border:"1px solid "+C.bdr,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <div style={{minWidth:0,flex:1}}>
-                  <div style={{fontWeight:700,fontSize:14,marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</div>
-                  <div style={{fontSize:11,color:C.muted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sup.meta.supplier}</div>
-                  <div style={{fontSize:10,color:C.muted,marginTop:2}}>{invCount} invoice{invCount!==1?"s":""}</div>
-                </div>
-                <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
-                  <div style={{fontSize:13,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(s.total)}</div>
-                </div>
-              </div>
-            );
-          })}
+
+          {/* Sort controls */}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:10}}>
+            <div style={{fontSize:13,color:"var(--text-muted)",fontFamily:"var(--font-mono)"}}>
+              {filteredDaySups.length} supplier{filteredDaySups.length!==1?"s":""}
+            </div>
+            <div className="sort-grp">
+              {[["received","Newest"],["az","A–Z"],["za","Z–A"],["high","$ High"],["low","$ Low"]].map(function(opt){
+                return(
+                  <button key={opt[0]} className={"sort-btn"+(sortMode===opt[0]?" sba":"")}
+                    onClick={function(){setSortMode(opt[0]);}}>{opt[1]}</button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Invoice list */}
+          {filteredDaySups.length===0 ? (
+            <div style={{color:"var(--text-muted)",textAlign:"center",padding:"40px 0",fontSize:14}}>No suppliers for this day</div>
+          ) : (
+            <div className="inv-list">
+              {filteredDaySups.map(function(s){
+                var sup = SUPPLIERS[s.name];
+                var invCount = (sup.invoices||[]).filter(function(inv){
+                  return (inv.receivedAt ? inv.receivedAt.split("T")[0] : null) === dayFilter;
+                }).length;
+                var initials = s.name.substring(0,2).toUpperCase();
+                return(
+                  <div key={s.name} className="inv-row"
+                    onClick={function(){setTab(s.name);setScreen("supplier");setSubScreen("invoices");setSearch("");setEditMode(false);}}>
+                    <div className="inv-summ">
+                      <div className="inv-av">{initials}</div>
+                      <div className="inv-info">
+                        <div className="inv-sup">{s.name}</div>
+                        <div className="inv-meta">
+                          <span>{sup.meta.supplier}</span>
+                          <span className="dot">·</span>
+                          <span className="inv-cnt">{invCount} invoice{invCount!==1?"s":""}</span>
+                        </div>
+                      </div>
+                      <div className="inv-amt">
+                        <span className="iau">Total</span>
+                        MUR {fmt(s.total)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── PAYMENTS — Redesigned ── */}
+      {/* ══════════════════════════════════════════════════════════════
+          PAYMENTS
+      ══════════════════════════════════════════════════════════════ */}
       {screen==="payments"&&(
-        <div style={{padding:"12px 10px"}}>
-          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers..." style={ISt}/>
-          {/* SUMMARY STATS */}
+        <div className="sec-page">
+
+          {/* Tab toggle — Overview / Credit Invoices */}
+          <div className="pay-tab-row">
+            <button className={"pay-tab-pill"+(payTab!=="credit"?" pta":"")}
+              onClick={function(){setPayTab("methods");}}>
+              📊 Overview
+            </button>
+            <button className={"pay-tab-pill"+(payTab==="credit"?" pta":"")}
+              onClick={function(){setPayTab("credit");}}>
+              💳 Credit Invoices
+              {creditUnpaidCount>0&&<span className="pay-tab-badge">{creditUnpaidCount}</span>}
+            </button>
+          </div>
+
+          {/* ── OVERVIEW TAB ── */}
+          {payTab!=="credit"&&(
+            <div>
+              {/* Method summary cards */}
+              <div className="method-cards">
+                {[
+                  {key:"Cash",          color:"var(--accent)", iconBg:"rgba(138,255,122,0.15)", icon:"💵"},
+                  {key:"Cheque",        color:"var(--info)",   iconBg:"rgba(122,183,255,0.15)", icon:"📄"},
+                  {key:"Credit",        color:"var(--warn)",   iconBg:"rgba(245,201,122,0.15)", icon:"💳"},
+                  {key:"Bank Transfer", color:"var(--danger)", iconBg:"rgba(255,111,111,0.15)", icon:"🏦"}
+                ].map(function(m){
+                  var st = methodStats[m.key] || {count:0, total:0};
+                  var pct = maxMethodTotal > 0 ? (st.total/maxMethodTotal)*100 : 0;
+                  return(
+                    <div key={m.key} className="method-card" style={{"--mc":m.color}}>
+                      <div className="mc-head">
+                        <div className="mc-icon" style={{background:m.iconBg}}>
+                          <span style={{fontSize:16}}>{m.icon}</span>
+                        </div>
+                        <div className="mc-name">{m.key}</div>
+                        <div className="mc-count">{st.count} sup</div>
+                      </div>
+                      <div className="mc-amount" style={{color:m.color}}>
+                        MUR {fmt(st.total)}<span className="mcu">total</span>
+                      </div>
+                      <div className="mc-bar">
+                        <div className="mc-fill" style={{width:pct+"%",background:m.color}}></div>
+                      </div>
+                      <div className="mc-foot">{st.count} supplier{st.count!==1?"s":""} · {pct.toFixed(0)}% of spend</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Search */}
+              <input
+                value={search}
+                onChange={function(e){setSearch(e.target.value);}}
+                placeholder="Search suppliers…"
+                style={{display:"block",width:"100%",background:"var(--panel)",border:"1px solid var(--border)",borderRadius:10,padding:"10px 14px",color:"var(--text)",fontSize:13,outline:"none",marginBottom:16}}
+              />
+
+              {/* Pay list */}
+              <div className="pay-list">
+                {supNames.filter(function(sn){
+                  if(!search) return true;
+                  return sn.toLowerCase().includes(lq) || (SUPPLIERS[sn].meta.supplier||"").toLowerCase().includes(lq);
+                }).map(function(sn){
+                  var sup = SUPPLIERS[sn];
+                  var total = sup.invoices.reduce(function(a,i){return a+i.total;},0);
+                  var pk = sn+"||pay";
+                  var pv = payments[pk] !== undefined ? payments[pk] : (sup.meta.payment||"");
+                  var initials = sn.substring(0,2).toUpperCase();
+                  var hasMethod = pv.trim().length > 0;
+                  var METHODS = ["Cash","Cheque","Credit","Bank Transfer"];
+                  return(
+                    <div key={sn} className="pay-card" style={{borderColor:hasMethod?"var(--border)":"var(--warn)"}}>
+                      <div className="pay-row">
+                        <div className="pay-av">{initials}</div>
+                        <div className="pay-info">
+                          <div className="pay-name">{sn}</div>
+                          <div className="pay-sub">{sup.meta.supplier}</div>
+                        </div>
+                        <div className="pay-right">
+                          <div className="pay-tlbl">Invoice total</div>
+                          <div className="pay-total">MUR {fmt(total)}</div>
+                        </div>
+                      </div>
+                      <div className="pay-method-row">
+                        <div className="pay-pills">
+                          {METHODS.map(function(m){
+                            var active = pv.trim() === m;
+                            return(
+                              <button key={m} className={"ppill"+(active?" ppa":"")}
+                                onClick={function(){setPayVal(pk, active ? "" : m);}}>
+                                {m}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <input
+                          className="pay-ref"
+                          value={pv}
+                          onChange={function(e){setPayVal(pk, e.target.value);}}
+                          placeholder="Reference / notes…"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── CREDIT INVOICES TAB ── */}
+          {payTab==="credit"&&(
+            <div>
+              {creditRows.length===0?(
+                <div style={{textAlign:"center",padding:"50px 0",color:"var(--text-muted)",fontSize:14,lineHeight:1.7}}>
+                  No Credit suppliers found.<br/>
+                  <span style={{fontSize:12.5}}>Go to <strong>Overview</strong> and set a supplier's payment method to <strong>Credit</strong>.</span>
+                </div>
+              ):(
+                <div>
+                  {/* Summary cards */}
+                  <div className="credit-summary">
+                    <div className="credit-sum-card" style={{borderColor:(creditUnpaidCount>0?"var(--warn)":"var(--border)")}}>
+                      <div className="credit-sum-lbl">Unpaid</div>
+                      <div className="credit-sum-val" style={{color:creditUnpaidCount>0?"var(--warn)":"var(--text-muted)"}}>{creditUnpaidCount}</div>
+                      <div className="credit-sum-sub">MUR {fmt(creditRows.filter(function(r){return(creditStatus[r.key]||"unpaid")==="unpaid";}).reduce(function(a,r){return a+r.amount;},0))}</div>
+                    </div>
+                    <div className="credit-sum-card">
+                      <div className="credit-sum-lbl">Paid</div>
+                      <div className="credit-sum-val" style={{color:"var(--accent)"}}>{creditRows.length-creditUnpaidCount}</div>
+                      <div className="credit-sum-sub">MUR {fmt(creditRows.filter(function(r){return(creditStatus[r.key]||"unpaid")==="paid";}).reduce(function(a,r){return a+r.amount;},0))}</div>
+                    </div>
+                  </div>
+
+                  {/* Invoice cards */}
+                  <div className="credit-list">
+                    {creditRows.map(function(r){
+                      var isPaid = (creditStatus[r.key]||"unpaid")==="paid";
+                      var due = creditDue[r.key]||"";
+                      return(
+                        <div key={r.key} className={"credit-card"+(isPaid?" cc-paid":"")}>
+                          <div className="credit-top">
+                            <div className="credit-av">{r.sn.substring(0,2).toUpperCase()}</div>
+                            <div className="credit-info">
+                              <div className="credit-sup">{r.sn}</div>
+                              <div className="credit-date">
+                                Inv {r.inv.id||"—"} · {fmtDD(r.inv.date)}
+                              </div>
+                            </div>
+                            <div style={{textAlign:"right",flexShrink:0}}>
+                              <div className="credit-amtlbl">Amount</div>
+                              <div className="credit-amt">MUR {fmt(r.amount)}</div>
+                            </div>
+                          </div>
+                          <div className="credit-foot">
+                            <div className="credit-due">
+                              <span className="credit-due-lbl">Due:</span>
+                              <input type="date" className="credit-due-in" value={due}
+                                onChange={function(e){var v=e.target.value;setCreditDue(function(p){var n=Object.assign({},p);n[r.key]=v;return n;});}}
+                              />
+                              {due&&<span style={{fontSize:11.5,color:"var(--text-muted)",fontFamily:"var(--font-mono)"}}>{fmtDD(due)}</span>}
+                            </div>
+                            <button className={"credit-status-btn "+(isPaid?"csb-paid":"csb-unpaid")}
+                              onClick={function(){var k=r.key;setCreditStatus(function(p){var n=Object.assign({},p);n[k]=isPaid?"unpaid":"paid";return n;});}}>
+                              {isPaid?"✓ Paid":"Mark Paid"}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════
+          CATALOGUE
+      ══════════════════════════════════════════════════════════════ */}
+      {screen==="catalogue"&&(
+        <div className="sec-page">
+
+          {/* Search + sort row */}
+          <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:18,flexWrap:"wrap"}}>
+            <input
+              value={search}
+              onChange={function(e){setSearch(e.target.value);}}
+              placeholder="Search suppliers…"
+              style={{flex:"1 1 200px",background:"var(--panel)",border:"1px solid var(--border)",borderRadius:10,padding:"10px 14px",color:"var(--text)",fontSize:13,outline:"none"}}
+            />
+            <div className="sort-grp">
+              {[["az","A–Z"],["za","Z–A"],["count","Most SKUs"],["default","Default"]].map(function(opt){
+                return(
+                  <button key={opt[0]} className={"sort-btn"+(catSort===opt[0]?" sba":"")}
+                    onClick={function(){setCatSort(opt[0]);}}>{opt[1]}</button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cat grid */}
           {(function(){
-            const methods={};
-            supNames.forEach(function(sn){
-              const pk=sn+"||pay";
-              const pv=payments[pk]!==undefined?payments[pk]:(SUPPLIERS[sn].meta.payment||"");
-              const key=pv.trim()||"Unset";
-              methods[key]=(methods[key]||0)+1;
+            var CAT_GLYPHS = ["🛒","📦","🏪","🧺","🍵","🥬","🛍","🧃","🧴","🥐","🫙","🧂","🥩","🫒","🍶","🥫","🧁","🍬","🌿","🫐"];
+            var list = supNames.map(function(sn){
+              var sup = SUPPLIERS[sn];
+              var prods = getSupProducts(sup);
+              return {name:sn, sup:sup, count:prods.length};
+            }).filter(function(s){
+              // Guard: meta or supplier label may be absent for newly-added suppliers
+              var supLabel = (s.sup&&s.sup.meta&&s.sup.meta.supplier)||"";
+              if(!search) return s.count > 0;
+              // When searching, include zero-count suppliers if name/meta matches
+              return s.name.toLowerCase().includes(lq) || supLabel.toLowerCase().includes(lq);
             });
+            if(catSort==="az") list = list.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+            else if(catSort==="za") list = list.slice().sort(function(a,b){return b.name.localeCompare(a.name);});
+            else if(catSort==="count") list = list.slice().sort(function(a,b){return b.count-a.count;});
+            if(list.length===0){
+              return(
+                <div style={{textAlign:"center",padding:"48px 20px",color:"var(--text-muted)"}}>
+                  <div style={{fontSize:32,marginBottom:12}}>🔎</div>
+                  <div style={{fontSize:15,fontWeight:600,marginBottom:6}}>No suppliers match</div>
+                  <div style={{fontSize:13}}>Try a different search term.</div>
+                </div>
+              );
+            }
             return(
-              <div style={{display:"flex",gap:6,overflowX:"auto",marginBottom:14,paddingBottom:4}}>
-                {Object.keys(methods).map(function(m){
-                  return(<div key={m} style={{flexShrink:0,background:C.surf2,borderRadius:10,padding:"8px 14px",border:"1px solid "+C.bdr,textAlign:"center"}}>
-                    <div style={{fontSize:16,fontWeight:800,color:m==="Unset"?C.muted:C.accent}}>{methods[m]}</div>
-                    <div style={{fontSize:10,color:C.muted,marginTop:2,maxWidth:80,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m}</div>
-                  </div>);
+              <div className="cat-grid">
+                {list.map(function(s,i){
+                  var supLabel=(s.sup&&s.sup.meta&&s.sup.meta.supplier)||s.name;
+                  return(
+                    <div key={s.name} className="cat-card"
+                      onClick={function(){setTab(s.name);setSubScreen("cat-supplier");setSearch("");}}>
+                      <div className="cat-emoji">{CAT_GLYPHS[i % CAT_GLYPHS.length]}</div>
+                      <div>
+                        <div className="cat-name">{s.name}</div>
+                        <div className="cat-meta">{supLabel}</div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div className="cat-count">{s.count}</div>
+                        <div className="cat-clbl">SKUs</div>
+                      </div>
+                    </div>
+                  );
                 })}
               </div>
             );
           })()}
-          {supNames.filter(function(sn){
-            if(!search)return true;
-            return sn.toLowerCase().includes(lq)||(SUPPLIERS[sn].meta.supplier||"").toLowerCase().includes(lq);
-          }).map(function(sn){
-            const sup=SUPPLIERS[sn];
-            const total=sup.invoices.reduce(function(a,i){return a+i.total;},0);
-            const pk=sn+"||pay";
-            const pv=payments[pk]!==undefined?payments[pk]:(sup.meta.payment||"");
-            const hasMethod=pv.trim().length>0;
-            const METHODS=["Cash","Credit","Cheque","Bank Transfer","Other"];
-            return(
-              <div key={sn} style={{background:C.surf,borderRadius:14,marginBottom:10,border:"1px solid "+(hasMethod?C.bdr:C.warn),overflow:"hidden"}}>
-                {/* HEADER ROW */}
-                <div style={{padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.bdr}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:700,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sn}</div>
-                    <div style={{fontSize:11,color:C.muted,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sup.meta.supplier}</div>
-                  </div>
-                  <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
-                    <div style={{fontSize:12,fontWeight:800,color:C.accent,fontFamily:"monospace"}}>MUR {fmt(total)}</div>
-                    {!hasMethod&&<div style={{fontSize:10,color:C.warn,marginTop:2}}>⚠ Not set</div>}
-                  </div>
-                </div>
-                {/* QUICK SELECT BUTTONS */}
-                <div style={{padding:"10px 14px",display:"flex",gap:6,flexWrap:"wrap"}}>
-                  {METHODS.map(function(m){
-                    const active=pv.trim()===m;
-                    return(<button key={m} onClick={function(){setPayVal(pk,active?"":m);}}
-                      style={{padding:"6px 12px",borderRadius:20,fontSize:11,fontWeight:700,cursor:"pointer",
-                        background:active?C.accent:C.surf2,color:active?"#000":C.muted,
-                        border:"1px solid "+(active?C.accent:C.bdr)}}>
-                      {m}
-                    </button>);
-                  })}
-                </div>
-                {/* CUSTOM NOTES */}
-                <div style={{padding:"0 14px 12px"}}>
-                  <input value={pv} onChange={function(e){setPayVal(pk,e.target.value);}}
-                    placeholder="Custom notes (e.g. Net 30 days, reference #)..."
-                    style={Object.assign({},ISt,{marginBottom:0,fontSize:12,background:C.surf2})}/>
-                </div>
-              </div>
-            );
-          })}
         </div>
       )}
 
-      {/* ── CATALOGUE — Supplier list only ── */}
-      {screen==="catalogue"&&(
-        <div style={{padding:"12px 10px"}}>
-          <input value={search} onChange={function(e){setSearch(e.target.value);}} placeholder="Search suppliers..." style={ISt}/>
-          <SortPills value={catSort} onChange={setCatSort} color={C.warn} options={[["az","A-Z"],["za","Z-A"],["count","Most Products"],["default","Default"]]}/>
-          {(function(){
-            let list=supNames.map(function(sn){
-              const sup=SUPPLIERS[sn];
-              const prods=getSupProducts(sup);
-              return{name:sn,sup:sup,count:prods.length};
-            }).filter(function(s){
-              if(!search)return s.count>0;
-              return s.name.toLowerCase().includes(lq)||s.sup.meta.supplier.toLowerCase().includes(lq);
-            });
-            if(catSort==="az")list=list.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
-            else if(catSort==="za")list=list.slice().sort(function(a,b){return b.name.localeCompare(a.name);});
-            else if(catSort==="count")list=list.slice().sort(function(a,b){return b.count-a.count;});
-            return list.map(function(s){
-              return(
-                <div key={s.name} onClick={function(){setTab(s.name);setSubScreen("cat-supplier");setSearch("");}}
-                  style={{background:C.surf,borderRadius:12,marginBottom:10,padding:"14px 16px",border:"1px solid "+C.bdr,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:700,fontSize:14,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.name}</div>
-                    <div style={{fontSize:11,color:C.muted,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.sup.meta.supplier}</div>
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0,marginLeft:10}}>
-                    <div style={{background:C.surf2,borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:700,color:C.warn}}>{s.count}</div>
-                    <div style={{color:C.muted,fontSize:16}}>{">"}</div>
-                  </div>
-                </div>
-              );
-            });
-          })()}
+      {toast&&(
+        <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:"var(--accent)",color:"#000",padding:"10px 20px",borderRadius:20,fontWeight:700,fontSize:13,zIndex:999,boxShadow:"0 4px 20px rgba(138,255,122,0.3)"}}>
+          {toast}
         </div>
       )}
-
-      {toast&&(<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:C.accent,color:"#000",padding:"10px 20px",borderRadius:20,fontWeight:700,fontSize:13,zIndex:999,boxShadow:"0 4px 20px rgba(0,229,160,0.4)"}}>{toast}</div>)}
     </div>
   );
 }

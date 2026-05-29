@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fowdar Store — Invoices</title>
+  <style>
+:root {
+  --bg:           #0a0a0a;
+  --bg-1:         #111111;
+  --panel:        #151515;
+  --panel-hover:  #1b1b1b;
+  --panel-2:      #1d1d1d;
+  --border:       #242424;
+  --border-soft:  #1e1e1e;
+  --border-strong:#2f2f2f;
+
+  --text:         #f5f5f5;
+  --text-dim:     #a3a3a3;
+  --text-muted:   #6e6e6e;
+  --text-faint:   #4a4a4a;
+
+  --accent:       #8aff7a;
+  --accent-soft:  #8aff7a26;
+  --accent-line:  #8aff7a3d;
+  --accent-bg:    #0d1a09;
+
+  --warn:         #f5b34a;
+  --warn-soft:    #f5b34a1f;
+  --warn-line:    #f5b34a3d;
+  --danger:       #ff6f6f;
+  --info:         #7ab7ff;
+  --info-soft:    #7ab7ff1f;
+  --info-line:    #7ab7ff3d;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font-family: inherit; color: inherit; }
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ============== Appbar ============== */
+.appbar {
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.appbar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+.brand-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.brand-back:hover { background: #8aff7a30; }
+.brand-back svg { width: 12px; height: 12px; }
+.brand-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.appbar-meta .totals {
+  text-align: right; font-family: var(--font-mono); line-height: 1.15;
+}
+.appbar-meta .label {
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted);
+}
+.appbar-meta .value {
+  margin-top: 4px; font-size: 16px; font-weight: 600; color: var(--accent);
+}
+
+/* ============== Page ============== */
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 22px 32px 80px;
+  flex: 1;
+}
+
+.section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label .rule { flex: 1; height: 1px; background: var(--border-soft); }
+.section-label .meta {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 11.5px;
+}
+
+/* ============== Week strip ============== */
+.week-strip {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 22px;
+}
+.week-nav {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  transition: all .15s ease;
+}
+.week-nav:hover { background: var(--panel-hover); color: var(--text); border-color: var(--border-strong); }
+.week-nav svg { width: 14px; height: 14px; }
+
+.day-cards {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.day-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 8px 10px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all .15s ease;
+  position: relative;
+}
+.day-card:hover {
+  background: var(--panel-hover);
+  border-color: var(--border-strong);
+}
+.day-card.active {
+  background: linear-gradient(180deg, var(--accent-bg) 0%, var(--panel) 100%);
+  border-color: var(--accent-line);
+}
+.day-card.active .day-name { color: var(--accent); }
+.day-card.today::after {
+  content: "";
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.day-card .day-name {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.day-card .day-num {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.day-card .day-total {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.day-card .day-count {
+  font-size: 10px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+.day-card.empty .day-total,
+.day-card.empty .day-count { color: var(--text-faint); }
+.day-card.active .day-total { color: var(--accent); }
+
+/* ============== Day summary ============== */
+.day-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat .label {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.stat .value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.stat .value.accent { color: var(--accent); }
+.stat .meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ============== Controls ============== */
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.search svg {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;
+}
+.field {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0 12px 0 38px;
+  height: 40px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s ease, background .15s ease;
+}
+.field:focus { border-color: var(--accent-line); background: var(--panel-hover); }
+.field::placeholder { color: var(--text-muted); }
+
+.sort-group {
+  display: inline-flex;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.sort-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: all .15s ease;
+}
+.sort-btn:hover:not(.active) { color: var(--text-dim); }
+.sort-btn svg { width: 12px; height: 12px; opacity: 0.7; }
+.sort-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+}
+.sort-btn.active svg { opacity: 1; }
+
+/* ============== Invoice list ============== */
+.inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.inv-row {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  transition: border-color .15s ease, background .15s ease;
+  overflow: hidden;
+}
+.inv-row:hover { border-color: var(--border-strong); }
+.inv-row.open { border-color: var(--accent-line); }
+
+.inv-summary {
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 40px 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  cursor: pointer;
+}
+.inv-avatar {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.inv-info { min-width: 0; }
+.inv-supplier {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+.inv-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  align-items: center;
+}
+.inv-meta .dot { color: var(--text-faint); }
+.inv-meta .ref {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.inv-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.inv-status .pip { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.inv-status.received { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.inv-status.partial  { color: var(--info);   border-color: var(--info-line);   background: var(--info-soft); }
+.inv-status.pending  { color: var(--warn);   border-color: var(--warn-line);   background: var(--warn-soft); }
+
+.inv-amount {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+  text-align: right;
+  min-width: 130px;
+}
+.inv-amount .unit {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.inv-chevron {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  color: var(--text-muted);
+  transition: transform .2s ease;
+}
+.inv-row.open .inv-chevron {
+  transform: rotate(180deg);
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.inv-chevron svg { width: 12px; height: 12px; }
+
+/* Expanded details */
+.inv-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.inv-row.open .inv-details { max-height: 800px; }
+.inv-details-inner {
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--border-soft);
+  margin-top: -1px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.line-table {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-top: 14px;
+}
+.line-table .row {
+  display: grid;
+  grid-template-columns: 1fr 80px 100px 110px;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+}
+.line-table .row:last-child { border-bottom: none; }
+.line-table .row.header {
+  background: var(--panel-2);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.line-table .row .num,
+.line-table .row .total {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+.line-table .row .total { color: var(--text); font-weight: 600; }
+.line-table .totals {
+  background: var(--panel-2);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.line-table .totals.grand { color: var(--accent); font-weight: 600; font-size: 14px; }
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s ease;
+}
+.btn:hover { background: var(--panel-hover); border-color: var(--border-strong); }
+.btn svg { width: 13px; height: 13px; }
+.btn.primary {
+  background: var(--accent); color: #0a1a06; border-color: var(--accent); font-weight: 600;
+}
+.btn.primary:hover { background: #9bff8d; }
+
+/* Footer */
+.foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+/* Empty state */
+.empty {
+  padding: 60px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+}
+.empty .glyph { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+.empty h3 { color: var(--text-dim); font-size: 15px; margin: 0 0 4px 0; }
+.empty p { margin: 0; font-size: 13px; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .day-summary { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .appbar-inner { padding: 14px 16px; }
+  .page { padding: 18px 16px 80px; }
+  .week-strip { grid-template-columns: 30px 1fr 30px; }
+  .day-cards { grid-template-columns: repeat(7, minmax(60px, 1fr)); }
+  .day-card .day-total, .day-card .day-count { font-size: 9.5px; }
+  .day-card .day-num { font-size: 18px; }
+  .inv-summary { grid-template-columns: 36px 1fr auto; gap: 12px; }
+  .inv-status, .inv-chevron { display: none; }
+  .inv-amount { min-width: 0; }
+  .brand-title { font-size: 18px; }
+  .line-table .row { grid-template-columns: 1fr 50px 80px; }
+  .line-table .row .num.qty { display: none; }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="appbar">
+      <div class="appbar-inner">
+        <a class="brand-back" href="Fowdar Store Home.html">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 2.5L3 6l4.5 3.5"/><path d="M3 6h7"/>
+          </svg>
+          Menu
+        </a>
+        <h1 class="brand-title">Invoices</h1>
+        <div class="appbar-meta">
+          <div class="totals">
+            <div class="label">Week Total</div>
+            <div class="value" id="week-total">MUR 0.00</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- ============== Week strip ============== -->
+      <div class="section-label">
+        <span id="week-label">Week of —</span>
+        <span class="rule"></span>
+        <span class="meta">tap a day to filter</span>
+      </div>
+      <div class="week-strip">
+        <button class="week-nav" id="prev-week" title="Previous week">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5L3 6l4.5 3.5"/></svg>
+        </button>
+        <div class="day-cards" id="day-cards"></div>
+        <button class="week-nav" id="next-week" title="Next week">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5L9 6l-4.5 3.5"/></svg>
+        </button>
+      </div>
+
+      <!-- ============== Day summary ============== -->
+      <div class="day-summary" id="day-summary"></div>
+
+      <!-- ============== Controls ============== -->
+      <div class="controls">
+        <div class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+          <input class="field" id="search" placeholder="Search supplier, invoice #, or product…" />
+        </div>
+        <div class="sort-group" id="sort-group">
+          <button class="sort-btn active" data-sort="newest">Newest</button>
+          <button class="sort-btn" data-sort="az">A–Z</button>
+          <button class="sort-btn" data-sort="za">Z–A</button>
+          <button class="sort-btn" data-sort="high">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 9.5V2.5M3 5.5L6 2.5l3 3"/></svg>
+            High
+          </button>
+          <button class="sort-btn" data-sort="low">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2.5V9.5M3 6.5l3 3 3-3"/></svg>
+            Low
+          </button>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <span>Invoices</span>
+        <span class="rule"></span>
+        <span class="meta" id="visible-count"></span>
+      </div>
+      <div class="inv-list" id="inv-list"></div>
+
+      <div class="foot">
+        <span>Fowdar Store Tracker · Invoices</span>
+        <span id="totals-foot"></span>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  // ===========================================================
+  // Helpers
+  // ===========================================================
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const DAYS_S = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const fmtMUR = (n) => "MUR " + n.toLocaleString("en-MU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtMURint = (n) => "MUR " + n.toLocaleString("en-MU", { maximumFractionDigits: 0 });
+  const initials = (name) => name.split(/\s+/).slice(0,2).map(s => s[0]).join("").toUpperCase();
+  const dateKey = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+  // ===========================================================
+  // Mock data — invoices indexed by date
+  // ===========================================================
+  // Anchor "today" to 25 May 2026 to match the app's other screens
+  const TODAY = new Date(2026, 4, 25);
+
+  // Build invoices spanning multiple dates
+  const INVOICES = [
+    // 20 May 2026 — main set from screenshot
+    { id:"INV-2710", date:"2026-05-20", supplier:"Food Canners",       sub:"Food Canners Marketing Ltd",  amount: 29682.63, status:"received", lines:[
+      { name:"Tomato Paste 70g · 100ct case", qty:6, unit:540,  total:3240 },
+      { name:"Baked Beans 410g · 24ct case",  qty:4, unit:1180, total:4720 },
+      { name:"Sweetcorn 340g · 24ct case",    qty:3, unit:1020, total:3060 },
+      { name:"Canned Tuna 185g · 48ct case",  qty:5, unit:3732, total:18662.63 },
+    ]},
+    { id:"INV-2711", date:"2026-05-20", supplier:"Panagora",           sub:"Panagora Marketing Co. Ltd.", amount: 14225.10, status:"received", lines:[
+      { name:"Nescafé Classic 200g · 12ct case", qty:2, unit:3240, total:6480 },
+      { name:"Maggi Cubes 4g · 60ct box",        qty:3, unit:1380, total:4140 },
+      { name:"Nido Powder Milk 900g · 12ct",     qty:0.78, unit:4622, total:3605.10 },
+    ]},
+    { id:"INV-2712", date:"2026-05-20", supplier:"Panagora",           sub:"Panagora Marketing Co. Ltd.", amount: 11260.00, status:"partial",  lines:[
+      { name:"KitKat 4-finger 41.5g · 36ct", qty:4, unit:1620, total:6480 },
+      { name:"Cerelac Wheat 400g · 12ct",    qty:1, unit:2880, total:2880 },
+      { name:"Maggi Noodles 70g · 48ct",     qty:2, unit:950,  total:1900 },
+    ]},
+    { id:"INV-2713", date:"2026-05-20", supplier:"Bedford Impex",      sub:"Bedford Impex Ltd",           amount:  4938.00, status:"received", lines:[
+      { name:"Olive Oil 1L · 6ct case", qty:3, unit:1646, total:4938 },
+    ]},
+    { id:"INV-2714", date:"2026-05-20", supplier:"Mayil Spices",       sub:"Mayil Spices Ltd",            amount:  8616.00, status:"received", lines:[
+      { name:"Turmeric Powder 200g · 24ct", qty:4, unit:1320, total:5280 },
+      { name:"Garam Masala 100g · 24ct",    qty:2, unit:1668, total:3336 },
+    ]},
+    { id:"INV-2715", date:"2026-05-20", supplier:"FSS Distributors",   sub:"FSS Distributors Ltd",        amount:  6838.31, status:"pending",  lines:[
+      { name:"Detergent 3kg · 4ct case",     qty:3, unit:1240, total:3720 },
+      { name:"Bleach 1L · 12ct case",        qty:2, unit:380,  total:760 },
+      { name:"Floor Cleaner 1L · 12ct case", qty:3, unit:786.10, total:2358.31 },
+    ]},
+    { id:"INV-2716", date:"2026-05-20", supplier:"Madhvi & Sons",      sub:"Madhvi & Sons Ltd",           amount:  5540.00, status:"received", lines:[
+      { name:"Basmati Rice 5kg · 4ct",       qty:2, unit:1680, total:3360 },
+      { name:"Atta Flour 5kg · 4ct",         qty:1, unit:2180, total:2180 },
+    ]},
+    { id:"INV-2717", date:"2026-05-20", supplier:"Phoenix Beverages",  sub:"Phoenix Beverages Limited",   amount:  5290.00, status:"received", lines:[
+      { name:"Phoenix Lager 33cl · 24ct",  qty:4, unit:980, total:3920 },
+      { name:"Stella Artois 33cl · 24ct",  qty:1, unit:1370, total:1370 },
+    ]},
+
+    // 22 May
+    { id:"INV-2718", date:"2026-05-22", supplier:"Innodis Ltd",        sub:"Innodis Group · Meat & Dairy",  amount: 18920.00, status:"received", lines:[
+      { name:"Chicken Whole Frozen 1.2kg · 12ct", qty:6, unit:1820, total:10920 },
+      { name:"Beef Mince Premium 500g · 20ct",    qty:3, unit:2640, total:7920 },
+      { name:"Frozen Mixed Veg 1kg · 12ct",       qty:0.108, unit:740, total:80 },
+    ]},
+    { id:"INV-2719", date:"2026-05-22", supplier:"Quality Beverages",  sub:"Quality Beverages Limited",   amount:  6164.00, status:"received", lines:[
+      { name:"Crystal Water 1.5L · 6ct pack",  qty:8, unit:220, total:1760 },
+      { name:"Coca-Cola 1.5L · 6ct pack",       qty:4, unit:540, total:2160 },
+      { name:"Goodlife Juice Orange 1L · 12ct", qty:3, unit:748, total:2244 },
+    ]},
+    { id:"INV-2720", date:"2026-05-22", supplier:"Dairy Vita",         sub:"Dairy Vita Co. Ltd.",         amount:  3120.50, status:"received", lines:[
+      { name:"Fresh Milk Full Cream 1L · 12ct", qty:4, unit:580, total:2320 },
+      { name:"Yogurt Plain 125g · 24ct",        qty:1.67, unit:480, total:800.50 },
+    ]},
+
+    // 23 May
+    { id:"INV-2721", date:"2026-05-23", supplier:"Lottotech",         sub:"Lottotech Distribution",       amount:  9240.00, status:"received", lines:[
+      { name:"Toilet Paper 12-roll · 8ct case",  qty:4, unit:1480, total:5920 },
+      { name:"Laundry Powder 3kg · 4ct case",    qty:2, unit:1240, total:2480 },
+      { name:"All-Purpose Cleaner 750ml · 12ct", qty:1, unit:840,  total:840 },
+    ]},
+    { id:"INV-2722", date:"2026-05-23", supplier:"Hapag Distribution", sub:"Hapag Distribution Ltd",      amount: 11480.00, status:"partial",  lines:[
+      { name:"Lay's Salted 150g · 20ct case",      qty:4, unit:1240, total:4960 },
+      { name:"Pringles Original 165g · 12ct case", qty:3, unit:1080, total:3240 },
+      { name:"Cadbury Dairy Milk 90g · 24ct case", qty:2, unit:1640, total:3280 },
+    ]},
+
+    // 19 May
+    { id:"INV-2705", date:"2026-05-19", supplier:"IBL Foods",          sub:"Ireland Blyth Limited · Foods", amount: 12440.00, status:"received", lines:[
+      { name:"Basmati Rice 5kg · 4ct case",    qty:4, unit:1680, total:6720 },
+      { name:"Sunflower Oil 5L · 4ct case",    qty:2, unit:2240, total:4480 },
+      { name:"Red Lentils 1kg · 20ct case",    qty:1, unit:1240, total:1240 },
+    ]},
+    { id:"INV-2706", date:"2026-05-19", supplier:"Innodis Ltd",        sub:"Innodis Group · Meat & Dairy",  amount:  8480.00, status:"received", lines:[
+      { name:"Chicken Wings Frozen 1kg · 10ct", qty:4, unit:1450, total:5800 },
+      { name:"Pork Sausage 400g · 10ct",        qty:2.91, unit:920, total:2680 },
+    ]},
+
+    // 18 May
+    { id:"INV-2700", date:"2026-05-18", supplier:"Phoenix Beverages",  sub:"Phoenix Beverages Limited",   amount:  7820.00, status:"received", lines:[
+      { name:"Phoenix Special 65cl · 12ct",  qty:4, unit:1120, total:4480 },
+      { name:"Guinness 33cl · 24ct",         qty:2, unit:1670, total:3340 },
+    ]},
+    // 21 May (Thu) — light day
+    { id:"INV-2708", date:"2026-05-21", supplier:"Dairy Vita",         sub:"Dairy Vita Co. Ltd.",         amount:  2240.00, status:"received", lines:[
+      { name:"Butter Salted 250g · 20ct case", qty:1.22, unit:1840, total:2240 },
+    ]},
+  ];
+
+  // ===========================================================
+  // State
+  // ===========================================================
+  let state = {
+    weekAnchor: startOfWeek(new Date(2026, 4, 20)), // start at week containing selected date
+    selectedDate: dateKey(new Date(2026, 4, 20)), // 20 May, matches screenshot
+    sort: "newest",
+    search: "",
+    openId: null,
+  };
+
+  function startOfWeek(d) {
+    const x = new Date(d);
+    const day = x.getDay(); // 0=Sun
+    const diff = (day === 0 ? -6 : 1 - day);
+    x.setDate(x.getDate() + diff);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+
+  // ===========================================================
+  // Rendering
+  // ===========================================================
+  function renderWeekStrip() {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(state.weekAnchor);
+      d.setDate(d.getDate() + i);
+      const k = dateKey(d);
+      const dayInvs = INVOICES.filter(inv => inv.date === k);
+      const total = dayInvs.reduce((s,x) => s + x.amount, 0);
+      days.push({ date: d, key: k, total, count: dayInvs.length });
+    }
+
+    const start = days[0].date, end = days[6].date;
+    const weekLabel = `Week of ${start.getDate()}–${end.getDate()} ${MONTHS[end.getMonth()]} ${end.getFullYear()}`;
+    document.getElementById("week-label").textContent = weekLabel;
+
+    const todayKey = dateKey(TODAY);
+    const html = days.map(d => {
+      const isActive = d.key === state.selectedDate;
+      const isToday = d.key === todayKey;
+      const isEmpty = d.count === 0;
+      return `
+        <div class="day-card ${isActive ? "active" : ""} ${isToday ? "today" : ""} ${isEmpty ? "empty" : ""}" data-key="${d.key}">
+          <div class="day-name">${DAYS_S[d.date.getDay()]}</div>
+          <div class="day-num">${d.date.getDate()}</div>
+          <div class="day-total">${d.count > 0 ? fmtMURint(d.total) : "—"}</div>
+          <div class="day-count">${d.count > 0 ? d.count + " invoice" + (d.count !== 1 ? "s" : "") : "no invoices"}</div>
+        </div>
+      `;
+    }).join("");
+    document.getElementById("day-cards").innerHTML = html;
+
+    const weekTotal = days.reduce((s,d) => s + d.total, 0);
+    document.getElementById("week-total").textContent = fmtMUR(weekTotal);
+  }
+
+  function renderDaySummary() {
+    const dayInvs = INVOICES.filter(inv => inv.date === state.selectedDate);
+    const total = dayInvs.reduce((s,x) => s + x.amount, 0);
+    const supplierCount = new Set(dayInvs.map(i => i.supplier)).size;
+    const biggest = dayInvs.reduce((a,b) => (b.amount > (a?.amount || 0) ? b : a), null);
+    const avg = dayInvs.length > 0 ? total / dayInvs.length : 0;
+
+    const d = new Date(state.selectedDate + "T00:00:00");
+    const dateLabel = `${DAYS_S[d.getDay()]} · ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+
+    document.getElementById("day-summary").innerHTML = `
+      <div class="stat">
+        <div class="label">Day Total</div>
+        <div class="value accent">${fmtMUR(total)}</div>
+        <div class="meta">${dateLabel}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Suppliers</div>
+        <div class="value">${supplierCount}</div>
+        <div class="meta">${dayInvs.length} invoice${dayInvs.length !== 1 ? "s" : ""}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Largest</div>
+        <div class="value">${biggest ? fmtMUR(biggest.amount) : "—"}</div>
+        <div class="meta">${biggest ? biggest.supplier : "no invoices today"}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Average</div>
+        <div class="value">${fmtMUR(avg)}</div>
+        <div class="meta">per invoice</div>
+      </div>
+    `;
+  }
+
+  function statusLabel(s) {
+    return s === "received" ? "Received" : s === "partial" ? "Partial" : "Pending";
+  }
+
+  function renderList() {
+    let list = INVOICES.filter(inv => inv.date === state.selectedDate);
+    const term = state.search.trim().toLowerCase();
+    if (term) {
+      list = list.filter(inv => {
+        const hay = `${inv.supplier} ${inv.sub} ${inv.id} ${inv.lines.map(l=>l.name).join(" ")}`.toLowerCase();
+        return hay.includes(term);
+      });
+    }
+    list.sort((a,b) => {
+      switch (state.sort) {
+        case "az":     return a.supplier.localeCompare(b.supplier);
+        case "za":     return b.supplier.localeCompare(a.supplier);
+        case "high":   return b.amount - a.amount;
+        case "low":    return a.amount - b.amount;
+        default:       return b.id.localeCompare(a.id); // newest = highest invoice number
+      }
+    });
+
+    const visible = document.getElementById("visible-count");
+    visible.textContent = list.length === 0
+      ? "0 invoices"
+      : `${list.length} invoice${list.length !== 1 ? "s" : ""}`;
+
+    const totalsFoot = document.getElementById("totals-foot");
+    const grand = list.reduce((s,i) => s + i.amount, 0);
+    totalsFoot.textContent = `${list.length} invoices · ${fmtMUR(grand)} on this day`;
+
+    if (list.length === 0) {
+      document.getElementById("inv-list").innerHTML = `
+        <div class="empty">
+          <div class="glyph">🧾</div>
+          <h3>No invoices on this day</h3>
+          <p>Pick another date in the week strip above.</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById("inv-list").innerHTML = list.map(inv => {
+      const subtotal = inv.lines.reduce((s,l) => s + l.total, 0);
+      const vat = subtotal * 0.15;
+      const grandLine = subtotal + vat;
+
+      const open = state.openId === inv.id;
+      return `
+        <div class="inv-row ${open ? "open" : ""}" data-id="${inv.id}">
+          <div class="inv-summary">
+            <div class="inv-avatar">${initials(inv.supplier)}</div>
+            <div class="inv-info">
+              <h3 class="inv-supplier">${inv.supplier}</h3>
+              <div class="inv-meta">
+                <span class="ref">${inv.id}</span>
+                <span>${inv.sub}</span>
+                <span class="dot">·</span>
+                <span>${inv.lines.length} line${inv.lines.length !== 1 ? "s" : ""}</span>
+              </div>
+            </div>
+            <span class="inv-status ${inv.status}"><span class="pip"></span>${statusLabel(inv.status)}</span>
+            <div class="inv-amount">
+              <span class="unit">Total</span>
+              ${fmtMUR(inv.amount)}
+            </div>
+            <div class="inv-chevron">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg>
+            </div>
+          </div>
+          <div class="inv-details">
+            <div class="inv-details-inner">
+              <div class="line-table">
+                <div class="row header">
+                  <span>Product</span>
+                  <span class="num qty">Qty</span>
+                  <span class="num">Unit</span>
+                  <span class="total">Total</span>
+                </div>
+                ${inv.lines.map(l => `
+                  <div class="row">
+                    <span>${l.name}</span>
+                    <span class="num qty">${l.qty}</span>
+                    <span class="num">${fmtMURint(l.unit)}</span>
+                    <span class="total">${fmtMUR(l.total)}</span>
+                  </div>
+                `).join("")}
+                <div class="totals">
+                  <span>Subtotal</span>
+                  <span>${fmtMUR(subtotal)}</span>
+                </div>
+                <div class="totals">
+                  <span>VAT (15%)</span>
+                  <span>${fmtMUR(vat)}</span>
+                </div>
+                <div class="totals grand">
+                  <span>Total</span>
+                  <span>${fmtMUR(grandLine)}</span>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="11" height="9" rx="1"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg>
+                  View PDF
+                </button>
+                <button class="btn">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 0 1 10 0"/><path d="M3 8v3.5h3.5"/><path d="M13 8v-3.5h-3.5"/></svg>
+                  Mark received
+                </button>
+                <button class="btn primary" style="margin-left:auto;">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2L2 7l5 2 2 5z"/><path d="M7 9l4-4"/></svg>
+                  Send to Payments
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderAll() {
+    renderWeekStrip();
+    renderDaySummary();
+    renderList();
+  }
+
+  // ===========================================================
+  // Interactions
+  // ===========================================================
+  document.addEventListener("click", (e) => {
+    const dayBtn = e.target.closest(".day-card");
+    if (dayBtn) {
+      state.selectedDate = dayBtn.dataset.key;
+      state.openId = null;
+      renderAll();
+      return;
+    }
+    if (e.target.closest("#prev-week")) {
+      const d = new Date(state.weekAnchor); d.setDate(d.getDate() - 7);
+      state.weekAnchor = d;
+      renderWeekStrip();
+      return;
+    }
+    if (e.target.closest("#next-week")) {
+      const d = new Date(state.weekAnchor); d.setDate(d.getDate() + 7);
+      state.weekAnchor = d;
+      renderWeekStrip();
+      return;
+    }
+    const sortBtn = e.target.closest(".sort-btn");
+    if (sortBtn) {
+      state.sort = sortBtn.dataset.sort;
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.toggle("active", b.dataset.sort === state.sort));
+      renderList();
+      return;
+    }
+    const invSummary = e.target.closest(".inv-summary");
+    if (invSummary) {
+      const row = invSummary.parentElement;
+      const id = row.dataset.id;
+      state.openId = state.openId === id ? null : id;
+      // Toggle in place rather than full re-render to keep animation smooth
+      document.querySelectorAll(".inv-row").forEach(r => {
+        r.classList.toggle("open", r.dataset.id === state.openId);
+      });
+      return;
+    }
+  });
+
+  document.getElementById("search").addEventListener("input", (e) => {
+    state.search = e.target.value;
+    renderList();
+  });
+
+  renderAll();
+  </script>
+</body>
+</html>
