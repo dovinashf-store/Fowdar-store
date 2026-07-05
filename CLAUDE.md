@@ -190,6 +190,14 @@ Extracts units-per-pack from product description. Applied in `calcRec`, `extract
 
 **Rule from user**: "Always use this logic" — when a description has a pack pattern, divide the line total by the pack count to get the per-unit price. Product weight (grams/ml/kg) is always larger than pack count in practice, which is why Pattern C works.
 
+### Carton-style UOM pack — `detectUnitPackSize(inv, row)`
+
+When the description has NO pack pattern, the pack count may live in the **UOM/Unit column**: `CAR12 PCS` (Vaulbert), `CTN 40U` (Dywada), `BTE18`/`CTN12` (Tenfa), generic `CTN X 12`, `12 PCS/CTN`, `BOX12`. It means "1 carton of N pieces" — qty counts cartons. Matched words: CAR/CTN/CRT/BOX/BTE/CASE/CS + N. Deliberately NOT matched: plain `Piece`/`Unit`, bare `CT` (Innodis has its own rule), Lim How `C30`-style codes.
+
+### `needsPackDivide(inv, row, val, packN)` — never divide blindly
+
+The AI has stored `buyPlusVat` at CARTON level on some invoices (Vaulbert SI25919) and already per-PIECE on others (Vaulbert SI26635, all Tenfa). Before dividing a pre-computed or unit-price value by packN, the app compares it against the line's `amount ÷ qty`: ratio ≈ 1 → carton level → divide; ratio ≈ packN → already per piece → leave it. Used in `calcRec`, `extractPriceDetail`, and the display Rec Price column.
+
 ---
 
 ## Totals Normalization — `normalizeTotals(t)`
@@ -284,6 +292,21 @@ The last row of the totals footer is prominently styled: green background tint (
 - Mixed invoices: some have Exempted column only (frozen/dairy), some have both Exempted + Taxable
 - `amountCol` varies by invoice — check column names
 
+### Vaulbert (HVC Ltd)
+- UOM `CAR12 PCS` / `CAR 24PCS` = 1 carton of N pieces; QTY counts cartons; unit price + line amount are per CARTON
+- `vatId` column: `Z` = zero-rated (pilchards), `S` = standard 15% (`rowVatFactor` reads it)
+- `buyPlusVat` stored at carton level (SI25919) OR pre-divided (SI26635) — `needsPackDivide` disambiguates
+- Old keyed invoices have `Pack` + `Price/Unit` columns — `Price/Unit` is the discounted per-piece price and wins in both `calcRec` and `extractPriceDetail`
+
+### Dywada
+- UOM `CTN 40U` = carton of 40; Qty counts cartons; `Total (Incl.)` is the amountCol (incl-VAT)
+- `Price/Unit` column = per-piece INCL-VAT buying price — used directly (vatRate 1.0)
+- `Unit Price (Excl.)` is per PIECE, `Price per CTN` per carton — don't confuse
+
+### Tenfa Marketing
+- UOM `BTE18`/`BTE24`/`CTN12` = box of N; `unitPrice`/`amount` per box
+- Existing `buyPlusVat` values are per PIECE (pre-divided) — the ratio guard leaves them alone
+
 ---
 
 ## VAT Audit Results (completed)
@@ -334,3 +357,5 @@ When Claude AI processes a new supplier PDF and generates the `items` array:
 | Pre-dividing `buyPlusVat` by pack count when generating invoice JSON | Store at full-pack level — the app divides automatically via `detectPackSize` |
 | Upserting to `price_amendments` without `Prefer: resolution=merge-duplicates` | Without this header, a second write creates a duplicate row and breaks the unique constraint |
 | Omitting `colOrder` from AI-generated invoice JSON | Include `colOrder` listing paper-invoice column names left-to-right so display matches paper |
+| Ignoring carton-style UOM (`CAR12 PCS`, `CTN 40U`, `BTE18`) | It means 1 carton of N pieces — qty counts cartons; per-piece price = carton price ÷ N (`detectUnitPackSize`) |
+| Dividing `buyPlusVat` by pack count unconditionally | Some AI invoices stored it pre-divided — always run `needsPackDivide` (ratio vs line amount) first |

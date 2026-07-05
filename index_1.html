@@ -1600,6 +1600,49 @@ function detectPackSize(desc){
   return null;
 }
 
+// ── UNIT-COLUMN PACK SIZE ───────────────────────────────────────────────────
+// Pack size from carton-style UOM/unit notations, when the description itself
+// has no pack pattern. "1 carton of N pieces" is written many ways:
+//   Vaulbert:  "CAR12 PCS", "CAR 24PCS"     Dywada: "CTN 40U", "CTN 12U"
+//   Tenfa:     "CTN12", "BTE18" (boîte)     generic: "CTN X 12", "12 PCS/CTN"
+// Deliberately NOT matched: plain "Piece"/"Unit", bare "CT" (Innodis — handled
+// by its own carton rule), and Lim How's "C30"-style unit codes (their
+// "Price (Ex)" is already per piece; dividing would corrupt it).
+function detectUnitPackSize(inv,row){
+  var cols=inv.cols||[];
+  var vals=[];
+  cols.forEach(function(c,i){
+    if(/^(uom|um|unit|units)$/i.test(String(c).trim()))vals.push(String(row[i]||""));
+  });
+  if(inv.qtyCol!=null)vals.push(String(row[inv.qtyCol]||""));
+  for(var i=0;i<vals.length;i++){
+    var m=vals[i].match(/\b(?:car|ctn|crt|box|bte|case|cs)\s*[x×]?\s*(\d+)/i);
+    if(m&&parseInt(m[1],10)>1)return parseInt(m[1],10);
+    m=vals[i].match(/(\d+)\s*(?:pcs?|pieces?|units?|u)\s*(?:\/|\bper\b)\s*(?:car|ctn|crt|box|bte|case|cs)/i);
+    if(m&&parseInt(m[1],10)>1)return parseInt(m[1],10);
+  }
+  return null;
+}
+
+// Decides whether a pack-level division by packN is still needed for a
+// pre-computed or unit-price value. The AI has stored buyPlusVat at CARTON
+// level on some invoices (Vaulbert SI25919) and already per-PIECE on others
+// (Vaulbert SI26635, all Tenfa) — so never divide blindly. Compare the value
+// against the line's own amount-per-qty:
+//   ratio ≈ 1      → value is at carton level  → divide
+//   ratio ≈ packN  → value is already per piece → leave it
+// With packs of 4+ the two cases never overlap, even with 15% VAT and
+// discounts in the mix. No reference amount → trust the contract (pack level).
+function needsPackDivide(inv,row,val,packN){
+  if(!packN||packN<=1)return false;
+  if(val==null||isNaN(val)||val<=0)return false;
+  var amt=parseFloat(row[inv.amountCol]);
+  var qty=(inv.qtyCol!=null)?(parseFloat(row[inv.qtyCol])||1):1;
+  if(isNaN(amt)||amt<=0||qty<=0)return true;
+  var r=(amt/qty)/val;
+  return r<packN*0.5;
+}
+
 // ── VAT RATE DETECTION ──────────────────────────────────────────────────────
 // Determines whether VAT is already included in the invoice line totals.
 // Returns 1.15 (VAT must be added) or 1.0 (VAT already included).
@@ -1641,7 +1684,7 @@ function detectVatRate(inv){
 var ITEM_FIELD_LABELS={
   // Description / product identification
   description:"Description",product:"Product",name:"Name",item:"Item",
-  code:"Code",sku:"SKU",
+  code:"Code",sku:"SKU",gtin:"GTIN",no:"No.",productNo:"Product No.",
   // Quantity variants
   qty:"Qty",quantity:"Qty",totalUnits:"Total Units",noOfCtns:"No of CTNS",
   qtyKg:"Qty/kg",units:"Units",pieces:"Pcs",pcs:"Pcs",
@@ -1651,6 +1694,7 @@ var ITEM_FIELD_LABELS={
   unitWt:"Unit Wt",
   // Price columns
   unitPrice:"Unit Price",unitPriceExcl:"Unit Price (Excl. VAT)",price:"Price",
+  unitPriceExclVat:"Unit Price (Excl. VAT)",
   priceEx:"Price (Ex)",totalUnitPrice:"Total Unit Price",
   // Net VAT / Net Amount (Grays)
   netVat:"Net VAT",netAmount:"Net Amount",
@@ -1658,6 +1702,7 @@ var ITEM_FIELD_LABELS={
   rsp:"RSP",
   // Exempt / taxable split
   exempted:"Exempted",taxable:"Taxable",vatType:"VAT Type",vatCode:"VAT Code",
+  vatId:"VAT ID",
   // Discounts / taxes
   disc:"Disc%",discount:"Discount",discAmt:"Disc. Amt",discPct:"Disc %",
   tax:"Tax",petTax:"PET Tax",
@@ -1666,6 +1711,8 @@ var ITEM_FIELD_LABELS={
   total:"Total",totalRs:"Total (Rs)",totalExcl:"Total (Excl. VAT)",
   totalExclVat:"Total (Excl. VAT)",totalInclVat:"Total (Incl. VAT)",
   amountExcl:"Amount (Excl)",itemAmt:"Amount",exclVat:"Excl. VAT",
+  lineAmount:"Line Amount",lineAmountExcl:"Line Amt (Excl. VAT)",
+  lineAmountExclVat:"Line Amt (Excl. VAT)",
 };
 // Fields present in every item but not shown as invoice columns (computed values)
 // buyPlusVat/recPrice are computed prices; the others are Claude audit fields.
@@ -1676,21 +1723,22 @@ var ITEM_FIELD_ORDER=[
   // RSP (Freelance, Grays — first column on paper)
   "rsp",
   // Identification
-  "description","product","name","item","code","sku",
+  "description","product","name","item","code","sku","gtin","no","productNo",
   // Quantity / carton counts
   "qty","quantity","totalUnits","noOfCtns","qtyKg","units","ctns","pieces","pcs",
   // Pack info
   "packSize","packs","uom","um","pcb","unit","unitWt",
   // Prices
-  "unitPrice","unitPriceExcl","priceEx","price","totalUnitPrice",
+  "unitPrice","unitPriceExcl","unitPriceExclVat","priceEx","price","totalUnitPrice",
   // Exempt / taxable / VAT type (butcher-style columns)
-  "exempted","taxable","vatType","vatCode",
+  "exempted","taxable","vatType","vatCode","vatId",
   // Discounts and taxes per line
   "disc","discount","discAmt","discPct","tax","petTax","vat","vatAmt","vatPct",
   // Net VAT (Grays)
   "netVat",
   // Line totals
-  "exclVat","total","totalExcl","totalExclVat","totalInclVat","totalRs","amountExcl","itemAmt","netAmount"
+  "exclVat","total","totalExcl","totalExclVat","totalInclVat","totalRs","amountExcl","itemAmt","netAmount",
+  "lineAmount","lineAmountExcl","lineAmountExclVat"
 ];
 
 // Converts new "items"-format invoices (pushed by Claude AI) to the legacy
@@ -1761,7 +1809,8 @@ function normalizeInv(inv){
   var AMT_KEYS=[
     "total","amountExcl","itemAmt","totalPayable",   // legacy
     "totalRs","totalExcl","totalExclVat","totalInclVat", // ocean, eagle, moroil variants
-    "taxable","itemTotal","lineTotal","netTotal","amount","totalInclDisc"
+    "taxable","itemTotal","lineTotal","netTotal","amount","totalInclDisc",
+    "lineAmountExclVat","lineAmountExcl","lineAmount"  // Vaulbert variants
   ];
   var amountCol=displayFields.length>0?displayFields.length-1:0;
   var _amtMatched=false;
@@ -1832,12 +1881,14 @@ function buildSuppliers(rows){
 }
 function calcRec(inv,ri,row,supMeta){
   // ── New-format invoices: pre-computed by Claude AI ──────────────────────
-  // Divide by pack size extracted from description so we get per-UNIT cost.
+  // Divide by pack size to get per-UNIT cost: description pattern first, then
+  // carton-style UOM ("CAR12 PCS", "CTN 40U", "BTE18"). needsPackDivide()
+  // decides carton-level vs already-per-piece — the AI has stored both.
   if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].buyPlusVat!=null){
     var bv=inv._precomputed[ri].buyPlusVat;
     var descNew=String(row[0]||""); // col 0 is always "Description" for normalised invoices
-    var N=detectPackSize(descNew);
-    return(N&&N>1)?bv/N:bv;
+    var N=detectPackSize(descNew)||detectUnitPackSize(inv,row);
+    return needsPackDivide(inv,row,bv,N)?bv/N:bv;
   }
   // Returns BUYING PRICE + VAT (cost per unit inclusive of VAT, no margin)
   const cols=inv.cols||[];
@@ -1930,8 +1981,20 @@ function calcRec(inv,ri,row,supMeta){
   // Unit prc excl vat generic
   const unitExclIdx=cols.findIndex(function(c){return c.toLowerCase()==="unit prc excl vat";});
 
-  if(ucpIdx>=0){const v=parseFloat(row[ucpIdx]);if(!isNaN(v))return v*vat;}
+  // "Price/Unit" first — explicitly per piece, never pack-divided
+  // (Vaulbert: 117.35/pc while "Unit Price" 1451.76 is the CARTON price)
   if(puIdx>=0){const v=parseFloat(row[puIdx]);if(!isNaN(v))return v*vat;}
+  // "Unit Price" may be per carton — divide by pack col / UOM pack when the
+  // ratio against the line amount confirms it's carton-level
+  if(ucpIdx>=0){
+    const v=parseFloat(row[ucpIdx]);
+    if(!isNaN(v)){
+      let uN=null;
+      if(inv.packCol!==null&&inv.packCol!==undefined){uN=parseFloat(row[inv.packCol])||null;}
+      else{uN=detectUnitPackSize(inv,row);}
+      return needsPackDivide(inv,row,v,uN)?(v*vat)/uN:v*vat;
+    }
+  }
   if(priceExIdx>=0){const v=parseFloat(row[priceExIdx]);if(!isNaN(v))return v*vat;}
   if(unitExclIdx>=0){const v=parseFloat(row[unitExclIdx]);if(!isNaN(v))return v*vat;}
 
@@ -1944,13 +2007,13 @@ function calcRec(inv,ri,row,supMeta){
     const _amtIsInclVat=/incl\.?\s*vat|total\s*incl|inc\s*vat|amount\s*incl/.test(_amtColName);
     const _effectiveVat=_amtIsInclVat?1.0:vat;
     var basePrice=(amt/qty/pack)*_effectiveVat;
-    // If no explicit pack column, check description for NxWEIGHT pack size
+    // If no explicit pack column, check description for NxWEIGHT pack size,
+    // then carton-style UOM notation ("CAR12 PCS", "CTN 40U", "BTE18")
     if(inv.packCol===null||inv.packCol===undefined){
       const di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
-      if(di>=0){
-        var N=detectPackSize(String(row[di]||""));
-        if(N&&N>1)return basePrice/N;
-      }
+      var N=di>=0?detectPackSize(String(row[di]||"")):null;
+      if(!N)N=detectUnitPackSize(inv,row);
+      if(N&&N>1)return basePrice/N;
     }
     return basePrice;
   }
@@ -1976,6 +2039,13 @@ function rowVatFactor(inv,row){
   if(vpIdx>=0){
     var p=parseFloat(row[vpIdx]);
     if(!isNaN(p))return p>1.5?1+p/100:(p>0?1+p:1.0);
+  }
+  // Vaulbert-style "VAT ID" code column: S = standard 15%, Z/E = zero-rated/exempt
+  var viIdx=cols.findIndex(function(c){return /^vat\s*id$/i.test(String(c).trim());});
+  if(viIdx>=0){
+    var code=String(row[viIdx]||"").trim().toUpperCase();
+    if(code==="S")return 1.15;
+    if(code==="Z"||code==="E")return 1.0;
   }
   var exIdx=cols.findIndex(function(c){return /^exempted$/i.test(String(c).trim());});
   var txIdx=cols.findIndex(function(c){return /^taxable$/i.test(String(c).trim());});
@@ -2012,10 +2082,12 @@ function extractPriceDetail(inv,ri,row,supMeta){
   var pack=(inv.packCol!=null)?(parseFloat(row[inv.packCol])||1):1;
   var di=cols.findIndex(function(c){return DESC_KEYS.indexOf(c.toLowerCase())>=0;});
 
-  // Pack size from description (when no explicit packCol)
+  // Pack size (when no explicit packCol): description pattern first, then
+  // carton-style UOM notation ("CAR12 PCS", "CTN 40U", "BTE18", ...)
   var packN=null;
-  if((inv.packCol===null||inv.packCol===undefined)&&di>=0){
-    var pn=detectPackSize(String(row[di]||""));
+  if(inv.packCol===null||inv.packCol===undefined){
+    var pn=di>=0?detectPackSize(String(row[di]||"")):null;
+    if(!pn)pn=detectUnitPackSize(inv,row);
     if(pn&&pn>1)packN=pn;
   }
   function packDivide(v){return packN?v/packN:v;}
@@ -2027,24 +2099,44 @@ function extractPriceDetail(inv,ri,row,supMeta){
            method:method,qty:qty,packN:packN};
   }
 
-  // 1. Pre-computed buyPlusVat — highest confidence (AI-processed invoice)
+  // 1. Pre-computed buyPlusVat — highest confidence (AI-processed invoice).
+  //    needsPackDivide() decides carton-level vs already-per-piece, because the
+  //    AI has stored both variants (see the function's comment).
   if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].buyPlusVat!=null){
-    var incl1=packDivide(inv._precomputed[ri].buyPlusVat);
+    var bv1=inv._precomputed[ri].buyPlusVat;
+    var incl1=needsPackDivide(inv,row,bv1,packN)?bv1/packN:bv1;
     return make(incl1,rvf!=null?incl1/rvf:null,"ai");
   }
 
-  // 2. Explicit excl-VAT unit price column — the raw value IS the excl price
-  //    Matches: "Unit Price Excl", "Unit Prc Excl Vat", "Price (Ex)", "UCP", "Unit Disc Prc Excl Vat"
+  // 2a. Explicit per-UNIT price column ("Price/Unit" — Vaulbert, Dywada):
+  //     already per piece, never pack-divided. Dywada's Price/Unit is incl-VAT
+  //     and both suppliers store vatRate 1.0, so ×vat is a no-op there.
+  var puIdx2=cols.findIndex(function(c){return /^price\s*\/\s*unit$/i.test(String(c).trim());});
+  if(puIdx2>=0){
+    var puV=parseFloat(row[puIdx2]);
+    if(!isNaN(puV)&&puV>0){
+      var puIncl=puV*vat;
+      return make(puIncl,rvf!=null?puIncl/rvf:null,"unit-col");
+    }
+  }
+
+  // 2b. Explicit excl-VAT unit price column — the raw value IS the excl price.
+  //     May be per piece (Dywada) or per carton (Vaulbert) — needsPackDivide
+  //     tells them apart against the line amount.
+  //    Matches: "Unit Price Excl", "Unit Price (Excl.)", "Unit Prc Excl Vat", "Price (Ex)", "UCP"
   var exclIdx=cols.findIndex(function(c){
     var cl=c.toLowerCase().trim();
-    return /^(unit\s*pric?e?\s*(excl|ex\b|ex\s*vat)|price\s*\(ex\)|ucp|unit\s*prc\s*excl)/.test(cl);
+    return /^(unit\s*pric?e?\s*\(?\s*(excl|ex\b|ex\s*vat)|price\s*\(ex\)|ucp|unit\s*prc\s*excl)/.test(cl);
   });
   if(exclIdx>=0){
     // Prefer discounted unit price when it exists
     var discIdx=cols.findIndex(function(c){return/unit\s*disc\s*prc\s*excl|disc.*unit.*prc/.test(c.toLowerCase());});
     var rawV=(discIdx>=0)?parseFloat(row[discIdx]):NaN;
     if(isNaN(rawV)||rawV<=0)rawV=parseFloat(row[exclIdx]);
-    if(!isNaN(rawV)&&rawV>0)return make(packDivide(rawV*vat),packDivide(rawV),"unit-col");
+    if(!isNaN(rawV)&&rawV>0){
+      var div2=needsPackDivide(inv,row,rawV,packN)?packN:1;
+      return make((rawV*vat)/div2,rawV/div2,"unit-col");
+    }
   }
 
   // 3a. RR Rapid: items sold by the dozen — divide qty by dozen size
@@ -3078,7 +3170,7 @@ function App(){
                             if(matchedRows[inv.id]&&matchedRows[inv.id].indexOf(ri)<0)return null;
                             const rec=calcRec(inv,ri,row,sup.meta);
                             // New-format invoices carry a pre-computed recPrice; use it if available
-                            var rec20;if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].recPrice!=null){var rp=inv._precomputed[ri].recPrice;var _N=detectPackSize(String(row[0]||""));rec20=(_N&&_N>1)?rp/_N:rp;}else{rec20=rec!==null?rec*1.2:null;}
+                            var rec20;if(inv._precomputed&&inv._precomputed[ri]&&inv._precomputed[ri].recPrice!=null){var rp=inv._precomputed[ri].recPrice;var _bv=inv._precomputed[ri].buyPlusVat;var _N=detectPackSize(String(row[0]||""))||detectUnitPackSize(inv,row);rec20=needsPackDivide(inv,row,_bv!=null?_bv:rp,_N)?rp/_N:rp;}else{rec20=rec!==null?rec*1.2:null;}
                             const spKey=invKey+"||"+ri+"||sp";const ntKey=invKey+"||"+ri+"||nt";
                             const spVal=cellEdits[spKey]!==undefined?cellEdits[spKey]:(rec20!==null?fmt(rec20):"");
                             const ntVal=cellEdits[ntKey]!==undefined?cellEdits[ntKey]:"";
